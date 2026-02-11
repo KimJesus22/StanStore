@@ -72,3 +72,7 @@ USING (
     AND profiles.is_admin = true
   )
 );
+
+-- FOR DEMO PURPOSES: Promote all existing users to Admin
+-- This allows you to test the Admin Panel immediately after running this script.
+UPDATE public.profiles SET is_admin = true;

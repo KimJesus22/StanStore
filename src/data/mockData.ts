@@ -2,7 +2,7 @@ import { Product } from '../types';
 
 export const mockProducts: Product[] = [
     {
-        id: '1',
+        id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b5c',
         name: 'Map of the Soul: 7',
         price: 29.99,
         image_url: '/images/mots7.jpg',
@@ -12,7 +12,7 @@ export const mockProducts: Product[] = [
         description: 'El cuarto álbum de estudio de BTS, "Map of the Soul: 7", es un viaje introspectivo que explora los siete años de carrera del grupo. Incluye éxitos como "ON" y "Black Swan". Versión aleatoria.',
     },
     {
-        id: '2',
+        id: 'f1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5d',
         name: 'NewJeans 2nd EP "Get Up"',
         price: 24.50,
         image_url: '/images/getup.jpg',
@@ -22,7 +22,7 @@ export const mockProducts: Product[] = [
         description: 'El segundo EP de NewJeans, "Get Up", presenta una mezcla refrescante de pop y R&B. Incluye las canciones "Super Shy", "ETA" y "Cool With You". El paquete incluye photobook y stickers.',
     },
     {
-        id: '3',
+        id: 'a1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5e',
         name: 'Caratbong V3',
         price: 55.00,
         image_url: '/images/caratbong.jpg',
@@ -32,7 +32,7 @@ export const mockProducts: Product[] = [
         description: 'La versión 3 del lightstick oficial de Seventeen. Cuenta con un diseño elegante y mayor brillo. Sincronizable con la app oficial para conciertos.',
     },
     {
-        id: '4',
+        id: 'b1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5f',
         name: 'BORN PINK World Tour Hoodie',
         price: 65.00,
         image_url: '/images/bp-hoodie.jpg',
@@ -42,7 +42,7 @@ export const mockProducts: Product[] = [
         description: 'Hoodie oficial del tour mundial BORN PINK de BLACKPINK. Fabricado con algodón de alta calidad, cómodo y estiloso. Diseño exclusivo del tour.',
     },
     {
-        id: '5',
+        id: 'c1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b60',
         name: '5-STAR (Limited Ver.)',
         price: 32.00,
         image_url: '/images/5-star.jpg',
@@ -52,7 +52,7 @@ export const mockProducts: Product[] = [
         description: 'Edición limitada del álbum "5-STAR" de Stray Kids. Incluye photocards especiales, póster y beneficios de preventa. Un must-have para cualquier Stay.',
     },
     {
-        id: '6',
+        id: 'd1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b61',
         name: 'CANDYBONG ∞',
         price: 58.00,
         image_url: '/images/candybong.jpg',

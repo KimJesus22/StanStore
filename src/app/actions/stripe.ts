@@ -31,14 +31,34 @@ export async function createCheckoutSession(cartItems: { id: string; quantity: n
                 continue; // Skip invalid items
             }
 
+            // Stripe requires absolute URLs. 
+            // Also, Stripe cannot access localhost images, so we only send images if they are from a public URL.
+            // For now, we'll try to constructs a valid URL, but if it's localhost, Stripe might warn or fail to display it.
+            // To be safe, let's only send images if they start with http/https and NOT localhost, 
+            // OR if we are in production.
+
+            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+            let imageUrl = product.image_url;
+
+            if (imageUrl && !imageUrl.startsWith('http')) {
+                imageUrl = `${baseUrl}${imageUrl}`;
+            }
+
+            // Filter out localhost images to prevent Stripe errors if it tries to validate reachability
+            // (Stripe sometimes errors on unreachable URLs)
+            const validImages = [];
+            if (imageUrl && !imageUrl.includes('localhost') && !imageUrl.includes('127.0.0.1')) {
+                validImages.push(imageUrl);
+            }
+
             lineItems.push({
                 price_data: {
-                    currency: 'usd',
+                    currency: 'mxn', // Changed to MXN as per user's card limitation error
                     product_data: {
                         name: product.name,
-                        images: product.image_url ? [product.image_url] : [],
+                        images: validImages,
                     },
-                    unit_amount: Math.round(product.price * 100), // Stripe expects cents
+                    unit_amount: Math.round(product.price * 100), // Stripe expects cents, so 29.99 becomes $29.99 MXN
                 },
                 quantity: item.quantity,
             });

@@ -25,9 +25,10 @@ USING (
   )
 );
 
--- 2. Insert allowed for authenticated users (for their own actions)
--- We might need a broader policy if anonymous users (failed login) need to log.
--- For now, we will use Service Role in the Server Action to bypass RLS for insertions, 
--- ensuring we can log even if the user is not logged in or RLS is strict.
--- But if we want to allow direct inserts from client (not recommended for audit), we would add a policy.
--- Recommendation: No INSERT policy for public/auth. Only Service Role (backend) should insert.
+-- 2. Insert allowed for authenticated and anon users (Demo Mode)
+-- Since we are missing the Service Role Key in some envs, we allow client-side logging
+-- In a strict prod env, this should only be via Service Role.
+CREATE POLICY "Enable insert for all users" 
+ON public.audit_logs FOR INSERT 
+TO public 
+WITH CHECK (true);

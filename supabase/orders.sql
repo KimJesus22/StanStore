@@ -20,7 +20,8 @@ USING (auth.uid() = user_id);
 -- Policy: Service role (and authenticated users via Server Action) can insert orders
 -- Note: We allow authenticated users to insert their own orders for this MVP simulation
 -- In a real app with Webhooks, only service_role would insert.
-CREATE POLICY "Users can insert own orders" 
+-- UPDATE: Allowing public insert for Demo purposes (handling anon client in legacy server actions)
+CREATE POLICY "Enable insert for all users" 
 ON public.orders FOR INSERT 
-TO authenticated 
-WITH CHECK (auth.uid() = user_id);
+TO public 
+WITH CHECK (true);

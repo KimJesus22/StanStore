@@ -1,7 +1,8 @@
--- Insert initial data based on mockData.ts
-INSERT INTO public.products (name, price, image_url, category, artist, is_new, description)
+-- Insert initial data based on mockData.ts with fixed UUIDs
+INSERT INTO public.products (id, name, price, image_url, category, artist, is_new, description)
 VALUES
   (
+    'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b5c',
     'Map of the Soul: 7',
     29.99,
     '/images/mots7.jpg',
@@ -11,6 +12,7 @@ VALUES
     'El cuarto álbum de estudio de BTS, "Map of the Soul: 7", es un viaje introspectivo que explora los siete años de carrera del grupo. Incluye éxitos como "ON" y "Black Swan". Versión aleatoria.'
   ),
   (
+    'f1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5d',
     'NewJeans 2nd EP "Get Up"',
     24.50,
     '/images/getup.jpg',
@@ -20,6 +22,7 @@ VALUES
     'El segundo EP de NewJeans, "Get Up", presenta una mezcla refrescante de pop y R&B. Incluye las canciones "Super Shy", "ETA" y "Cool With You". El paquete incluye photobook y stickers.'
   ),
   (
+    'a1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5e',
     'Caratbong V3',
     55.00,
     '/images/caratbong.jpg',
@@ -29,6 +32,7 @@ VALUES
     'La versión 3 del lightstick oficial de Seventeen. Cuenta con un diseño elegante y mayor brillo. Sincronizable con la app oficial para conciertos.'
   ),
   (
+    'b1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5f',
     'BORN PINK World Tour Hoodie',
     65.00,
     '/images/bp-hoodie.jpg',
@@ -38,6 +42,7 @@ VALUES
     'Hoodie oficial del tour mundial BORN PINK de BLACKPINK. Fabricado con algodón de alta calidad, cómodo y estiloso. Diseño exclusivo del tour.'
   ),
   (
+    'c1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b60',
     '5-STAR (Limited Ver.)',
     32.00,
     '/images/5-star.jpg',
@@ -47,6 +52,7 @@ VALUES
     'Edición limitada del álbum "5-STAR" de Stray Kids. Incluye photocards especiales, póster y beneficios de preventa. Un must-have para cualquier Stay.'
   ),
   (
+    'd1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b61',
     'CANDYBONG ∞',
     58.00,
     '/images/candybong.jpg',
@@ -54,4 +60,5 @@ VALUES
     'TWICE',
     TRUE,
     'El nuevo lightstick oficial de TWICE, CANDYBONG Infinity. Diseño mejorado con panel táctil y nuevos modos de iluminación. Perfecto para iluminar los estadios.'
-  );
+  )
+ON CONFLICT (id) DO NOTHING;
