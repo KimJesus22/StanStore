@@ -153,89 +153,121 @@ const LinkButton = styled.button`
   }
 `;
 
+const ErrorMessage = styled.span`
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
+  margin-left: 0.5rem;
+`;
+
 export default function AuthModal() {
-    const { isAuthModalOpen, closeAuthModal } = useAuthStore();
-    const [isSignUp, setIsSignUp] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
+  const { isAuthModalOpen, closeAuthModal } = useAuthStore();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    if (!isAuthModalOpen) return null;
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setLoading(true);
+  if (!isAuthModalOpen) return null;
 
-        try {
-            if (isSignUp) {
-                const { error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                });
-                if (error) throw error;
-                toast.success('¡Registro exitoso! Revisa tu email para confirmar.');
-                closeAuthModal();
-            } else {
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
-                if (error) throw error;
-                toast.success('¡Bienvenido de nuevo!');
-                closeAuthModal();
-            }
-        } catch (error: any) {
-            toast.error(error.message || 'Ocurrió un error');
-        } finally {
-            setLoading(false);
-        }
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setErrors({});
+    setLoading(true);
+
+    try {
+      // 1. Zod Validation
+      const { LoginSchema, RegisterSchema } = await import('@/lib/validations');
+      const schema = isSignUp ? RegisterSchema : LoginSchema;
+
+      const result = schema.safeParse({ email, password });
+
+      if (!result.success) {
+        const fieldErrors = result.error.flatten().fieldErrors;
+        setErrors({
+          email: fieldErrors.email?.[0],
+          password: fieldErrors.password?.[0],
+        });
+        setLoading(false);
+        return;
+      }
+
+      // 2. Supabase Action
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast.success('¡Registro exitoso! Revisa tu email para confirmar.');
+        closeAuthModal();
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast.success('¡Bienvenido de nuevo!');
+        closeAuthModal();
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Ocurrió un error');
+    } finally {
+      setLoading(false);
     }
+  }
 
-    return (
-        <Overlay onClick={(e) => e.target === e.currentTarget && closeAuthModal()}>
-            <Modal>
-                <CloseButton onClick={closeAuthModal} aria-label="Cerrar">
-                    <X size={20} />
-                </CloseButton>
+  return (
+    <Overlay onClick={(e) => e.target === e.currentTarget && closeAuthModal()}>
+      <Modal>
+        <CloseButton onClick={closeAuthModal} aria-label="Cerrar">
+          <X size={20} />
+        </CloseButton>
 
-                <Title>{isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión'}</Title>
+        <Title>{isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión'}</Title>
 
-                <Form onSubmit={handleSubmit}>
-                    <InputGroup>
-                        <IconWrapper><Mail size={18} /></IconWrapper>
-                        <Input
-                            type="email"
-                            placeholder="Correo electrónico"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </InputGroup>
+        <Form onSubmit={handleSubmit}>
+          <InputGroup>
+            <IconWrapper><Mail size={18} /></IconWrapper>
+            <Input
+              type="email"
+              placeholder="Correo electrónico"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{ borderColor: errors.email ? '#ef4444' : '#e0e0e0' }}
+            />
+            {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
+          </InputGroup>
 
-                    <InputGroup>
-                        <IconWrapper><Lock size={18} /></IconWrapper>
-                        <Input
-                            type="password"
-                            placeholder="Contraseña"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            minLength={6}
-                            required
-                        />
-                    </InputGroup>
+          <InputGroup>
+            <IconWrapper><Lock size={18} /></IconWrapper>
+            <Input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              minLength={6}
+              required
+              style={{ borderColor: errors.password ? '#ef4444' : '#e0e0e0' }}
+            />
+            {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+          </InputGroup>
 
-                    <Button type="submit" disabled={loading}>
-                        {loading ? <Loader2 className="animate-spin" size={20} /> : (isSignUp ? 'Registrarse' : 'Entrar')}
-                    </Button>
-                </Form>
+          <Button type="submit" disabled={loading}>
+            {loading ? <Loader2 className="animate-spin" size={20} /> : (isSignUp ? 'Registrarse' : 'Entrar')}
+          </Button>
+        </Form>
 
-                <Footer>
-                    {isSignUp ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}
-                    <LinkButton onClick={() => setIsSignUp(!isSignUp)} type="button">
-                        {isSignUp ? 'Inicia sesión' : 'Regístrate'}
-                    </LinkButton>
-                </Footer>
-            </Modal>
-        </Overlay>
-    );
+        <Footer>
+          {isSignUp ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}
+          <LinkButton onClick={() => setIsSignUp(!isSignUp)} type="button">
+            {isSignUp ? 'Inicia sesión' : 'Regístrate'}
+          </LinkButton>
+        </Footer>
+      </Modal>
+    </Overlay>
+  );
 }

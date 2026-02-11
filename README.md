@@ -53,6 +53,12 @@ Proyecto de e-commerce moderno enfocado en mercancía de K-pop (MVP), construido
   - Los usuarios pueden ver el detalle de sus compras pasadas en `/profile`.
   - Los items se guardan como JSON para mantener un registro histórico inmutable (por si los precios cambian después).
 
+### 🛡️ Seguridad (Hardening)
+- **Input Validation**: Esquemas estrictos con `Zod` para evitar datos malformados en Login/Registro.
+- **Security Headers**: Middleware configurado con `Content-Security-Policy`, `X-Frame-Options` (anti-clickjacking) y más.
+- **Rate Limiting**: Limitación de peticiones por IP en APIs críticas para mitigar fuerza bruta.
+- **Protección XSS**: Renderizado seguro por defecto en React y sanitización de inputs.
+
 ## 📂 Estructura del Proyecto
 
 - `src/app`: Rutas de Next.js.
