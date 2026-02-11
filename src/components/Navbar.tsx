@@ -85,32 +85,32 @@ const RelativeContainer = styled.div`
 `;
 
 export default function Navbar() {
-    const items = useCartStore((state) => state.items);
-    const [mounted, setMounted] = useState(false);
+  const { items, toggleCart } = useCartStore();
+  const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
+  const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
-    return (
-        <Nav>
-            <Logo href="/">StanStore</Logo>
-            <IconsContainer>
-                <IconWrapper aria-label="Buscar">
-                    <Search />
-                </IconWrapper>
-                <IconWrapper aria-label="Carrito">
-                    <RelativeContainer>
-                        <ShoppingCart />
-                        {mounted && totalItems > 0 && <Badge>{totalItems}</Badge>}
-                    </RelativeContainer>
-                </IconWrapper>
-                <IconWrapper aria-label="Perfil">
-                    <User />
-                </IconWrapper>
-            </IconsContainer>
-        </Nav>
-    );
+  return (
+    <Nav>
+      <Logo href="/">StanStore</Logo>
+      <IconsContainer>
+        <IconWrapper aria-label="Buscar">
+          <Search />
+        </IconWrapper>
+        <IconWrapper aria-label="Carrito" onClick={toggleCart}>
+          <RelativeContainer>
+            <ShoppingCart />
+            {mounted && totalItems > 0 && <Badge>{totalItems}</Badge>}
+          </RelativeContainer>
+        </IconWrapper>
+        <IconWrapper aria-label="Perfil">
+          <User />
+        </IconWrapper>
+      </IconsContainer>
+    </Nav>
+  );
 }

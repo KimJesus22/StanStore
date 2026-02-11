@@ -3,7 +3,16 @@
 import styled from 'styled-components';
 import { Product } from '@/types';
 import { useCartStore } from '@/store/useCartStore';
+import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
+import toast from 'react-hot-toast';
+
+const CardLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  width: 100%;
+`;
 
 const Card = styled.div`
   display: flex;
@@ -111,34 +120,47 @@ const AddButton = styled.button`
 `;
 
 interface ProductCardProps {
-    product: Product;
+  product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-    const addToCart = useCartStore((state) => state.addToCart);
+  const addToCart = useCartStore((state) => state.addToCart);
 
-    const handleAddToCart = (e: React.MouseEvent) => {
-        e.stopPropagation(); // Evitar navegar al detalle del producto si se hace click en el botón
-        addToCart(product);
-    };
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Evitar navegar al detalle del producto si se hace click en el botón
+    addToCart(product);
+    toast.success('Producto añadido correctamente', {
+      style: {
+        border: '1px solid #10CFBD',
+        padding: '16px',
+        color: '#111',
+      },
+      iconTheme: {
+        primary: '#10CFBD',
+        secondary: '#FFFAEE',
+      },
+    });
+  };
 
-    return (
-        <Card>
-            <ImageContainer>
-                <img src={product.image_url} alt={product.name} loading="lazy" />
-            </ImageContainer>
-            <Artist>{product.artist}</Artist>
-            <ProductName>{product.name}</ProductName>
-            <Footer>
-                <Price>${product.price.toFixed(2)}</Price>
-                <AddButton
-                    className="add-to-cart-btn"
-                    onClick={handleAddToCart}
-                    aria-label="Añadir al carrito"
-                >
-                    <ShoppingBag size={16} />
-                </AddButton>
-            </Footer>
-        </Card>
-    );
+  return (
+    <CardLink href={`/product/${product.id}`}>
+      <Card>
+        <ImageContainer>
+          <img src={product.image_url} alt={product.name} loading="lazy" />
+        </ImageContainer>
+        <Artist>{product.artist}</Artist>
+        <ProductName>{product.name}</ProductName>
+        <Footer>
+          <Price>${product.price.toFixed(2)}</Price>
+          <AddButton
+            className="add-to-cart-btn"
+            onClick={handleAddToCart}
+            aria-label="Añadir al carrito"
+          >
+            <ShoppingBag size={16} />
+          </AddButton>
+        </Footer>
+      </Card>
+    </CardLink>
+  );
 }

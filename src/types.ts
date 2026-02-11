@@ -6,4 +6,5 @@ export interface Product {
     category: 'album' | 'lightstick' | 'merch';
     artist: 'BTS' | 'NewJeans' | 'Seventeen' | 'BLACKPINK' | 'TWICE' | 'Stray Kids' | string;
     is_new: boolean;
+    description?: string;
 }

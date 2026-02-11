@@ -1,0 +1,280 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { useParams, useRouter } from 'next/navigation';
+import { mockProducts } from '@/data/mockData';
+import { useCartStore } from '@/store/useCartStore';
+import { Minus, Plus, ShoppingBag, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import toast from 'react-hot-toast';
+
+const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  display: flex;
+  gap: 4rem;
+  min-height: 80vh;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 2rem 1rem;
+    gap: 2rem;
+  }
+`;
+
+const ImageWrapper = styled.div`
+  flex: 1;
+  background-color: #fca5a5;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  aspect-ratio: 1 / 1;
+  position: relative;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+`;
+
+const InfoWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const BackLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #111;
+  }
+`;
+
+const Artist = styled.h2`
+  font-size: 1.25rem;
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+`;
+
+const ProductName = styled.h1`
+  font-size: 3rem;
+  font-weight: 800;
+  color: #111;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+`;
+
+const Price = styled.div`
+  font-size: 2rem;
+  font-weight: 700;
+  color: #10CFBD;
+  margin-bottom: 2rem;
+`;
+
+const Description = styled.p`
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #444;
+  margin-bottom: 3rem;
+`;
+
+const Controls = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+const QuantitySelector = styled.div`
+  display: flex;
+  align-items: center;
+  border: 1px solid #e0e0e0;
+  border-radius: 50px;
+  padding: 0.5rem;
+  background-color: #fff;
+`;
+
+const QtyButton = styled.button`
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+`;
+
+const QtyValue = styled.span`
+  width: 40px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+`;
+
+const AddToCartButton = styled.button`
+  flex: 1;
+  background-color: #111;
+  color: white;
+  border: none;
+  height: 56px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: transform 0.2s, background-color 0.2s;
+  padding: 0 2rem;
+
+  &:hover {
+    transform: translateY(-2px);
+    background-color: #000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const NotFoundContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 2rem;
+`;
+
+export default function ProductPage() {
+  const params = useParams();
+  const router = useRouter();
+  const { addToCart } = useCartStore();
+  const [quantity, setQuantity] = useState(1);
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (params?.id) {
+      const foundProduct = mockProducts.find((p) => p.id === params.id);
+      setProduct(foundProduct || null);
+      setLoading(false);
+    }
+  }, [params?.id]);
+
+  const handleQuantityChange = (delta: number) => {
+    setQuantity((prev) => Math.max(1, prev + delta));
+  };
+
+  const handleAddToCart = () => {
+    if (product) {
+      for (let i = 0; i < quantity; i++) {
+        addToCart(product);
+      }
+
+      toast.success(`Añadido ${quantity} ${quantity === 1 ? 'producto' : 'productos'} al carrito`, {
+        style: {
+          border: '1px solid #10CFBD',
+          padding: '16px',
+          color: '#111',
+        },
+        iconTheme: {
+          primary: '#10CFBD',
+          secondary: '#FFFAEE',
+        },
+      });
+    }
+  };
+
+  if (loading) return null;
+
+  if (!product) {
+    return (
+      <NotFoundContainer>
+        <h1 style={{ marginBottom: '1rem', fontSize: '2rem' }}>Producto no encontrado</h1>
+        <p style={{ marginBottom: '2rem', color: '#666' }}>Lo sentimos, el producto que buscas no existe.</p>
+        <Link href="/" passHref>
+          <AddToCartButton as="a" style={{ display: 'inline-flex', maxWidth: '200px' }}>
+            Volver al inicio
+          </AddToCartButton>
+        </Link>
+      </NotFoundContainer>
+    );
+  }
+
+  return (
+    <Container>
+      <ImageWrapper>
+        <img src={product.image_url} alt={product.name} />
+      </ImageWrapper>
+
+      <InfoWrapper>
+        <BackLink href="/">
+          <ArrowLeft size={20} />
+          Volver
+        </BackLink>
+
+        <Artist>{product.artist}</Artist>
+        <ProductName>{product.name}</ProductName>
+        <Price>${product.price.toFixed(2)}</Price>
+
+        <Description>
+          {product.description || "Sin descripción disponible para este producto."}
+        </Description>
+
+        <Controls>
+          <QuantitySelector>
+            <QtyButton onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}>
+              <Minus size={18} />
+            </QtyButton>
+            <QtyValue>{quantity}</QtyValue>
+            <QtyButton onClick={() => handleQuantityChange(1)}>
+              <Plus size={18} />
+            </QtyButton>
+          </QuantitySelector>
+
+          <AddToCartButton onClick={handleAddToCart}>
+            <ShoppingBag size={20} />
+            Añadir al Carrito
+          </AddToCartButton>
+        </Controls>
+      </InfoWrapper>
+    </Container>
+  );
+}

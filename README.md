@@ -1,46 +1,46 @@
 # StanStore
 
-E-commerce portfolio project focused on K-pop merchandise, built with modern web technologies.
+Proyecto de portafolio de e-commerce enfocado en mercancía de K-pop, construido con tecnologías web modernas.
 
-## Tech Stack
+## Tecnologías Utilizadas
 
 - **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Styled Components](https://styled-components.com/) (Server-Side Rendering configured)
-- **State Management**: [Zustand](https://github.com/pmndrs/zustand) (with `persist` middleware)
-- **Icons**: [Lucide React](https://lucide.dev/)
+- **Lenguaje**: [TypeScript](https://www.typescriptlang.org/)
+- **Estilos**: [Styled Components](https://styled-components.com/) (Configurado con SSR)
+- **Manejo de Estado**: [Zustand](https://github.com/pmndrs/zustand) (con middleware `persist`)
+- **Iconos**: [Lucide React](https://lucide.dev/)
 
-## Features
+## Características
 
-- **Responsive Design**: Mobile-first approach for all components.
-- **Product Grid**: Dynamic grid layout for displaying products.
-- **Cart System**:
-  - Add to cart functionality.
-  - Persistent storage using `localStorage`.
-  - Dynamic cart badge in Navbar.
-- **Interactive UI**:
-  - Hover effects on product cards.
-  - Smooth transitions.
+- **Diseño Responsivo**: Enfoque mobile-first para todos los componentes.
+- **Grilla de Productos**: Diseño dinámico para mostrar productos.
+- **Sistema de Carrito**:
+  - Funcionalidad de agregar al carrito.
+  - Almacenamiento persistente usando `localStorage`.
+  - Distintivo (badge) dinámico en la barra de navegación.
+- **Interfaz Interactiva**:
+  - Efectos hover en tarjetas de productos.
+  - Transiciones suaves.
 
-## Project Structure
+## Estructura del Proyecto
 
-- `src/app`: App Router pages and layouts.
-- `src/components`: Reusable UI components (`Navbar`, `ProductCard`).
-- `src/store`: Global state management (`useCartStore`).
-- `src/data`: Mock data for development.
-- `src/lib`: Utility configurations (e.g., Styled Components registry).
-- `src/types.ts`: TypeScript interfaces.
+- `src/app`: Páginas y layouts de App Router.
+- `src/components`: Componentes de UI reutilizables (`Navbar`, `ProductCard`).
+- `src/store`: Manejo de estado global (`useCartStore`).
+- `src/data`: Datos de prueba para desarrollo.
+- `src/lib`: Configuraciones de utilidades (ej. registro de Styled Components).
+- `src/types.ts`: Interfaces de TypeScript.
 
-## Getting Started
+## Comenzando
 
-1.  Install dependencies:
+1.  Instala las dependencias:
     ```bash
     npm install
     ```
 
-2.  Run the development server:
+2.  Ejecuta el servidor de desarrollo:
     ```bash
     npm run dev
     ```
 
-3.  Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3.  Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver el resultado.
