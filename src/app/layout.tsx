@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import StyledComponentsRegistry from "@/lib/registry";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
+import AuthProvider from "@/components/AuthProvider";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
@@ -20,9 +21,11 @@ export default function RootLayout({
       <body>
         <StyledComponentsRegistry>
           <Toaster position="bottom-center" />
-          <Navbar />
-          <CartDrawer />
-          {children}
+          <AuthProvider>
+            <Navbar />
+            <CartDrawer />
+            {children}
+          </AuthProvider>
         </StyledComponentsRegistry>
       </body>
     </html>

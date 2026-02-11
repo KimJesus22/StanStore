@@ -84,15 +84,29 @@ const RelativeContainer = styled.div`
   align-items: center;
 `;
 
+import { useAuthStore } from '@/store/useAuthStore';
+import { useRouter } from 'next/navigation';
+
 export default function Navbar() {
   const { items, toggleCart } = useCartStore();
+  const { user, openAuthModal, signOut } = useAuthStore();
   const [mounted, setMounted] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
+
+  const handleProfileClick = () => {
+    if (user) {
+      router.push('/profile');
+    } else {
+      openAuthModal();
+    }
+  };
 
   return (
     <Nav>
@@ -107,9 +121,20 @@ export default function Navbar() {
             {mounted && totalItems > 0 && <Badge>{totalItems}</Badge>}
           </RelativeContainer>
         </IconWrapper>
-        <IconWrapper aria-label="Perfil">
-          <User />
-        </IconWrapper>
+
+        {mounted ? (
+          <IconWrapper
+            aria-label={user ? "Mi Perfil" : "Iniciar Sesión"}
+            onClick={handleProfileClick}
+            title={user ? user.email || "Usuario" : "Iniciar Sesión"}
+          >
+            <User color={user ? "#10CFBD" : "#333"} />
+          </IconWrapper>
+        ) : (
+          <IconWrapper>
+            <User />
+          </IconWrapper>
+        )}
       </IconsContainer>
     </Nav>
   );

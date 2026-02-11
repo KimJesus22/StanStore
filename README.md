@@ -40,6 +40,12 @@ Proyecto de e-commerce moderno enfocado en mercancía de K-pop (MVP), construido
 - **Notificaciones Toast**: Confirmaciones visuales no intrusivas al realizar acciones.
 - **Manejo de Errores**: Fallbacks visuales y notificaciones en caso de error de red.
 
+### 🔐 Autenticación y Seguridad
+- **Registro y Login**: Sistema completo con correo/contraseña usando Supabase Auth.
+- **Estado Global**: Manejo de sesión con Zustand (`useAuthStore`).
+- **Rutas Protegidas**: Redirección automática en el cliente para páginas privadas como `/profile`.
+- **Row Level Security (RLS)**: Las políticas de base de datos aseguran que la data sensible esté protegida en el origen.
+
 ## 📂 Estructura del Proyecto
 
 - `src/app`: Rutas de Next.js.
