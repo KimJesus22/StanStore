@@ -1,94 +1,89 @@
-# StanStore
+# StanStore 🎵 | E-commerce Seguro y Moderno
 
-Proyecto de e-commerce moderno enfocado en mercancía de K-pop (MVP), construido con Next.js 15, TypeScript y Supabase.
+![Estado del Despliegue](https://img.shields.io/badge/deploy-vercel-black?style=for-the-badge&logo=vercel)
+![Licencia](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
 
-**[🌐 Ver Demo en Vivo](https://stan-store.vercel.app/)**
+**StanStore** es una plataforma de comercio electrónico moderna enfocada en mercancía exclusiva. Este proyecto no solo es una tienda funcional, sino una **demostración de ingeniería de software segura**, implementando las mejores prácticas de ciberseguridad en el desarrollo web moderno.
 
-## 🚀 Tecnologías
+![Dashboard Preview](./public/screenshots/preview.png)
+*(Reemplaza esta imagen con una captura real de tu interfaz)*
 
-- **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
-- **Lenguaje**: [TypeScript](https://www.typescriptlang.org/)
-- **Base de Datos**: [Supabase](https://supabase.com/) (PostgreSQL)
-- **Estilos**: [Styled Components](https://styled-components.com/) (Configurado con SSR)
-- **Estado Global**: [Zustand](https://github.com/pmndrs/zustand) (con persistencia en `localStorage`)
-- **Iconos**: [Lucide React](https://lucide.dev/)
-- **Notificaciones**: [React Hot Toast](https://react-hot-toast.com/)
+## 🚀 Tecnologías (Tech Stack)
 
-## ✨ Características Implementadas
+Este proyecto está construido sobre una arquitectura robusta, escalable y segura:
 
-### 🛍️ Experiencia de Compra
-- **Diseño Responsivo**: Interfaz adaptada a móviles y escritorio.
-- **Grilla de Productos**: Visualización dinámica de items con efectos hover.
-- **Filtrado por Categoría**: Filtros dinámicos por artista en la página de inicio.
-- **Detalle de Producto**: Página individual (`/product/[id]`) con descripción, selector de cantidad y botones de acción.
+-   **Frontend**: [Next.js 15 (App Router)](https://nextjs.org/) - Renderizado híbrido (SSR/CSR) y Server Actions.
+-   **Lenguaje**: [TypeScript](https://www.typescriptlang.org/) - Tipado estático estricto para reducir bugs en tiempo de ejecución.
+-   **Base de Datos**: [Supabase](https://supabase.com/) (PostgreSQL) - Persistencia de datos relacional y autenticación.
+-   **Pagos**: [Stripe](https://stripe.com/) - Procesamiento de pagos seguro y cumplimiento de PCI-DSS (vía delegación).
+-   **Estilos**: [Styled Components](https://styled-components.com/) - CSS-in-JS con aislamiento de estilos y temas dinámicos.
+-   **Validación**: [Zod](https://zod.dev/) - Validación de esquemas en tiempo de ejecución.
 
-### 🛒 Gestión del Carrito (Drawer)
-- **Panel Deslizante**: Acceso rápido al carrito sin salir de la página.
-- **Persistencia**: Los items se guardan localmente para no perder la sesión.
-- **Acciones**:
-  - Añadir productos (desde tarjeta o detalle).
-  - Eliminar items individuales.
-  - Cálculo automático del total.
-  - Auto-apertura al añadir productos.
+---
 
-### 🗄️ Backend (Supabase)
-- **Base de Datos Real**: Los productos se obtienen de una tabla `products` en Supabase.
-- **Resiliencia**: Si la conexión falla o no hay credenciales, la app usa automáticamente datos de prueba (`mockData`) para no romper la experiencia.
-- **Scripts SQL**: En la carpeta `/supabase` encontrarás los scripts para replicar la estructura (`schema.sql`) y datos (`seed.sql`).
+## 🛡️ Ingeniería de Seguridad (Security Hardening)
 
-### 🔔 Feedback de Usuario
-- **Notificaciones Toast**: Confirmaciones visuales no intrusivas al realizar acciones.
-- **Manejo de Errores**: Fallbacks visuales y notificaciones en caso de error de red.
+Como proyecto enfocado en la ciberseguridad, se han implementado múltiples capas de defensa en profundidad según el top 10 de OWASP:
 
-### 🔐 Autenticación y Seguridad
-- **Registro y Login**: Sistema completo con correo/contraseña usando Supabase Auth.
-- **Estado Global**: Manejo de sesión con Zustand (`useAuthStore`).
-- **Rutas Protegidas**: Redirección automática en el cliente para páginas privadas como `/profile`.
-- **Row Level Security (RLS)**: Las políticas de base de datos aseguran que la data sensible esté protegida en el origen.
+### 1. Validación de Entrada (Input Validation)
+Todos los datos de entrada (formularios de login, registro, búsqueda) son **estrictamente validados y sanitizados** utilizando esquemas **Zod** antes de ser procesados.
+-   *Prevención*: Inyección SQL (parcialmente cubierto por ORM), NoSQL Injection y datos malformados.
+-   *Implementación*: `src/lib/validations.ts`.
 
-### 💳 Pagos y Pedidos
-- **Stripe Checkout**: Integración segura para procesar pagos.
-- **Historial de Compras**:
-  - Los pedidos se guardan automáticamente en Supabase tras el pago exitoso.
-  - Los usuarios pueden ver el detalle de sus compras pasadas en `/profile`.
-  - Los items se guardan como JSON para mantener un registro histórico inmutable (por si los precios cambian después).
+### 2. Cabeceras de Seguridad HTTP (Security Headers)
+Se ha configurado un **Middleware** personalizado para inyectar cabeceras de seguridad en todas las respuestas:
+-   **Content-Security-Policy (CSP)**: Restringe las fuentes de ejecución de scripts (solo dominios confiables como Stripe/Supabase), mitigando ataques **XSS**.
+-   **X-Frame-Options: DENY**: Previene ataques de **Clickjacking**.
+-   **X-Content-Type-Options: nosniff**: Evita que el navegador "adivine" tipos MIME (MIME Sniffing).
+-   **Referrer-Policy**: Protege la privacidad del usuario al navegar fuera del sitio.
 
-### 🛡️ Seguridad (Hardening)
-- **Input Validation**: Esquemas estrictos con `Zod` para evitar datos malformados en Login/Registro.
-- **Security Headers**: Middleware configurado con `Content-Security-Policy`, `X-Frame-Options` (anti-clickjacking) y más.
-- **Rate Limiting**: Limitación de peticiones por IP en APIs críticas para mitigar fuerza bruta.
-- **Protección XSS**: Renderizado seguro por defecto en React y sanitización de inputs.
+### 3. Rate Limiting (Protección Anti-Brute Force)
+Implementación de un algoritmo de **Token Bucket** (en memoria para demo) en el Middleware para proteger endpoints críticos (`/api/*`, Server Actions) contra ataques de fuerza bruta y denegación de servicio (DoS).
+-   *Límite*: 20 peticiones por minuto por IP.
 
-## 📂 Estructura del Proyecto
+### 4. Autenticación y Autorización (IAM)
+-   **Row Level Security (RLS)**: La seguridad se aplica a nivel del motor de base de datos (PostgreSQL). Incluso si una consulta SQL es inyectada, el atacante no puede ver datos que no le pertenecen.
+-   **Server-Side Validation**: Las sesiones de pago de Stripe se crean exclusivamente en el servidor, validando los precios contra la base de datos para evitar la manipulación de precios en el cliente (Price Tampering).
 
-- `src/app`: Rutas de Next.js.
-- `src/components`: Componentes reutilizables.
-- `src/store`: Lógica de estado global.
-- `src/lib`: Cliente de Supabase y configuraciones.
-- `supabase/`: Scripts SQL para la base de datos.
+---
 
-## 🛠️ Instalación y Configuración
+## 📸 Galería
 
-1.  **Clonar y configurar dependencias**:
+| Perfil de Usuario | Carrito de Compras | Pasarela de Pago |
+|:---:|:---:|:---:|
+| ![Perfil](./public/screenshots/profile.png) | ![Carrito](./public/screenshots/cart.png) | ![Stripe](./public/screenshots/stripe.png) |
+
+---
+
+## 🛠️ Instalación Local
+
+Sigue estos pasos para desplegar el entorno de desarrollo:
+
+1.  **Clonar el repositorio**:
     ```bash
-    git clone <tu-repo>
+    git clone https://github.com/tu-usuario/StanStore.git
+    cd StanStore
+    ```
+
+2.  **Instalar dependencias**:
+    ```bash
     npm install
     ```
 
-2.  **Configurar Variables de Entorno**:
-    Crea un archivo `.env.local` con tus credenciales de Supabase:
+3.  **Configurar Variables de Entorno**:
+    Crea un archivo `.env.local` en la raíz y añade tus claves:
     ```bash
-    NEXT_PUBLIC_SUPABASE_URL=tu_url_aqui
-    NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key_aqui
+    NEXT_PUBLIC_SUPABASE_URL=tu_url
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+    STRIPE_SECRET_KEY=sk_test_...
     ```
 
-3.  **Iniciar servidor de desarrollo**:
+4.  **Ejecutar servidor de desarrollo**:
     ```bash
     npm run dev
     ```
 
-## 🚀 Despliegue en Vercel
+## 📄 Licencia
 
-1.  Importa el proyecto en Vercel desde GitHub.
-2.  En "Environment Variables", añade las mismas variables que en tu `.env.local`.
-3.  ¡Despliega! La configuración de build (`npm run build`) es automática.
+Este proyecto está bajo la Licencia MIT - siéntete libre de usarlo para aprendizaje.
