@@ -6,6 +6,7 @@ import { useCartStore } from '@/store/useCartStore';
 import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 const CardLink = styled(Link)`
   text-decoration: none;
@@ -14,20 +15,16 @@ const CardLink = styled(Link)`
   width: 100%;
 `;
 
-const Card = styled.div`
+const Card = styled(motion.div)`
   display: flex;
   flex-direction: column;
   background-color: transparent;
   width: 100%;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  position: relative; /* Para posicionar elementos si fuera necesario */
+  position: relative;
   padding-bottom: 10px;
 
-  &:hover {
-    transform: translateY(-5px);
-  }
-
+  /* Remove CSS hover since we use framer motion, but keep child selector logic if needed */
   &:hover .add-to-cart-btn {
     opacity: 1;
     transform: translateY(0);
@@ -87,7 +84,7 @@ const Price = styled.div`
   color: #10CFBD;
 `;
 
-const AddButton = styled.button`
+const AddButton = styled(motion.button)`
   background-color: #111;
   color: #fff;
   border: none;
@@ -99,19 +96,12 @@ const AddButton = styled.button`
   justify-content: center;
   cursor: pointer;
   opacity: 0; 
-  transform: translateY(10px);
-  transition: all 0.2s ease;
+  /* transform is handled by class selector in CSS mostly, but we can animate scale with framer */
   
-  /* Clase para el selector del hover del padre */
   &.add-to-cart-btn {
-    /* Estado inicial */
+    /* Estado inicial controlable por CSS del padre */
   }
 
-  &:hover {
-    background-color: #10CFBD;
-    transform: scale(1.1) !important;
-  }
-  
   /* En móvil, mostrar siempre */
   @media (max-width: 768px) {
     opacity: 1;
@@ -121,13 +111,15 @@ const AddButton = styled.button`
 
 interface ProductCardProps {
   product: Product;
+  index?: number; // Para staggered animation
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const addToCart = useCartStore((state) => state.addToCart);
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Evitar navegar al detalle del producto si se hace click en el botón
+    e.preventDefault(); // Prevent Link navigation
+    e.stopPropagation();
     addToCart(product);
     toast.success('Producto añadido correctamente', {
       style: {
@@ -144,7 +136,12 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <CardLink href={`/product/${product.id}`}>
-      <Card>
+      <Card
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: index * 0.1 }}
+        whileHover={{ scale: 1.05 }}
+      >
         <ImageContainer>
           <img src={product.image_url} alt={product.name} loading="lazy" />
         </ImageContainer>
@@ -156,6 +153,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="add-to-cart-btn"
             onClick={handleAddToCart}
             aria-label="Añadir al carrito"
+            whileHover={{ scale: 1.1, backgroundColor: "#10CFBD" }}
+            whileTap={{ scale: 0.9 }}
           >
             <ShoppingBag size={16} />
           </AddButton>

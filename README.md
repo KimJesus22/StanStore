@@ -44,6 +44,15 @@ Implementación de un algoritmo de **Token Bucket** (en memoria para demo) en el
 ### 4. Autenticación y Autorización (IAM)
 -   **Row Level Security (RLS)**: La seguridad se aplica a nivel del motor de base de datos (PostgreSQL). Incluso si una consulta SQL es inyectada, el atacante no puede ver datos que no le pertenecen.
 -   **Server-Side Validation**: Las sesiones de pago de Stripe se crean exclusivamente en el servidor, validando los precios contra la base de datos para evitar la manipulación de precios en el cliente (Price Tampering).
+-   **Gestión de Productos**: Formulario para crear nuevos productos directamente en Supabase.
+-   **RLS Avanzado**: Políticas de seguridad que solo permiten `INSERT` si el usuario tiene `is_admin = true`.
+
+### 🔍 Búsqueda Avanzada
+-   **Debounce**: Input optimizado que evita peticiones innecesarias mientras el usuario escribe (`useDebounce` hook).
+-   **Filtro Potente**: Búsqueda insensible a mayúsculas/minúsculas (`ilike`) en nombre, artista y categoría.
+-   **UX**: Sugerencias automáticas cuando no hay resultados.
+
+## 📂 Estructura del Proyecto
 
 ---
 

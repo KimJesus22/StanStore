@@ -5,8 +5,9 @@ import { useCartStore } from '@/store/useCartStore';
 import { X, Trash2, ShoppingBag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const Overlay = styled.div<{ $isOpen: boolean }>`
+const Overlay = styled(motion.div)`
   position: fixed;
   top: 0;
   left: 0;
@@ -14,12 +15,9 @@ const Overlay = styled.div<{ $isOpen: boolean }>`
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
-  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
-  visibility: ${({ $isOpen }) => ($isOpen ? 'visible' : 'hidden')};
-  transition: opacity 0.3s ease, visibility 0.3s ease;
 `;
 
-const Drawer = styled.div<{ $isOpen: boolean }>`
+const Drawer = styled(motion.div)`
   position: fixed;
   top: 0;
   right: 0;
@@ -28,8 +26,6 @@ const Drawer = styled.div<{ $isOpen: boolean }>`
   height: 100%;
   background-color: #fff;
   z-index: 1000;
-  transform: translateX(${({ $isOpen }) => ($isOpen ? '0' : '100%')});
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -85,7 +81,7 @@ const EmptyState = styled.div`
   gap: 1rem;
 `;
 
-const CartItem = styled.div`
+const CartItem = styled(motion.div)`
   display: flex;
   gap: 1rem;
   align-items: center;
@@ -167,7 +163,7 @@ const TotalRow = styled.div`
   font-weight: 700;
 `;
 
-const CheckoutButton = styled.button`
+const CheckoutButton = styled(motion.button)`
   width: 100%;
   background-color: #111;
   color: white;
@@ -177,11 +173,6 @@ const CheckoutButton = styled.button`
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #000;
-  }
   
   &:disabled {
     background-color: #ccc;
@@ -229,59 +220,85 @@ export default function CartDrawer() {
   };
 
   return (
-    <>
-      <Overlay $isOpen={isCartOpen} onClick={closeCart} />
-      <Drawer $isOpen={isCartOpen} onClick={(e) => e.stopPropagation()}>
-        <Header>
-          <Title>Tu Carrito ({items.length})</Title>
-          <CloseButton onClick={closeCart}>
-            <X size={24} />
-          </CloseButton>
-        </Header>
-
-        {items.length === 0 ? (
-          <EmptyState>
-            <ShoppingBag size={48} style={{ opacity: 0.2 }} />
-            <p>Tu carrito está vacío</p>
-          </EmptyState>
-        ) : (
-          <Content>
-            {items.map((item) => (
-              <CartItem key={item.id}>
-                <ItemImage>
-                  <img src={item.image_url} alt={item.name} />
-                </ItemImage>
-                <ItemDetails>
-                  <ItemName>{item.name}</ItemName>
-                  <ItemArtist>{item.artist}</ItemArtist>
-                  <ItemPrice>
-                    ${item.price.toFixed(2)} x {item.quantity}
-                  </ItemPrice>
-                </ItemDetails>
-                <RemoveButton
-                  onClick={() => removeFromCart(item.id)}
-                  aria-label="Eliminar producto"
-                >
-                  <Trash2 size={18} />
-                </RemoveButton>
-              </CartItem>
-            ))}
-          </Content>
-        )}
-
-        <Footer>
-          <TotalRow>
-            <span>Total</span>
-            <span>${total.toFixed(2)}</span>
-          </TotalRow>
-          <CheckoutButton
-            disabled={items.length === 0 || checkoutLoading}
-            onClick={handleCheckout}
+    <AnimatePresence>
+      {isCartOpen && (
+        <>
+          <Overlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeCart}
+          />
+          <Drawer
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            onClick={(e) => e.stopPropagation()}
           >
-            {checkoutLoading ? 'Redirigiendo...' : 'Pagar Ahora con Stripe'}
-          </CheckoutButton>
-        </Footer>
-      </Drawer>
-    </>
+            <Header>
+              <Title>Tu Carrito ({items.length})</Title>
+              <CloseButton onClick={closeCart}>
+                <X size={24} />
+              </CloseButton>
+            </Header>
+
+            {items.length === 0 ? (
+              <EmptyState>
+                <ShoppingBag size={48} style={{ opacity: 0.2 }} />
+                <p>Tu carrito está vacío</p>
+              </EmptyState>
+            ) : (
+              <Content>
+                <AnimatePresence mode="popLayout">
+                  {items.map((item) => (
+                    <CartItem
+                      key={item.id}
+                      layout
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ItemImage>
+                        <img src={item.image_url} alt={item.name} />
+                      </ItemImage>
+                      <ItemDetails>
+                        <ItemName>{item.name}</ItemName>
+                        <ItemArtist>{item.artist}</ItemArtist>
+                        <ItemPrice>
+                          ${item.price.toFixed(2)} x {item.quantity}
+                        </ItemPrice>
+                      </ItemDetails>
+                      <RemoveButton
+                        onClick={() => removeFromCart(item.id)}
+                        aria-label="Eliminar producto"
+                      >
+                        <Trash2 size={18} />
+                      </RemoveButton>
+                    </CartItem>
+                  ))}
+                </AnimatePresence>
+              </Content>
+            )}
+
+            <Footer>
+              <TotalRow>
+                <span>Total</span>
+                <span>${total.toFixed(2)}</span>
+              </TotalRow>
+              <CheckoutButton
+                disabled={items.length === 0 || checkoutLoading}
+                onClick={handleCheckout}
+                whileHover={{ scale: 1.02, backgroundColor: '#000' }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {checkoutLoading ? 'Redirigiendo...' : 'Pagar Ahora con Stripe'}
+              </CheckoutButton>
+            </Footer>
+          </Drawer>
+        </>
+      )}
+    </AnimatePresence>
   );
 }

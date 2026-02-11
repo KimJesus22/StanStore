@@ -134,8 +134,8 @@ export default function Home() {
 
           {filteredProducts.length > 0 ? (
             <Grid>
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {filteredProducts.map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
               ))}
             </Grid>
           ) : (

@@ -132,8 +132,8 @@ function SearchResults() {
                         Quizás te interese
                     </SuggestionTitle>
                     <Grid>
-                        {mockProducts.slice(0, 3).map(product => (
-                            <ProductCard key={product.id} product={product} />
+                        {mockProducts.slice(0, 3).map((product, index) => (
+                            <ProductCard key={product.id} product={product} index={index} />
                         ))}
                     </Grid>
                 </Container>
@@ -149,8 +149,8 @@ function SearchResults() {
             </Header>
 
             <Grid>
-                {products.map(product => (
-                    <ProductCard key={product.id} product={product} />
+                {products.map((product, index) => (
+                    <ProductCard key={product.id} product={product} index={index} />
                 ))}
             </Grid>
         </Container>
