@@ -1,46 +1,75 @@
 # StanStore
 
-Proyecto de portafolio de e-commerce enfocado en mercancía de K-pop, construido con tecnologías web modernas.
+Proyecto de e-commerce moderno enfocado en mercancía de K-pop (MVP), construido con Next.js 15, TypeScript y Supabase.
 
-## Tecnologías Utilizadas
+**[🌐 Ver Demo en Vivo](https://stan-store.vercel.app/)**
+
+## 🚀 Tecnologías
 
 - **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
 - **Lenguaje**: [TypeScript](https://www.typescriptlang.org/)
+- **Base de Datos**: [Supabase](https://supabase.com/) (PostgreSQL)
 - **Estilos**: [Styled Components](https://styled-components.com/) (Configurado con SSR)
-- **Manejo de Estado**: [Zustand](https://github.com/pmndrs/zustand) (con middleware `persist`)
+- **Estado Global**: [Zustand](https://github.com/pmndrs/zustand) (con persistencia en `localStorage`)
 - **Iconos**: [Lucide React](https://lucide.dev/)
+- **Notificaciones**: [React Hot Toast](https://react-hot-toast.com/)
 
-## Características
+## ✨ Características Implementadas
 
-- **Diseño Responsivo**: Enfoque mobile-first para todos los componentes.
-- **Grilla de Productos**: Diseño dinámico para mostrar productos.
-- **Sistema de Carrito**:
-  - Funcionalidad de agregar al carrito.
-  - Almacenamiento persistente usando `localStorage`.
-  - Distintivo (badge) dinámico en la barra de navegación.
-- **Interfaz Interactiva**:
-  - Efectos hover en tarjetas de productos.
-  - Transiciones suaves.
+### 🛍️ Experiencia de Compra
+- **Diseño Responsivo**: Interfaz adaptada a móviles y escritorio.
+- **Grilla de Productos**: Visualización dinámica de items con efectos hover.
+- **Filtrado por Categoría**: Filtros dinámicos por artista en la página de inicio.
+- **Detalle de Producto**: Página individual (`/product/[id]`) con descripción, selector de cantidad y botones de acción.
 
-## Estructura del Proyecto
+### 🛒 Gestión del Carrito (Drawer)
+- **Panel Deslizante**: Acceso rápido al carrito sin salir de la página.
+- **Persistencia**: Los items se guardan localmente para no perder la sesión.
+- **Acciones**:
+  - Añadir productos (desde tarjeta o detalle).
+  - Eliminar items individuales.
+  - Cálculo automático del total.
+  - Auto-apertura al añadir productos.
 
-- `src/app`: Páginas y layouts de App Router.
-- `src/components`: Componentes de UI reutilizables (`Navbar`, `ProductCard`).
-- `src/store`: Manejo de estado global (`useCartStore`).
-- `src/data`: Datos de prueba para desarrollo.
-- `src/lib`: Configuraciones de utilidades (ej. registro de Styled Components).
-- `src/types.ts`: Interfaces de TypeScript.
+### 🗄️ Backend (Supabase)
+- **Base de Datos Real**: Los productos se obtienen de una tabla `products` en Supabase.
+- **Resiliencia**: Si la conexión falla o no hay credenciales, la app usa automáticamente datos de prueba (`mockData`) para no romper la experiencia.
+- **Scripts SQL**: En la carpeta `/supabase` encontrarás los scripts para replicar la estructura (`schema.sql`) y datos (`seed.sql`).
 
-## Comenzando
+### 🔔 Feedback de Usuario
+- **Notificaciones Toast**: Confirmaciones visuales no intrusivas al realizar acciones.
+- **Manejo de Errores**: Fallbacks visuales y notificaciones en caso de error de red.
 
-1.  Instala las dependencias:
+## 📂 Estructura del Proyecto
+
+- `src/app`: Rutas de Next.js.
+- `src/components`: Componentes reutilizables.
+- `src/store`: Lógica de estado global.
+- `src/lib`: Cliente de Supabase y configuraciones.
+- `supabase/`: Scripts SQL para la base de datos.
+
+## 🛠️ Instalación y Configuración
+
+1.  **Clonar y configurar dependencias**:
     ```bash
+    git clone <tu-repo>
     npm install
     ```
 
-2.  Ejecuta el servidor de desarrollo:
+2.  **Configurar Variables de Entorno**:
+    Crea un archivo `.env.local` con tus credenciales de Supabase:
+    ```bash
+    NEXT_PUBLIC_SUPABASE_URL=tu_url_aqui
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key_aqui
+    ```
+
+3.  **Iniciar servidor de desarrollo**:
     ```bash
     npm run dev
     ```
 
-3.  Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver el resultado.
+## 🚀 Despliegue en Vercel
+
+1.  Importa el proyecto en Vercel desde GitHub.
+2.  En "Environment Variables", añade las mismas variables que en tu `.env.local`.
+3.  ¡Despliega! La configuración de build (`npm run build`) es automática.
