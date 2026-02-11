@@ -85,11 +85,14 @@ const RelativeContainer = styled.div`
 `;
 
 import { useAuthStore } from '@/store/useAuthStore';
+import { useAdmin } from '@/hooks/useAdmin';
 import { useRouter } from 'next/navigation';
+import { Shield } from 'lucide-react';
 
 export default function Navbar() {
   const { items, toggleCart } = useCartStore();
   const { user, openAuthModal, signOut } = useAuthStore();
+  const { isAdmin } = useAdmin();
   const [mounted, setMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
@@ -123,13 +126,24 @@ export default function Navbar() {
         </IconWrapper>
 
         {mounted ? (
-          <IconWrapper
-            aria-label={user ? "Mi Perfil" : "Iniciar Sesión"}
-            onClick={handleProfileClick}
-            title={user ? user.email || "Usuario" : "Iniciar Sesión"}
-          >
-            <User color={user ? "#10CFBD" : "#333"} />
-          </IconWrapper>
+          <>
+            {isAdmin && (
+              <IconWrapper
+                aria-label="Panel Administrador"
+                onClick={() => router.push('/admin')}
+                title="Panel de Administración"
+              >
+                <Shield />
+              </IconWrapper>
+            )}
+            <IconWrapper
+              aria-label={user ? "Mi Perfil" : "Iniciar Sesión"}
+              onClick={handleProfileClick}
+              title={user ? user.email || "Usuario" : "Iniciar Sesión"}
+            >
+              <User color={user ? "#10CFBD" : "#333"} />
+            </IconWrapper>
+          </>
         ) : (
           <IconWrapper>
             <User />

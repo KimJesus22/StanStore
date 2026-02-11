@@ -16,3 +16,12 @@ export const RegisterSchema = z.object({
 export const SearchSchema = z.object({
     query: z.string().trim().max(100, 'La búsqueda es demasiado larga').optional(),
 });
+
+export const ProductSchema = z.object({
+    name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
+    price: z.number().min(0.01, 'El precio debe ser mayor a 0'),
+    category: z.string().min(2, 'La categoría es requerida'),
+    artist: z.string().min(1, 'El artista es requerido'),
+    description: z.string().min(10, 'La descripción debe ser más detallada'),
+    image_url: z.string().url('Debe ser una URL válida'),
+});
