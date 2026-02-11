@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
+import { supabase } from '@/lib/supabaseClient';
 import styled from 'styled-components';
-import { User, LogOut, Package } from 'lucide-react';
+import { User, LogOut, Package, Calendar, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Container = styled.div`
@@ -24,6 +25,7 @@ const ProfileCard = styled.div`
   padding: 3rem;
   box-shadow: 0 10px 30px rgba(0,0,0,0.05);
   text-align: center;
+  margin-bottom: 2rem;
 `;
 
 const Avatar = styled.div`
@@ -51,29 +53,68 @@ const ID = styled.p`
   margin-bottom: 2rem;
 `;
 
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-bottom: 3rem;
+const SectionTitle = styled.h3`
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 `;
 
-const StatCard = styled.div`
-  background: #f9f9f9;
-  padding: 1.5rem;
+const OrdersList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+`;
+
+const OrderCard = styled.div`
+  background: #fff;
+  border: 1px solid #eee;
   border-radius: 12px;
-  
-  h3 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #111;
-    margin-bottom: 0.25rem;
+  padding: 1.5rem;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #10CFBD;
+    box-shadow: 0 4px 12px rgba(16, 207, 189, 0.1);
   }
-  
-  p {
-    color: #666;
-    font-size: 0.9rem;
-  }
+`;
+
+const OrderHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f5f5f5;
+`;
+
+const OrderDate = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+`;
+
+const OrderTotal = styled.div`
+  font-weight: 700;
+  color: #111;
+`;
+
+const OrderItems = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const OrderItemRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #444;
 `;
 
 const LogoutButton = styled.button`
@@ -88,6 +129,7 @@ const LogoutButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
+  margin-top: 1rem;
 
   &:hover {
     background: #ffebee;
@@ -95,55 +137,111 @@ const LogoutButton = styled.button`
   }
 `;
 
+interface Order {
+  id: string;
+  total: number;
+  status: string;
+  created_at: string;
+  items: any[];
+}
+
 export default function ProfilePage() {
-    const { user, isLoading, signOut, openAuthModal } = useAuthStore();
-    const router = useRouter();
+  const { user, isLoading, signOut, openAuthModal } = useAuthStore();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+  const router = useRouter();
 
-    useEffect(() => {
-        if (!isLoading && !user) {
-            toast.error('Debes iniciar sesión para ver tu perfil');
-            router.push('/');
-            setTimeout(() => openAuthModal(), 500);
+  useEffect(() => {
+    if (!isLoading && !user) {
+      toast.error('Debes iniciar sesión para ver tu perfil');
+      router.push('/');
+      setTimeout(() => openAuthModal(), 500);
+    }
+  }, [user, isLoading, router, openAuthModal]);
+
+  useEffect(() => {
+    async function fetchOrders() {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching orders:', error);
+        } else {
+          setOrders(data || []);
         }
-    }, [user, isLoading, router, openAuthModal]);
-
-    const handleLogout = async () => {
-        await signOut();
-        toast.success('Sesión cerrada correctamente');
-        router.push('/');
-    };
-
-    if (isLoading) {
-        return <Container><p style={{ textAlign: 'center' }}>Cargando perfil...</p></Container>;
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoadingOrders(false);
+      }
     }
 
-    if (!user) return null; // Redirect logic handles this, prevent flash
+    fetchOrders();
+  }, [user]);
 
-    return (
-        <Container>
-            <ProfileCard>
-                <Avatar>
-                    <User size={48} />
-                </Avatar>
-                <Email>{user.email}</Email>
-                <ID>ID: {user.id}</ID>
+  const handleLogout = async () => {
+    await signOut();
+    toast.success('Sesión cerrada correctamente');
+    router.push('/');
+  };
 
-                <StatsGrid>
-                    <StatCard>
-                        <h3>0</h3>
-                        <p>Pedidos Realizados</p>
-                    </StatCard>
-                    <StatCard>
-                        <h3>0</h3>
-                        <p>Lista de Deseos</p>
-                    </StatCard>
-                </StatsGrid>
+  if (isLoading || loadingOrders) {
+    return <Container><p style={{ textAlign: 'center' }}>Cargando perfil...</p></Container>;
+  }
 
-                <LogoutButton onClick={handleLogout}>
-                    <LogOut size={18} />
-                    Cerrar Sesión
-                </LogoutButton>
-            </ProfileCard>
-        </Container>
-    );
+  if (!user) return null;
+
+  return (
+    <Container>
+      <ProfileCard>
+        <Avatar>
+          <User size={48} />
+        </Avatar>
+        <Email>{user.email}</Email>
+        <ID>ID: {user.id}</ID>
+        <LogoutButton onClick={handleLogout}>
+          <LogOut size={18} />
+          Cerrar Sesión
+        </LogoutButton>
+      </ProfileCard>
+
+      <SectionTitle>
+        <Package color="#10CFBD" /> Mis Pedidos ({orders.length})
+      </SectionTitle>
+
+      <OrdersList>
+        {orders.length === 0 ? (
+          <p style={{ color: '#888', fontStyle: 'italic' }}>No has realizado ninguna compra aún.</p>
+        ) : (
+          orders.map((order) => (
+            <OrderCard key={order.id}>
+              <OrderHeader>
+                <OrderDate>
+                  <Calendar size={16} />
+                  {new Date(order.created_at).toLocaleDateString('es-ES', {
+                    year: 'numeric', month: 'long', day: 'numeric'
+                  })}
+                </OrderDate>
+                <OrderTotal>${Number(order.total).toFixed(2)}</OrderTotal>
+              </OrderHeader>
+              <OrderItems>
+                {Array.isArray(order.items) && order.items.map((item: any, index: number) => (
+                  <OrderItemRow key={index}>
+                    <span>{item.quantity}x {item.name}</span>
+                    <span>${(item.price * item.quantity).toFixed(2)}</span>
+                  </OrderItemRow>
+                ))}
+              </OrderItems>
+            </OrderCard>
+          ))
+        )}
+      </OrdersList>
+    </Container>
+  );
 }

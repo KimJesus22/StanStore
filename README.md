@@ -46,10 +46,12 @@ Proyecto de e-commerce moderno enfocado en mercancía de K-pop (MVP), construido
 - **Rutas Protegidas**: Redirección automática en el cliente para páginas privadas como `/profile`.
 - **Row Level Security (RLS)**: Las políticas de base de datos aseguran que la data sensible esté protegida en el origen.
 
-### 💳 Pagos (Stripe)
-- **Modo de Prueba**: Integración funcional con Stripe Checkout (Test Mode).
-- **Seguridad**: Los precios se validan en el servidor (`Server Action`) consultando la base de datos, impidiendo la manipulación desde el cliente.
-- **Flujo Completo**: Carrito -> Stripe Hosting -> Página de Éxito.
+### 💳 Pagos y Pedidos
+- **Stripe Checkout**: Integración segura para procesar pagos.
+- **Historial de Compras**:
+  - Los pedidos se guardan automáticamente en Supabase tras el pago exitoso.
+  - Los usuarios pueden ver el detalle de sus compras pasadas en `/profile`.
+  - Los items se guardan como JSON para mantener un registro histórico inmutable (por si los precios cambian después).
 
 ## 📂 Estructura del Proyecto
 
