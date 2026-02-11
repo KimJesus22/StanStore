@@ -222,8 +222,8 @@ export default function AuthModal() {
         toast.success('¡Bienvenido de nuevo!');
         closeAuthModal();
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Ocurrió un error');
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Ocurrió un error');
     } finally {
       setLoading(false);
     }

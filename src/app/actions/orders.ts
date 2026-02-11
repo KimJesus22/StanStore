@@ -48,8 +48,8 @@ export async function saveOrder(orderData: {
         }
 
         return { success: true, order: data };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Unexpected error saving order:', error);
-        return { success: false, error: 'Unexpected error: ' + error.message };
+        return { success: false, error: 'Unexpected error: ' + (error instanceof Error ? error.message : String(error)) };
     }
 }

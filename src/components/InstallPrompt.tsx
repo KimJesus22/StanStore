@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Download, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Banner = styled(motion.div)`
@@ -84,69 +84,71 @@ const CloseButton = styled.button`
 `;
 
 export default function InstallPrompt() {
-    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-    const [showBanner, setShowBanner] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showBanner, setShowBanner] = useState(false);
 
-    useEffect(() => {
-        const handler = (e: any) => {
-            // Prevent the mini-infobar from appearing on mobile
-            e.preventDefault();
-            // Stash the event so it can be triggered later.
-            setDeferredPrompt(e);
-            // Update UI notify the user they can install the PWA
-            setShowBanner(true);
-        };
-
-        window.addEventListener('beforeinstallprompt', handler);
-
-        return () => {
-            window.removeEventListener('beforeinstallprompt', handler);
-        };
-    }, []);
-
-    const handleInstallClick = async () => {
-        if (!deferredPrompt) return;
-
-        // Show the install prompt
-        deferredPrompt.prompt();
-
-        // Wait for the user to respond to the prompt
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
-
-        // We've used the prompt, and can't use it again, throw it away
-        setDeferredPrompt(null);
-        setShowBanner(false);
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handler = (e: any) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e);
+      // Update UI notify the user they can install the PWA
+      setShowBanner(true);
     };
 
-    const handleClose = () => {
-        setShowBanner(false);
+    window.addEventListener('beforeinstallprompt', handler);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
     };
+  }, []);
 
-    if (!showBanner) return null;
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
 
-    return (
-        <AnimatePresence>
-            <Banner
-                initial={{ y: 100, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 100, opacity: 0 }}
-                transition={{ type: 'spring', damping: 20 }}
-            >
-                <Content>
-                    <Icon>S</Icon>
-                    <Text>
-                        <Title>Instalar App</Title>
-                        <Subtitle>Accede más rápido y offline</Subtitle>
-                    </Text>
-                </Content>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <InstallButton onClick={handleInstallClick}>Instalar</InstallButton>
-                    <CloseButton onClick={handleClose}>
-                        <X size={18} />
-                    </CloseButton>
-                </div>
-            </Banner>
-        </AnimatePresence>
-    );
+    // Show the install prompt
+    deferredPrompt.prompt();
+
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+
+    // We've used the prompt, and can't use it again, throw it away
+    setDeferredPrompt(null);
+    setShowBanner(false);
+  };
+
+  const handleClose = () => {
+    setShowBanner(false);
+  };
+
+  if (!showBanner) return null;
+
+  return (
+    <AnimatePresence>
+      <Banner
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 100, opacity: 0 }}
+        transition={{ type: 'spring', damping: 20 }}
+      >
+        <Content>
+          <Icon>S</Icon>
+          <Text>
+            <Title>Instalar App</Title>
+            <Subtitle>Accede más rápido y offline</Subtitle>
+          </Text>
+        </Content>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <InstallButton onClick={handleInstallClick}>Instalar</InstallButton>
+          <CloseButton onClick={handleClose}>
+            <X size={18} />
+          </CloseButton>
+        </div>
+      </Banner>
+    </AnimatePresence>
+  );
 }

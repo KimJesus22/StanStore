@@ -2,7 +2,7 @@
 
 import styled from 'styled-components';
 import { Search, ShoppingCart, User, Shield, X } from 'lucide-react';
-import { Link, useRouter, usePathname } from '@/navigation';
+import { Link, useRouter } from '@/navigation';
 import { useCartStore } from '@/store/useCartStore';
 import { useEffect, useState, useRef } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';

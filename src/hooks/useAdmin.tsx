@@ -9,7 +9,6 @@ export function useAdmin() {
     const { user, isLoading: isAuthLoading } = useAuthStore();
     const [isAdmin, setIsAdmin] = useState(false);
     const [checking, setChecking] = useState(true);
-    const router = useRouter();
 
     useEffect(() => {
         async function checkAdmin() {

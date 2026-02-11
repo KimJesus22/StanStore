@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCartStore } from '../useCartStore';
 
@@ -8,9 +8,10 @@ const mockProduct = {
     name: 'Test Product',
     price: 100,
     image_url: 'http://example.com/image.jpg',
-    category: 'test',
+    category: 'merch' as const,
     artist: 'Test Artist',
     is_new: false,
+    stock: 10,
 };
 
 describe('useCartStore', () => {

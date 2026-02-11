@@ -7,7 +7,6 @@ import ProductCard from '@/components/ProductCard';
 import CategoryFilter from '@/components/CategoryFilter';
 import { supabase } from '@/lib/supabaseClient';
 import { Product } from '@/types';
-import toast from 'react-hot-toast';
 import { useTranslations } from 'next-intl';
 
 const Main = styled.main`

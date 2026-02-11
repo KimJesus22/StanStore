@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { supabase } from '@/lib/supabaseClient';
 import styled from 'styled-components';
-import { User, LogOut, Package, Calendar, ChevronRight } from 'lucide-react';
+import { User, LogOut, Package, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Container = styled.div`
@@ -142,6 +142,7 @@ interface Order {
   total: number;
   status: string;
   created_at: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   items: any[];
 }
 
@@ -231,6 +232,7 @@ export default function ProfilePage() {
                 <OrderTotal>${Number(order.total).toFixed(2)}</OrderTotal>
               </OrderHeader>
               <OrderItems>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {Array.isArray(order.items) && order.items.map((item: any, index: number) => (
                   <OrderItemRow key={index}>
                     <span>{item.quantity}x {item.name}</span>

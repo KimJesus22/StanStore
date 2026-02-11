@@ -1,7 +1,6 @@
 import { Metadata, ResolvingMetadata } from 'next';
 import { supabase } from '@/lib/supabaseClient';
 import ProductDetails from '@/components/ProductDetails';
-import { Product } from '@/types';
 
 type Props = {
   params: Promise<{ id: string }>

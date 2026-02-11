@@ -13,6 +13,7 @@ export async function createCheckoutSession(cartItems: { id: string; quantity: n
         }
 
         const stripe = new Stripe(stripeKey, {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             apiVersion: '2025-01-27.acacia' as any, // Bypass TS check for latest version
         });
 
@@ -84,9 +85,9 @@ export async function createCheckoutSession(cartItems: { id: string; quantity: n
         });
 
         return { url: session.url };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Stripe Error:', error);
-        await logAuditAction('CHECKOUT_SESSION_FAILED', { error: error.message });
+        await logAuditAction('CHECKOUT_SESSION_FAILED', { error: error instanceof Error ? error.message : String(error) });
         return { error: 'Error creating checkout session' };
     }
 }

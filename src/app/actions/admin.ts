@@ -54,9 +54,9 @@ export async function createProduct(formData: {
         revalidatePath('/');
         return { success: true, product: data };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Create Product Error:', error);
-        await logAuditAction('PRODUCT_CREATION_ERROR', { error: error.message });
+        await logAuditAction('PRODUCT_CREATION_ERROR', { error: error instanceof Error ? error.message : String(error) });
         return { success: false, error: 'Error inesperado al crear el producto' };
     }
 }

@@ -13,7 +13,7 @@ const supabaseAdmin = createClient(
 
 export async function logAuditAction(
     action: string,
-    details: Record<string, any> = {},
+    details: Record<string, unknown> = {},
     userId?: string
 ) {
     try {

@@ -118,7 +118,7 @@ function SearchResults() {
         return (
             <>
                 <Header>
-                    <Title>Sin resultados para <QueryText>"{query}"</QueryText></Title>
+                    <Title>Sin resultados para <QueryText>&ldquo;{query}&rdquo;</QueryText></Title>
                 </Header>
 
                 <EmptyState>
@@ -144,7 +144,7 @@ function SearchResults() {
     return (
         <Container>
             <Header>
-                <Title>Resultados para <QueryText>"{query}"</QueryText></Title>
+                <Title>Resultados para <QueryText>&ldquo;{query}&rdquo;</QueryText></Title>
                 <p>{products.length} {products.length === 1 ? 'producto encontrado' : 'productos encontrados'}</p>
             </Header>
 
