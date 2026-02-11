@@ -1,0 +1,58 @@
+import { Product } from '../types';
+
+export const mockProducts: Product[] = [
+    {
+        id: '1',
+        name: 'Map of the Soul: 7',
+        price: 29.99,
+        image_url: '/images/mots7.jpg',
+        category: 'album',
+        artist: 'BTS',
+        is_new: false,
+    },
+    {
+        id: '2',
+        name: 'NewJeans 2nd EP "Get Up"',
+        price: 24.50,
+        image_url: '/images/getup.jpg',
+        category: 'album',
+        artist: 'NewJeans',
+        is_new: true,
+    },
+    {
+        id: '3',
+        name: 'Caratbong V3',
+        price: 55.00,
+        image_url: '/images/caratbong.jpg',
+        category: 'lightstick',
+        artist: 'Seventeen',
+        is_new: true,
+    },
+    {
+        id: '4',
+        name: 'BORN PINK Word Tour Hoodie',
+        price: 65.00,
+        image_url: '/images/bornpink_hoodie.jpg',
+        category: 'merch',
+        artist: 'BLACKPINK',
+        is_new: false,
+    },
+    {
+        id: '5',
+        name: '5-STAR (Limited Ver.)',
+        price: 32.00,
+        image_url: '/images/5star.jpg',
+        category: 'album',
+        artist: 'Stray Kids',
+        is_new: false,
+    },
+    {
+        id: '6',
+        name: 'CANDYBONG ∞',
+        price: 58.00,
+        image_url: '/images/candybong.jpg',
+        category: 'lightstick',
+        artist: 'TWICE',
+        is_new: true,
+    },
+];
