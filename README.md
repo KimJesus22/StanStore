@@ -46,6 +46,11 @@ Proyecto de e-commerce moderno enfocado en mercancía de K-pop (MVP), construido
 - **Rutas Protegidas**: Redirección automática en el cliente para páginas privadas como `/profile`.
 - **Row Level Security (RLS)**: Las políticas de base de datos aseguran que la data sensible esté protegida en el origen.
 
+### 💳 Pagos (Stripe)
+- **Modo de Prueba**: Integración funcional con Stripe Checkout (Test Mode).
+- **Seguridad**: Los precios se validan en el servidor (`Server Action`) consultando la base de datos, impidiendo la manipulación desde el cliente.
+- **Flujo Completo**: Carrito -> Stripe Hosting -> Página de Éxito.
+
 ## 📂 Estructura del Proyecto
 
 - `src/app`: Rutas de Next.js.

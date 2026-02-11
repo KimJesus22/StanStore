@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useCartStore } from '@/store/useCartStore';
 import { X, Trash2, ShoppingBag } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 const Overlay = styled.div<{ $isOpen: boolean }>`
   position: fixed;
@@ -189,75 +190,98 @@ const CheckoutButton = styled.button`
 `;
 
 export default function CartDrawer() {
-    const { isCartOpen, closeCart, items, removeFromCart } = useCartStore();
-    const [mounted, setMounted] = useState(false);
+  const { isCartOpen, closeCart, items, removeFromCart } = useCartStore();
+  const [mounted, setMounted] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    if (!mounted) return null;
+  if (!mounted) return null;
 
-    const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-    const handleCheckout = () => {
-        // Mock checkout
-        alert(`Checkout procesado por $${total.toFixed(2)}`);
-    };
+  const handleCheckout = async () => {
+    if (items.length === 0) return;
+    setCheckoutLoading(true);
+    try {
+      const { createCheckoutSession } = await import('@/app/actions/stripe');
 
-    return (
-        <>
-            <Overlay $isOpen={isCartOpen} onClick={closeCart} />
-            <Drawer $isOpen={isCartOpen}>
-                <Header>
-                    <Title>
-                        <ShoppingBag size={20} />
-                        Tu Carrito
-                    </Title>
-                    <CloseButton onClick={closeCart}>
-                        <X size={24} />
-                    </CloseButton>
-                </Header>
+      const { url, error } = await createCheckoutSession(
+        items.map(item => ({ id: item.id, quantity: item.quantity }))
+      );
 
-                <Content>
-                    {items.length === 0 ? (
-                        <EmptyState>
-                            <ShoppingBag size={48} style={{ opacity: 0.2 }} />
-                            <p>Tu carrito está vacío</p>
-                        </EmptyState>
-                    ) : (
-                        items.map((item) => (
-                            <CartItem key={item.id}>
-                                <ItemImage>
-                                    <img src={item.image_url} alt={item.name} />
-                                </ItemImage>
-                                <ItemDetails>
-                                    <ItemName>{item.name}</ItemName>
-                                    <ItemArtist>{item.artist}</ItemArtist>
-                                    <ItemPrice>
-                                        ${item.price.toFixed(2)} x {item.quantity}
-                                    </ItemPrice>
-                                </ItemDetails>
-                                <RemoveButton onClick={() => removeFromCart(item.id)}>
-                                    <Trash2 size={18} />
-                                </RemoveButton>
-                            </CartItem>
-                        ))
-                    )}
-                </Content>
+      if (error) {
+        toast.error('Error al iniciar el pago: ' + error);
+        return;
+      }
 
-                {items.length > 0 && (
-                    <Footer>
-                        <TotalRow>
-                            <span>Total</span>
-                            <span>${total.toFixed(2)}</span>
-                        </TotalRow>
-                        <CheckoutButton onClick={handleCheckout}>
-                            Checkout
-                        </CheckoutButton>
-                    </Footer>
-                )}
-            </Drawer>
-        </>
-    );
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Ocurrió un error inesperado');
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <Overlay $isOpen={isCartOpen} onClick={closeCart} />
+      <Drawer $isOpen={isCartOpen} onClick={(e) => e.stopPropagation()}>
+        <Header>
+          <Title>Tu Carrito ({items.length})</Title>
+          <CloseButton onClick={closeCart}>
+            <X size={24} />
+          </CloseButton>
+        </Header>
+
+        {items.length === 0 ? (
+          <EmptyState>
+            <ShoppingBag size={48} style={{ opacity: 0.2 }} />
+            <p>Tu carrito está vacío</p>
+          </EmptyState>
+        ) : (
+          <Content>
+            {items.map((item) => (
+              <CartItem key={item.id}>
+                <ItemImage>
+                  <img src={item.image_url} alt={item.name} />
+                </ItemImage>
+                <ItemDetails>
+                  <ItemName>{item.name}</ItemName>
+                  <ItemArtist>{item.artist}</ItemArtist>
+                  <ItemPrice>
+                    ${item.price.toFixed(2)} x {item.quantity}
+                  </ItemPrice>
+                </ItemDetails>
+                <RemoveButton
+                  onClick={() => removeFromCart(item.id)}
+                  aria-label="Eliminar producto"
+                >
+                  <Trash2 size={18} />
+                </RemoveButton>
+              </CartItem>
+            ))}
+          </Content>
+        )}
+
+        <Footer>
+          <TotalRow>
+            <span>Total</span>
+            <span>${total.toFixed(2)}</span>
+          </TotalRow>
+          <CheckoutButton
+            disabled={items.length === 0 || checkoutLoading}
+            onClick={handleCheckout}
+          >
+            {checkoutLoading ? 'Redirigiendo...' : 'Pagar Ahora con Stripe'}
+          </CheckoutButton>
+        </Footer>
+      </Drawer>
+    </>
+  );
 }
