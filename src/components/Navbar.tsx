@@ -1,10 +1,14 @@
 'use client';
 
 import styled from 'styled-components';
-import { Search, ShoppingCart, User } from 'lucide-react';
+import { Search, ShoppingCart, User, Shield, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/useCartStore';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useAdmin } from '@/hooks/useAdmin';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const Nav = styled.nav`
   display: flex;
@@ -28,6 +32,10 @@ const Logo = styled(Link)`
   color: #000;
   text-decoration: none;
   letter-spacing: -0.5px;
+  
+  @media (max-width: 480px) {
+    font-size: 1.2rem;
+  }
 `;
 
 const IconsContainer = styled.div`
@@ -54,18 +62,45 @@ const IconWrapper = styled.button`
     color: #000;
   }
 
-  /* Ajuste de tamaño para móviles si es necesario */
   svg {
     width: 24px;
     height: 24px;
   }
 `;
 
+const SearchContainer = styled.div<{ $isOpen: boolean }>`
+  display: flex;
+  align-items: center;
+  background: ${({ $isOpen }) => ($isOpen ? '#f5f5f5' : 'transparent')};
+  border-radius: 50px;
+  padding: ${({ $isOpen }) => ($isOpen ? '0.5rem 1rem' : '0')};
+  transition: all 0.3s ease;
+  width: ${({ $isOpen }) => ($isOpen ? '300px' : '40px')};
+  overflow: hidden;
+
+  @media (max-width: 640px) {
+    width: ${({ $isOpen }) => ($isOpen ? '160px' : '40px')};
+  }
+`;
+
+const SearchInput = styled.input<{ $isOpen: boolean }>`
+  border: none;
+  background: transparent;
+  outline: none;
+  margin-left: 0.5rem;
+  width: 100%;
+  font-size: 1rem;
+  display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
+  color: #111;
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
+  transition: opacity 0.2s 0.1s;
+`;
+
 const Badge = styled.span`
   position: absolute;
   top: -8px;
   right: -8px;
-  background-color: #ef4444; /* Rojo vibrante */
+  background-color: #ef4444;
   color: white;
   font-size: 0.7rem;
   font-weight: 700;
@@ -84,22 +119,38 @@ const RelativeContainer = styled.div`
   align-items: center;
 `;
 
-import { useAuthStore } from '@/store/useAuthStore';
-import { useAdmin } from '@/hooks/useAdmin';
-import { useRouter } from 'next/navigation';
-import { Shield } from 'lucide-react';
-
 export default function Navbar() {
   const { items, toggleCart } = useCartStore();
-  const { user, openAuthModal, signOut } = useAuthStore();
+  const { user, openAuthModal } = useAuthStore();
   const { isAdmin } = useAdmin();
   const [mounted, setMounted] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
+
+  // Search Logic
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 500);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (isSearchOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isSearchOpen]);
+
+  // Effect to navigate on debounced query
+  useEffect(() => {
+    if (debouncedQuery) {
+      router.push(`/search?q=${encodeURIComponent(debouncedQuery)}`);
+    } else if (query === '' && isSearchOpen) {
+      // Optional: Navigate back or clear? Maybe stay on search page but show popular?
+      // For now, let's leave it to user to clear manually or navigate away
+    }
+  }, [debouncedQuery, router]);
 
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -111,13 +162,35 @@ export default function Navbar() {
     }
   };
 
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+    if (!isSearchOpen) {
+      setQuery(''); // Reset on open? Or keep?
+    }
+  };
+
   return (
     <Nav>
       <Logo href="/">StanStore</Logo>
       <IconsContainer>
-        <IconWrapper aria-label="Buscar">
-          <Search />
-        </IconWrapper>
+        <SearchContainer $isOpen={isSearchOpen}>
+          <IconWrapper onClick={toggleSearch} aria-label="Buscar">
+            {isSearchOpen ? <Search size={20} color="#666" /> : <Search />}
+          </IconWrapper>
+          <SearchInput
+            $isOpen={isSearchOpen}
+            placeholder="Buscar productos..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            ref={inputRef}
+          />
+          {isSearchOpen && query && (
+            <button onClick={() => setQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+              <X size={16} color="#999" />
+            </button>
+          )}
+        </SearchContainer>
+
         <IconWrapper aria-label="Carrito" onClick={toggleCart}>
           <RelativeContainer>
             <ShoppingCart />
