@@ -2,6 +2,7 @@
 
 import Stripe from 'stripe';
 import { supabase } from '@/lib/supabaseClient';
+import { logAuditAction } from '@/app/actions/audit';
 
 export async function createCheckoutSession(cartItems: { id: string; quantity: number }[]) {
     try {
@@ -56,9 +57,16 @@ export async function createCheckoutSession(cartItems: { id: string; quantity: n
             cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/`,
         });
 
+        // Audit Log
+        await logAuditAction('CHECKOUT_SESSION_CREATED', {
+            amountTotal: lineItems.reduce((acc, item) => acc + (item.price_data.unit_amount * item.quantity), 0) / 100,
+            itemCount: cartItems.length
+        });
+
         return { url: session.url };
-    } catch (error) {
+    } catch (error: any) {
         console.error('Stripe Error:', error);
+        await logAuditAction('CHECKOUT_SESSION_FAILED', { error: error.message });
         return { error: 'Error creating checkout session' };
     }
 }

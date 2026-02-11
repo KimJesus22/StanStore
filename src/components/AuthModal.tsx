@@ -201,14 +201,24 @@ export default function AuthModal() {
           password,
         });
         if (error) throw error;
+
+        // Audit Log
+        const { logAuditAction } = await import('@/app/actions/audit');
+        await logAuditAction('SIGNUP_SUCCESS', { email });
+
         toast.success('¡Registro exitoso! Revisa tu email para confirmar.');
         closeAuthModal();
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
+
+        // Audit Log
+        const { logAuditAction } = await import('@/app/actions/audit');
+        await logAuditAction('LOGIN_SUCCESS', { email, userId: data.user.id }, data.user.id);
+
         toast.success('¡Bienvenido de nuevo!');
         closeAuthModal();
       }

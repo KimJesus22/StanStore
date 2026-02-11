@@ -17,7 +17,10 @@ Este proyecto está construido sobre una arquitectura robusta, escalable y segur
 -   **Base de Datos**: [Supabase](https://supabase.com/) (PostgreSQL) - Persistencia de datos relacional y autenticación.
 -   **Pagos**: [Stripe](https://stripe.com/) - Procesamiento de pagos seguro y cumplimiento de PCI-DSS (vía delegación).
 -   **Estilos**: [Styled Components](https://styled-components.com/) - CSS-in-JS con aislamiento de estilos y temas dinámicos.
+-   **Animaciones**: [Framer Motion](https://www.framer.com/motion/) - Transiciones fluidas, gestos y efectos de micro-interacción.
 -   **Validación**: [Zod](https://zod.dev/) - Validación de esquemas en tiempo de ejecución.
+-   **Protección XSS**: Renderizado seguro por defecto en React y sanitización de inputs.
+-   **Audit Logs (Nuevo)**: Sistema de registro inmutable que captura IP, User-Agent y detalles de acciones críticas (Login, Pagos, Admin) para análisis forense y compliance.
 
 ---
 
