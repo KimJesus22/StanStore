@@ -114,6 +114,7 @@ const ErrorMsg = styled.span`
 
 export default function AdminPage() {
     const [loading, setLoading] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [errors, setErrors] = useState<any>({});
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

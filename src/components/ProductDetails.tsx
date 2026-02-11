@@ -1,13 +1,15 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useParams, useRouter } from 'next/navigation';
-import { mockProducts } from '@/data/mockData';
 import { useCartStore } from '@/store/useCartStore';
 import { Minus, Plus, ShoppingBag, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/navigation';
 import toast from 'react-hot-toast';
+import { Product } from '@/types';
+import { useTranslations } from 'next-intl';
+import { supabase } from '@/lib/supabaseClient';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -170,6 +172,13 @@ const AddToCartButton = styled.button`
   &:active {
     transform: translateY(0);
   }
+  
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
 `;
 
 const NotFoundContainer = styled.div`
@@ -182,61 +191,112 @@ const NotFoundContainer = styled.div`
   padding: 2rem;
 `;
 
-export default function ProductPage() {
-  const params = useParams();
-  const router = useRouter();
+const StockBadge = styled.div`
+  display: inline-block;
+  background-color: #fff0f0;
+  color: #e53e3e;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+  border: 1px solid #fed7d7;
+`;
+
+interface ProductDetailsProps {
+  product: Product | null;
+}
+
+export default function ProductDetails({ product }: ProductDetailsProps) {
+  const t = useTranslations('Product');
   const { addToCart } = useCartStore();
   const [quantity, setQuantity] = useState(1);
-  const [product, setProduct] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [currentStock, setCurrentStock] = useState(product?.stock || 0);
 
   useEffect(() => {
-    if (params?.id) {
-      const foundProduct = mockProducts.find((p) => p.id === params.id);
-      setProduct(foundProduct || null);
-      setLoading(false);
-    }
-  }, [params?.id]);
+    if (!product) return;
+
+    // Subscription to changes in this product
+    const channel = supabase
+      .channel(`product-${product.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'products',
+          filter: `id=eq.${product.id}`,
+        },
+        (payload) => {
+          console.log('Stock updated:', payload);
+          if (payload.new && typeof payload.new.stock === 'number') {
+            setCurrentStock(payload.new.stock);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [product]);
 
   const handleQuantityChange = (delta: number) => {
-    setQuantity((prev) => Math.max(1, prev + delta));
+    setQuantity((prev) => {
+      const next = prev + delta;
+      if (next > currentStock) {
+        toast.error(t('stockLimit', { stock: currentStock }));
+        return prev;
+      }
+      return Math.max(1, next);
+    });
   };
 
   const handleAddToCart = () => {
-    if (product) {
-      for (let i = 0; i < quantity; i++) {
-        addToCart(product);
-      }
+    if (!product) return;
 
-      toast.success(`Añadido ${quantity} ${quantity === 1 ? 'producto' : 'productos'} al carrito`, {
-        style: {
-          border: '1px solid #10CFBD',
-          padding: '16px',
-          color: '#111',
-        },
-        iconTheme: {
-          primary: '#10CFBD',
-          secondary: '#FFFAEE',
-        },
-      });
+    if (quantity > currentStock) {
+      toast.error(t('stockLimit', { stock: currentStock }));
+      return;
     }
-  };
 
-  if (loading) return null;
+    // In a real app we might want to reserve stock here via RPC
+    // For now we just check local realtime state
+
+    for (let i = 0; i < quantity; i++) {
+      // We might want to pass currentStock to cart too, but let's stick to Product interface
+      // spreading product effectively passes initial stock, not realtime, but for cart display it's usually fine
+      addToCart(product);
+    }
+
+    toast.success(t('addedToCart', { quantity, count: quantity }), {
+      style: {
+        border: '1px solid #10CFBD',
+        padding: '16px',
+        color: '#111',
+      },
+      iconTheme: {
+        primary: '#10CFBD',
+        secondary: '#FFFAEE',
+      },
+    });
+  };
 
   if (!product) {
     return (
       <NotFoundContainer>
-        <h1 style={{ marginBottom: '1rem', fontSize: '2rem' }}>Producto no encontrado</h1>
-        <p style={{ marginBottom: '2rem', color: '#666' }}>Lo sentimos, el producto que buscas no existe.</p>
+        <h1 style={{ marginBottom: '1rem', fontSize: '2rem' }}>{t('notFound')}</h1>
+        <p style={{ marginBottom: '2rem', color: '#666' }}>{t('notFoundMessage')}</p>
         <Link href="/" passHref>
           <AddToCartButton as="a" style={{ display: 'inline-flex', maxWidth: '200px' }}>
-            Volver al inicio
+            {t('backHome')}
           </AddToCartButton>
         </Link>
       </NotFoundContainer>
     );
   }
+
+  const isOutOfStock = currentStock === 0;
 
   return (
     <Container>
@@ -247,11 +307,18 @@ export default function ProductPage() {
       <InfoWrapper>
         <BackLink href="/">
           <ArrowLeft size={20} />
-          Volver
+          {t('back')}
         </BackLink>
 
         <Artist>{product.artist}</Artist>
         <ProductName>{product.name}</ProductName>
+
+        {currentStock > 0 && currentStock < 10 && (
+          <StockBadge>
+            {t('onlyLeft', { count: currentStock })}
+          </StockBadge>
+        )}
+
         <Price>${product.price.toFixed(2)}</Price>
 
         <Description>
@@ -260,18 +327,27 @@ export default function ProductPage() {
 
         <Controls>
           <QuantitySelector>
-            <QtyButton onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}>
+            <QtyButton
+              onClick={() => handleQuantityChange(-1)}
+              disabled={quantity <= 1 || isOutOfStock}
+            >
               <Minus size={18} />
             </QtyButton>
-            <QtyValue>{quantity}</QtyValue>
-            <QtyButton onClick={() => handleQuantityChange(1)}>
+            <QtyValue>{isOutOfStock ? 0 : quantity}</QtyValue>
+            <QtyButton
+              onClick={() => handleQuantityChange(1)}
+              disabled={isOutOfStock || quantity >= currentStock}
+            >
               <Plus size={18} />
             </QtyButton>
           </QuantitySelector>
 
-          <AddToCartButton onClick={handleAddToCart}>
+          <AddToCartButton
+            onClick={handleAddToCart}
+            disabled={isOutOfStock}
+          >
             <ShoppingBag size={20} />
-            Añadir al Carrito
+            {isOutOfStock ? t('outOfStock') : t('addToCart')}
           </AddToCartButton>
         </Controls>
       </InfoWrapper>

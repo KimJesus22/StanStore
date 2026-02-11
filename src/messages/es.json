@@ -1,0 +1,32 @@
+{
+    "Navbar": {
+        "home": "Inicio",
+        "search": "Buscar",
+        "profile": "Perfil",
+        "cart": "Carrito"
+    },
+    "Product": {
+        "addToCart": "Añadir al Carrito",
+        "addedToCart": "Añadido {quantity} {count, plural, =1 {producto} other {productos}} al carrito",
+        "back": "Volver",
+        "notFound": "Producto no encontrado",
+        "notFoundMessage": "Lo sentimos, el producto que buscas no existe.",
+        "backHome": "Volver al inicio",
+        "outOfStock": "Agotado",
+        "onlyLeft": "¡Solo quedan {count} unidades!",
+        "stockLimit": "No puedes añadir más de {stock} unidades"
+    },
+    "Cart": {
+        "title": "Tu Carrito",
+        "empty": "Tu carrito está vacío",
+        "total": "Total",
+        "checkout": "Pagar"
+    },
+    "Home": {
+        "title": "Novedades",
+        "subtitle": "Lo último de tus artistas favoritos",
+        "loading": "Cargando productos...",
+        "noResults": "No se encontraron productos para esta categoría.",
+        "categoryAll": "Todos"
+    }
+}

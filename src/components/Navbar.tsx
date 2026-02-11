@@ -2,13 +2,14 @@
 
 import styled from 'styled-components';
 import { Search, ShoppingCart, User, Shield, X } from 'lucide-react';
-import Link from 'next/link';
+import { Link, useRouter, usePathname } from '@/navigation';
 import { useCartStore } from '@/store/useCartStore';
 import { useEffect, useState, useRef } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useAdmin } from '@/hooks/useAdmin';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const Nav = styled.nav`
   display: flex;
@@ -120,6 +121,7 @@ const RelativeContainer = styled.div`
 `;
 
 export default function Navbar() {
+  const t = useTranslations('Navbar');
   const { items, toggleCart } = useCartStore();
   const { user, openAuthModal } = useAuthStore();
   const { isAdmin } = useAdmin();
@@ -146,9 +148,6 @@ export default function Navbar() {
   useEffect(() => {
     if (debouncedQuery) {
       router.push(`/search?q=${encodeURIComponent(debouncedQuery)}`);
-    } else if (query === '' && isSearchOpen) {
-      // Optional: Navigate back or clear? Maybe stay on search page but show popular?
-      // For now, let's leave it to user to clear manually or navigate away
     }
   }, [debouncedQuery, router]);
 
@@ -165,7 +164,7 @@ export default function Navbar() {
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
     if (!isSearchOpen) {
-      setQuery(''); // Reset on open? Or keep?
+      setQuery('');
     }
   };
 
@@ -173,13 +172,15 @@ export default function Navbar() {
     <Nav>
       <Logo href="/">StanStore</Logo>
       <IconsContainer>
+        <LanguageSwitcher />
+
         <SearchContainer $isOpen={isSearchOpen}>
-          <IconWrapper onClick={toggleSearch} aria-label="Buscar">
+          <IconWrapper onClick={toggleSearch} aria-label={t('search')}>
             {isSearchOpen ? <Search size={20} color="#666" /> : <Search />}
           </IconWrapper>
           <SearchInput
             $isOpen={isSearchOpen}
-            placeholder="Buscar productos..."
+            placeholder={`${t('search')}...`}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             ref={inputRef}
@@ -191,7 +192,7 @@ export default function Navbar() {
           )}
         </SearchContainer>
 
-        <IconWrapper aria-label="Carrito" onClick={toggleCart}>
+        <IconWrapper aria-label={t('cart')} onClick={toggleCart}>
           <RelativeContainer>
             <ShoppingCart />
             {mounted && totalItems > 0 && <Badge>{totalItems}</Badge>}
@@ -210,7 +211,7 @@ export default function Navbar() {
               </IconWrapper>
             )}
             <IconWrapper
-              aria-label={user ? "Mi Perfil" : "Iniciar Sesión"}
+              aria-label={user ? t('profile') : "Iniciar Sesión"}
               onClick={handleProfileClick}
               title={user ? user.email || "Usuario" : "Iniciar Sesión"}
             >

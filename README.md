@@ -55,6 +55,35 @@ Implementación de un algoritmo de **Token Bucket** (en memoria para demo) en el
 -   **Filtro Potente**: Búsqueda insensible a mayúsculas/minúsculas (`ilike`) en nombre, artista y categoría.
 -   **UX**: Sugerencias automáticas cuando no hay resultados.
 
+
+## 🌟 Funcionalidades Avanzadas (Nuevas)
+
+### 1. Progressive Web App (PWA) 📱
+StanStore es ahora instalable en dispositivos móviles y de escritorio.
+- **Offline First**: Gracias a `@ducanh2912/next-pwa`, la aplicación cachea recursos críticos para funcionar sin conexión.
+- **Install Prompt**: Un banner personalizado invita a los usuarios a instalar la app si su navegador lo soporta.
+- **Manifiesto**: Iconos y configuración de tema personalizados.
+
+### 2. Stock en Tiempo Real (Realtime) ⚡
+Suscripción en vivo a la base de datos de Supabase.
+- **Inventario Vivo**: Si alguien compra el último producto, el botón de "Añadir al Carrito" se deshabilita instantáneamente para todos los usuarios conectados sin recargar la página.
+- **Badges Reactivos**: Avisos visuales cuando quedan pocas unidades (ej: "¡Solo quedan 2!").
+
+### 3. Internacionalización (i18n) 🌍
+Soporte global con enrutamiento localizado.
+- **Idiomas**: Español (`/es`), Inglés (`/en`), Coreano (`/ko`).
+- **Detección Automática**: Middleware que redirige según la preferencia del navegador.
+- **SEO Internacional**: Etiquetas `hreflang` y metadatos localizados.
+
+### 4. CI/CD Pipeline 🤖
+Automatización robusta con GitHub Actions.
+- **Validación Automática**: En cada `push` a `main`, se ejecutan:
+    - Instalación limpia de dependencias.
+    - **Linting**: Verificación de estilo y calidad de código.
+    - **Tests Unitarios**: Ejecución de suite Vitest.
+    - **Escaneo de Secretos**: Detección de API Keys expuestas con Gitleaks.
+- **Despliegue Seguro**: Vercel solo despliega si todas las verificaciones pasan exitosamente.
+
 ## 📂 Estructura del Proyecto
 
 ---

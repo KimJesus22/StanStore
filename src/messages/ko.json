@@ -1,0 +1,32 @@
+{
+    "Navbar": {
+        "home": "홈",
+        "search": "검색",
+        "profile": "프로필",
+        "cart": "장바구니"
+    },
+    "Product": {
+        "addToCart": "장바구니 담기",
+        "addedToCart": "장바구니에 {quantity}개 추가됨",
+        "back": "뒤로",
+        "notFound": "상품을 찾을 수 없음",
+        "notFoundMessage": "죄송합니다. 찾으시는 상품이 존재하지 않습니다.",
+        "backHome": "홈으로 돌아가기",
+        "outOfStock": "품절",
+        "onlyLeft": "{count}개 남았습니다!",
+        "stockLimit": "{stock}개 이상 추가할 수 없습니다"
+    },
+    "Cart": {
+        "title": "장바구니",
+        "empty": "장바구니가 비어 있습니다",
+        "total": "합계",
+        "checkout": "결제하기"
+    },
+    "Home": {
+        "title": "신상품",
+        "subtitle": "좋아하는 아티스트의 최신 상품",
+        "loading": "상품 불러오는 중...",
+        "noResults": "이 카테고리의 상품이 없습니다.",
+        "categoryAll": "전체"
+    }
+}

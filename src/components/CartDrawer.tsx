@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import styled from 'styled-components';
@@ -6,6 +7,7 @@ import { X, Trash2, ShoppingBag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 const Overlay = styled(motion.div)`
   position: fixed;
@@ -181,6 +183,7 @@ const CheckoutButton = styled(motion.button)`
 `;
 
 export default function CartDrawer() {
+  const t = useTranslations('Cart');
   const { isCartOpen, closeCart, items, removeFromCart } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -237,7 +240,7 @@ export default function CartDrawer() {
             onClick={(e) => e.stopPropagation()}
           >
             <Header>
-              <Title>Tu Carrito ({items.length})</Title>
+              <Title>{t('title')} ({items.length})</Title>
               <CloseButton onClick={closeCart}>
                 <X size={24} />
               </CloseButton>
@@ -246,7 +249,7 @@ export default function CartDrawer() {
             {items.length === 0 ? (
               <EmptyState>
                 <ShoppingBag size={48} style={{ opacity: 0.2 }} />
-                <p>Tu carrito está vacío</p>
+                <p>{t('empty')}</p>
               </EmptyState>
             ) : (
               <Content>
@@ -284,7 +287,7 @@ export default function CartDrawer() {
 
             <Footer>
               <TotalRow>
-                <span>Total</span>
+                <span>{t('total')}</span>
                 <span>${total.toFixed(2)}</span>
               </TotalRow>
               <CheckoutButton
@@ -293,7 +296,7 @@ export default function CartDrawer() {
                 whileHover={{ scale: 1.02, backgroundColor: '#000' }}
                 whileTap={{ scale: 0.98 }}
               >
-                {checkoutLoading ? 'Redirigiendo...' : 'Pagar Ahora con Stripe'}
+                {checkoutLoading ? 'Redirigiendo...' : t('checkout')}
               </CheckoutButton>
             </Footer>
           </Drawer>

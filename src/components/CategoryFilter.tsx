@@ -37,20 +37,22 @@ interface CategoryFilterProps {
     categories: string[];
     selectedCategory: string;
     onSelectCategory: (category: string) => void;
+    allLabel?: string;
 }
 
 export default function CategoryFilter({
     categories,
     selectedCategory,
     onSelectCategory,
+    allLabel = 'Todos',
 }: CategoryFilterProps) {
     return (
         <FilterContainer>
             <FilterButton
-                $isActive={selectedCategory === 'Todos'}
-                onClick={() => onSelectCategory('Todos')}
+                $isActive={selectedCategory === 'Todos' || selectedCategory === allLabel}
+                onClick={() => onSelectCategory(allLabel)}
             >
-                Todos
+                {allLabel}
             </FilterButton>
             {categories.map((category) => (
                 <FilterButton

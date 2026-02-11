@@ -1,20 +1,48 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
+import { locales, localePrefix } from './navigation';
+import { NextRequest, NextResponse } from 'next/server';
+
+// Create the next-intl middleware
+const intlMiddleware = createMiddleware({
+    // A list of all locales that are supported
+    locales,
+
+    // Used when no locale matches
+    defaultLocale: 'es',
+    localePrefix
+});
 
 // Simple in-memory rate limit map (for demo purposes)
-// In production, use Redis (e.g., Upstash) for distributed state
 const rateLimit = new Map();
-
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const MAX_REQUESTS = 20; // 20 requests per minute per IP for API routes
 
-export function middleware(request: NextRequest) {
-    const response = NextResponse.next();
+export default function middleware(request: NextRequest) {
+    const pathname = request.nextUrl.pathname;
 
-    // 1. Security Headers
-    // CSP: Content Security Policy
-    // Allow scripts from self, Supabase, Stripe
-    // Allow styles from self and inline (styled-components needs inline)
+    // 1. Rate Limiting (API Routes & Actions only)
+    if (pathname.startsWith('/api') || request.method === 'POST') {
+        const ip = request.headers.get('x-forwarded-for') || 'unknown';
+        const now = Date.now();
+        const record = rateLimit.get(ip);
+
+        if (record) {
+            if (now - record.startTime > RATE_LIMIT_WINDOW) {
+                rateLimit.set(ip, { count: 1, startTime: now });
+            } else {
+                record.count++;
+                if (record.count > MAX_REQUESTS) {
+                    return new NextResponse('Too Many Requests', { status: 429 });
+                }
+            }
+        } else {
+            rateLimit.set(ip, { count: 1, startTime: now });
+        }
+    }
+
+    // 2. CSP Headers
+    const response = intlMiddleware(request); // Run next-intl middleware first to get the response
+
     const cspHeader = `
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://m.stripe.network;
@@ -31,7 +59,6 @@ export function middleware(request: NextRequest) {
     frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
   `;
 
-    // Replace newlines with spaces
     const contentSecurityPolicyHeaderValue = cspHeader
         .replace(/\s{2,}/g, ' ')
         .trim();
@@ -48,52 +75,10 @@ export function middleware(request: NextRequest) {
     response.headers.set('Referrer-Policy', 'origin-when-cross-origin');
     response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()');
 
-    // 2. Rate Limiting (API Routes & Actions only)
-    // We use the pathname to filter
-    const pathname = request.nextUrl.pathname;
-
-    if (pathname.startsWith('/api') || request.method === 'POST') {
-        const ip = request.headers.get('x-forwarded-for') || 'unknown';
-        const now = Date.now();
-
-        const record = rateLimit.get(ip);
-
-        if (record) {
-            if (now - record.startTime > RATE_LIMIT_WINDOW) {
-                // Reset window
-                rateLimit.set(ip, { count: 1, startTime: now });
-            } else {
-                // Increment count
-                record.count++;
-                if (record.count > MAX_REQUESTS) {
-                    return new NextResponse('Too Many Requests', { status: 429 });
-                }
-            }
-        } else {
-            // New record
-            rateLimit.set(ip, { count: 1, startTime: now });
-        }
-
-        // Cleanup old records occasionally (simple garbage collection simulation)
-        if (rateLimit.size > 1000) {
-            rateLimit.clear();
-        }
-    }
-
     return response;
 }
 
 export const config = {
-    matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes) -> actually we WANT to match api for rate limit, so we keep them
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         */
-        {
-            source: '/((?!_next/static|_next/image|favicon.ico).*)',
-        },
-    ],
+    // Match only internationalized pathnames
+    matcher: ['/', '/(es|en|ko)/:path*']
 };

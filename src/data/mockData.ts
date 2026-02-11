@@ -10,6 +10,7 @@ export const mockProducts: Product[] = [
         artist: 'BTS',
         is_new: false,
         description: 'El cuarto álbum de estudio de BTS, "Map of the Soul: 7", es un viaje introspectivo que explora los siete años de carrera del grupo. Incluye éxitos como "ON" y "Black Swan". Versión aleatoria.',
+        stock: 50,
     },
     {
         id: 'f1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5d',
@@ -20,6 +21,7 @@ export const mockProducts: Product[] = [
         artist: 'NewJeans',
         is_new: true,
         description: 'El segundo EP de NewJeans, "Get Up", presenta una mezcla refrescante de pop y R&B. Incluye las canciones "Super Shy", "ETA" y "Cool With You". El paquete incluye photobook y stickers.',
+        stock: 20,
     },
     {
         id: 'a1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5e',
@@ -30,6 +32,7 @@ export const mockProducts: Product[] = [
         artist: 'Seventeen',
         is_new: true,
         description: 'La versión 3 del lightstick oficial de Seventeen. Cuenta con un diseño elegante y mayor brillo. Sincronizable con la app oficial para conciertos.',
+        stock: 5,
     },
     {
         id: 'b1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5f',
@@ -40,6 +43,7 @@ export const mockProducts: Product[] = [
         artist: 'BLACKPINK',
         is_new: false,
         description: 'Hoodie oficial del tour mundial BORN PINK de BLACKPINK. Fabricado con algodón de alta calidad, cómodo y estiloso. Diseño exclusivo del tour.',
+        stock: 0,
     },
     {
         id: 'c1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b60',
@@ -50,6 +54,7 @@ export const mockProducts: Product[] = [
         artist: 'Stray Kids',
         is_new: false,
         description: 'Edición limitada del álbum "5-STAR" de Stray Kids. Incluye photocards especiales, póster y beneficios de preventa. Un must-have para cualquier Stay.',
+        stock: 100,
     },
     {
         id: 'd1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b61',
@@ -60,5 +65,6 @@ export const mockProducts: Product[] = [
         artist: 'TWICE',
         is_new: true,
         description: 'El nuevo lightstick oficial de TWICE, CANDYBONG Infinity. Diseño mejorado con panel táctil y nuevos modos de iluminación. Perfecto para iluminar los estadios.',
+        stock: 12,
     },
 ];

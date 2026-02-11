@@ -7,4 +7,5 @@ export interface Product {
     artist: 'BTS' | 'NewJeans' | 'Seventeen' | 'BLACKPINK' | 'TWICE' | 'Stray Kids' | string;
     is_new: boolean;
     description?: string;
+    stock: number;
 }
