@@ -22,6 +22,44 @@ Este proyecto está construido sobre una arquitectura robusta, escalable y segur
 -   **Protección XSS**: Renderizado seguro por defecto en React y sanitización de inputs.
 -   **Audit Logs (Nuevo)**: Sistema de registro inmutable que captura IP, User-Agent y detalles de acciones críticas (Login, Pagos, Admin) para análisis forense y compliance.
 
+## 🏗️ Arquitectura del Sistema
+
+```mermaid
+graph TD
+    subgraph Client ["Cliente (Browser/PWA)"]
+        User[Usuario]
+    end
+
+    subgraph Vercel ["Vercel Infrastructure"]
+        Edge[Edge Network/CDN]
+        NextJS[Next.js App Router]
+    end
+
+    subgraph BaaS ["Backend Services"]
+        Supabase[(Supabase: Auth & DB)]
+        Stripe[Stripe: Pagos]
+        Cloudinary[Cloudinary: Media]
+        Sentry[Sentry: Observabilidad]
+    end
+
+    subgraph CI_CD ["DevOps Pipeline"]
+        GitHub[GitHub Actions]
+    end
+
+    User -->|HTTPS Request| Edge
+    Edge -->|Route| NextJS
+    
+    NextJS -->|Server Actions| Supabase
+    NextJS -->|Checkout Session| Stripe
+    NextJS -->|Image Optimization| Cloudinary
+    
+    NextJS -.->|Error Reporting| Sentry
+    User -.->|Client Errors| Sentry
+
+    GitHub -->|CI: Test & Lint| GitHub
+    GitHub -->|CD: Auto Deploy| Vercel
+```
+
 ---
 
 ## 🛡️ Ingeniería de Seguridad (Security Hardening)

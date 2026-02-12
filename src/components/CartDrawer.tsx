@@ -8,6 +8,9 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+
+const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 const Overlay = styled(motion.div)`
   position: fixed;
@@ -102,6 +105,7 @@ const ItemImage = styled.div`
   overflow: hidden;
   background-color: #f0f0f0;
   flex-shrink: 0;
+  position: relative;
 
   img {
     width: 100%;
@@ -264,7 +268,15 @@ export default function CartDrawer() {
                       transition={{ duration: 0.2 }}
                     >
                       <ItemImage>
-                        <img src={item.image_url} alt={item.name} />
+                        <Image
+                          src={item.image_url}
+                          alt={item.name}
+                          fill
+                          sizes="80px"
+                          placeholder="blur"
+                          blurDataURL={BLUR_DATA_URL}
+                          style={{ objectFit: 'cover' }}
+                        />
                       </ItemImage>
                       <ItemDetails>
                         <ItemName>{item.name}</ItemName>

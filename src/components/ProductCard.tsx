@@ -8,6 +8,9 @@ import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
+
+const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 const CardLink = styled(Link)`
   text-decoration: none;
@@ -144,7 +147,16 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
         whileHover={{ scale: 1.05 }}
       >
         <ImageContainer>
-          <img src={product.image_url} alt={product.name} loading="lazy" />
+          <Image
+            src={product.image_url}
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={index < 4}
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
+            style={{ objectFit: 'cover' }}
+          />
         </ImageContainer>
         <Artist>{product.artist}</Artist>
         <ProductName>{product.name}</ProductName>

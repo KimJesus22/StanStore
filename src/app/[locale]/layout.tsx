@@ -10,6 +10,8 @@ import { locales } from '@/navigation';
 import '../globals.css';
 import type { Metadata, Viewport } from 'next';
 import InstallPrompt from '@/components/InstallPrompt';
+import CookieBanner from '@/components/CookieBanner';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,6 +59,7 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <StyledComponentsRegistry>
+            <GoogleAnalytics gaId="G-XXXXXXXXXX" />
             <Toaster position="bottom-center" />
             <AuthProvider>
               <Navbar />
@@ -64,6 +67,7 @@ export default async function LocaleLayout({
               <InstallPrompt />
               {children}
             </AuthProvider>
+            <CookieBanner />
           </StyledComponentsRegistry>
         </NextIntlClientProvider>
       </body>

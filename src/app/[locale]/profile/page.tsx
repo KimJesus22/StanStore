@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { supabase } from '@/lib/supabaseClient';
 import styled from 'styled-components';
-import { User, LogOut, Package, Calendar } from 'lucide-react';
+import { User, LogOut, Package, Calendar, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getUserData } from '@/app/actions/privacy';
 
 const Container = styled.div`
   max-width: 800px;
@@ -117,11 +118,18 @@ const OrderItemRow = styled.div`
   color: #444;
 `;
 
-const LogoutButton = styled.button`
+const ActionButtons = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+`;
+
+const ButtonBase = styled.button`
   background: #fff;
   border: 1px solid #e0e0e0;
-  color: #d32f2f;
-  padding: 1rem 2rem;
+  padding: 0.8rem 1.5rem;
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -129,11 +137,21 @@ const LogoutButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  margin-top: 1rem;
+`;
 
+const LogoutButton = styled(ButtonBase)`
+  color: #d32f2f;
   &:hover {
     background: #ffebee;
     border-color: #ef9a9a;
+  }
+`;
+
+const ExportButton = styled(ButtonBase)`
+  color: #10CFBD;
+  &:hover {
+    background: #e0f2f1;
+    border-color: #10CFBD;
   }
 `;
 
@@ -206,10 +224,40 @@ export default function ProfilePage() {
         </Avatar>
         <Email>{user.email}</Email>
         <ID>ID: {user.id}</ID>
-        <LogoutButton onClick={handleLogout}>
-          <LogOut size={18} />
-          Cerrar Sesión
-        </LogoutButton>
+
+        <ActionButtons>
+          <ExportButton onClick={async () => {
+            const toastId = toast.loading('Generando reporte...');
+            try {
+              const result = await getUserData(user.id);
+              if (result.success && result.data) {
+                const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `stanstore_data_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                toast.success('Datos exportados correctamente', { id: toastId });
+              } else {
+                toast.error('Error al exportar datos', { id: toastId });
+              }
+            } catch (e) {
+              console.error(e);
+              toast.error('Error inesperado', { id: toastId });
+            }
+          }}>
+            <Download size={18} />
+            Mis Datos (ARCO)
+          </ExportButton>
+
+          <LogoutButton onClick={handleLogout}>
+            <LogOut size={18} />
+            Cerrar Sesión
+          </LogoutButton>
+        </ActionButtons>
       </ProfileCard>
 
       <SectionTitle>

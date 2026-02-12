@@ -10,6 +10,12 @@ import toast from 'react-hot-toast';
 import { Product } from '@/types';
 import { useTranslations } from 'next-intl';
 import { supabase } from '@/lib/supabaseClient';
+import Image from 'next/image';
+import ReviewForm from './ReviewForm';
+import ReviewList from './ReviewList';
+import { verifyPurchase } from '@/app/actions/reviews';
+
+const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 const Container = styled.div`
   max-width: 1200px;
@@ -212,6 +218,24 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   const { addToCart } = useCartStore();
   const [quantity, setQuantity] = useState(1);
   const [currentStock, setCurrentStock] = useState(product?.stock || 0);
+  const [canReview, setCanReview] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkUserEligibility = async () => {
+      if (!product) return;
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+        // Verify via Server Action if user bought the product
+        const purchased = await verifyPurchase(product.id, user.id);
+        setCanReview(purchased);
+      }
+    };
+
+    checkUserEligibility();
+  }, [product]);
 
   useEffect(() => {
     if (!product) return;
@@ -301,7 +325,16 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   return (
     <Container>
       <ImageWrapper>
-        <img src={product.image_url} alt={product.name} />
+        <Image
+          src={product.image_url}
+          alt={product.name}
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw, 50vw"
+          placeholder="blur"
+          blurDataURL={BLUR_DATA_URL}
+          style={{ objectFit: 'cover' }}
+        />
       </ImageWrapper>
 
       <InfoWrapper>
@@ -350,6 +383,25 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             {isOutOfStock ? t('outOfStock') : t('addToCart')}
           </AddToCartButton>
         </Controls>
+
+        {/* Reviews Section */}
+        <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: 700 }}>Opiniones de los fans</h2>
+
+          {canReview && userId && (
+            <ReviewForm
+              productId={product.id}
+              userId={userId}
+              onReviewSubmitted={() => {
+                setCanReview(false); // Hide form after submission? Or just let them see their review in the list
+                toast.success('¡Reseña enviada!');
+              }}
+            />
+          )}
+
+          <ReviewList productId={product.id} />
+        </div>
+
       </InfoWrapper>
     </Container>
   );
