@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import { Product } from '@/types';
 import { useCartStore } from '@/store/useCartStore';
-import Link from 'next/link';
+import { Link } from '@/navigation';
 import { ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';

@@ -1,7 +1,7 @@
 'use client';
 
 import styled from 'styled-components';
-import { Search, ShoppingCart, User, Shield, X } from 'lucide-react';
+import { Search, ShoppingCart, User, Shield, X, Music } from 'lucide-react';
 import { Link, useRouter } from '@/navigation';
 import { useCartStore } from '@/store/useCartStore';
 import { useEffect, useState, useRef } from 'react';
@@ -174,6 +174,9 @@ export default function Navbar() {
     <Nav>
       <Logo href="/">StanStore</Logo>
       <IconsContainer>
+        <IconWrapper as={Link} href="/artists" aria-label="Artistas" style={{ textDecoration: 'none' }}>
+          <Music size={20} />
+        </IconWrapper>
         <LanguageSwitcher />
 
         <SearchContainer $isOpen={isSearchOpen}>

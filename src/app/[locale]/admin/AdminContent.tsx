@@ -296,6 +296,7 @@ export default function AdminPage() {
   const [artistResults, setArtistResults] = useState<SpotifyArtist[]>([]);
   const [selectedArtist, setSelectedArtist] = useState<SpotifyArtist | null>(null);
   const [showArtistDropdown, setShowArtistDropdown] = useState(false);
+  const [kpopArtists, setKpopArtists] = useState<SpotifyArtist[]>([]);
 
   const [albumResults, setAlbumResults] = useState<SpotifyAlbum[]>([]);
   const [selectedAlbum, setSelectedAlbum] = useState<SpotifyAlbum | null>(null);
@@ -309,13 +310,25 @@ export default function AdminPage() {
     else setProducts(data || []);
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => {
+    fetchProducts();
+    // Pre-load K-Pop artists for suggestions
+    fetch('/api/spotify/kpop').then(r => r.json()).then(d => {
+      if (d.artists) setKpopArtists(d.artists.map((a: any) => ({ id: a.id, name: a.name, image: a.imageSmall, genres: a.genres })));
+    }).catch(() => { });
+  }, []);
 
   // Debounced artist search
   useEffect(() => {
-    if (selectedArtist || artistQuery.length < 2) {
+    if (selectedArtist) {
       setArtistResults([]);
       setShowArtistDropdown(false);
+      return;
+    }
+
+    // Show K-Pop suggestions when empty
+    if (artistQuery.length < 2) {
+      setArtistResults(kpopArtists);
       return;
     }
 
@@ -477,6 +490,10 @@ export default function AdminPage() {
                     setArtistQuery(e.target.value);
                     if (selectedArtist) setSelectedArtist(null);
                   }}
+                  onFocus={() => {
+                    if (!selectedArtist && artistResults.length > 0) setShowArtistDropdown(true);
+                  }}
+                  onBlur={() => setTimeout(() => setShowArtistDropdown(false), 200)}
                   required
                   autoComplete="off"
                   style={{ width: '100%' }}
