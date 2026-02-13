@@ -20,6 +20,7 @@ globalIgnores([
   "public/sw.js",
   "public/swe-worker-*.js",
   "public/workbox-*.js",
+  "storybook-static/**",
 ]), ...storybook.configs["flat/recommended"]]);
 
 export default eslintConfig;

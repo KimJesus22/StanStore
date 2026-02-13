@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSpotifyToken } from '@/lib/spotify';
+import { getSpotifyToken, SpotifyArtist } from '@/lib/spotify';
 
 const KPOP_ARTIST_IDS = [
     '3Nrfpe0tUJi4K4DXYWgMUX', // BTS
@@ -49,8 +49,8 @@ export async function GET() {
         const data = await res.json();
 
         const artists = data.artists
-            .filter((a: any) => a !== null)
-            .map((a: any) => ({
+            .filter((a: SpotifyArtist | null) => a !== null)
+            .map((a: SpotifyArtist) => ({
                 id: a.id,
                 name: a.name,
                 image: a.images?.[0]?.url || null,
@@ -60,7 +60,7 @@ export async function GET() {
                 followers: a.followers?.total || 0,
                 externalUrl: a.external_urls?.spotify || null,
             }))
-            .sort((a: any, b: any) => b.popularity - a.popularity);
+            .sort((a: { popularity: number }, b: { popularity: number }) => b.popularity - a.popularity);
 
         return NextResponse.json({ artists });
     } catch (error) {

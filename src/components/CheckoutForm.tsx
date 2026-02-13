@@ -3,7 +3,6 @@
 import styled from 'styled-components';
 import { useState } from 'react';
 import { useCartStore } from '@/store/useCartStore';
-import { useAuthStore } from '@/store/useAuthStore';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useLocale } from 'next-intl';
 import { ShippingInfo } from '@/types';
@@ -339,8 +338,7 @@ const TermsCheckbox = styled.label`
 /* ─── Component ─── */
 
 export default function CheckoutForm() {
-    const { items, clearCart } = useCartStore();
-    const { user } = useAuthStore();
+    const { items } = useCartStore();
     const { convertPrice } = useCurrency();
     const locale = useLocale();
 

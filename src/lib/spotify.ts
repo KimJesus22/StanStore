@@ -5,6 +5,40 @@
 let cachedToken: string | null = null;
 let tokenExpiry = 0;
 
+export interface SpotifyImage {
+    url: string;
+    height: number;
+    width: number;
+}
+
+export interface SpotifyArtist {
+    id: string;
+    name: string;
+    images: SpotifyImage[];
+    genres: string[];
+    popularity: number;
+    followers: { total: number };
+    external_urls: { spotify: string };
+}
+
+export interface SpotifyAlbum {
+    id: string;
+    name: string;
+    images: SpotifyImage[];
+    release_date: string;
+    total_tracks: number;
+    artists: SpotifyArtist[];
+}
+
+export interface SpotifyTrack {
+    id: string;
+    name: string;
+    track_number: number;
+    duration_ms: number;
+    preview_url: string | null;
+    artists: SpotifyArtist[];
+}
+
 export async function getSpotifyToken(): Promise<string> {
     if (cachedToken && Date.now() < tokenExpiry) {
         return cachedToken;
@@ -36,7 +70,7 @@ export async function getSpotifyToken(): Promise<string> {
     return cachedToken!;
 }
 
-async function spotifyFetch(endpoint: string) {
+async function spotifyFetch<T>(endpoint: string): Promise<T> {
     const token = await getSpotifyToken();
     const res = await fetch(`https://api.spotify.com/v1${endpoint}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -51,10 +85,10 @@ async function spotifyFetch(endpoint: string) {
 }
 
 export async function searchArtists(query: string, limit = 5) {
-    const data = await spotifyFetch(
+    const data = await spotifyFetch<{ artists: { items: SpotifyArtist[] } }>(
         `/search?q=${encodeURIComponent(query)}&type=artist&limit=${limit}`
     );
-    return data.artists.items.map((a: any) => ({
+    return data.artists.items.map((a) => ({
         id: a.id,
         name: a.name,
         image: a.images?.[1]?.url || a.images?.[0]?.url || null,
@@ -66,21 +100,21 @@ export async function searchArtists(query: string, limit = 5) {
 
 export async function searchAlbums(query: string, artistName?: string, limit = 10) {
     const q = artistName ? `${query} artist:${artistName}` : query;
-    const data = await spotifyFetch(
+    const data = await spotifyFetch<{ albums: { items: SpotifyAlbum[] } }>(
         `/search?q=${encodeURIComponent(q)}&type=album&limit=${limit}`
     );
-    return data.albums.items.map((a: any) => ({
+    return data.albums.items.map((a) => ({
         id: a.id,
         name: a.name,
         image: a.images?.[1]?.url || a.images?.[0]?.url || null,
         releaseDate: a.release_date,
         totalTracks: a.total_tracks,
-        artists: a.artists?.map((ar: any) => ar.name) || [],
+        artists: a.artists?.map((ar) => ar.name) || [],
     }));
 }
 
 export async function getArtist(artistId: string) {
-    const a = await spotifyFetch(`/artists/${artistId}`);
+    const a = await spotifyFetch<SpotifyArtist>(`/artists/${artistId}`);
     return {
         id: a.id,
         name: a.name,
@@ -94,10 +128,10 @@ export async function getArtist(artistId: string) {
 }
 
 export async function getArtistAlbums(artistId: string, limit = 10) {
-    const data = await spotifyFetch(
+    const data = await spotifyFetch<{ items: SpotifyAlbum[] }>(
         `/artists/${artistId}/albums?include_groups=album,single&limit=${limit}&market=MX`
     );
-    return data.items.map((a: any) => ({
+    return data.items.map((a) => ({
         id: a.id,
         name: a.name,
         image: a.images?.[1]?.url || a.images?.[0]?.url || null,
@@ -108,8 +142,8 @@ export async function getArtistAlbums(artistId: string, limit = 10) {
 
 export async function getAlbumTracks(albumId: string) {
     const [album, tracksData] = await Promise.all([
-        spotifyFetch(`/albums/${albumId}`),
-        spotifyFetch(`/albums/${albumId}/tracks?limit=50`),
+        spotifyFetch<SpotifyAlbum>(`/albums/${albumId}`),
+        spotifyFetch<{ items: SpotifyTrack[] }>(`/albums/${albumId}/tracks?limit=50`),
     ]);
 
     return {
@@ -118,15 +152,15 @@ export async function getAlbumTracks(albumId: string) {
             name: album.name,
             image: album.images?.[0]?.url || null,
             releaseDate: album.release_date,
-            artists: album.artists?.map((a: any) => a.name) || [],
+            artists: album.artists?.map((a) => a.name) || [],
         },
-        tracks: tracksData.items.map((t: any, i: number) => ({
+        tracks: tracksData.items.map((t, i) => ({
             id: t.id,
             name: t.name,
             trackNumber: t.track_number || i + 1,
             durationMs: t.duration_ms,
             previewUrl: t.preview_url,
-            artists: t.artists?.map((a: any) => a.name) || [],
+            artists: t.artists?.map((a) => a.name) || [],
         })),
     };
 }

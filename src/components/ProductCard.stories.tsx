@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, storybook/use-storybook-testing-library, storybook/no-renderer-packages
 import type { Meta, StoryObj } from '@storybook/react';
 import ProductCard from './ProductCard';
 import { Product } from '@/types';

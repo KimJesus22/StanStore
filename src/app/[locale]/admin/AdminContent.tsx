@@ -314,7 +314,8 @@ export default function AdminPage() {
     fetchProducts();
     // Pre-load K-Pop artists for suggestions
     fetch('/api/spotify/kpop').then(r => r.json()).then(d => {
-      if (d.artists) setKpopArtists(d.artists.map((a: any) => ({ id: a.id, name: a.name, image: a.imageSmall, genres: a.genres })));
+      // The API returns pre-formatted artists matching our local interface
+      if (d.artists) setKpopArtists(d.artists);
     }).catch(() => { });
   }, []);
 
@@ -344,7 +345,7 @@ export default function AdminPage() {
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [artistQuery, selectedArtist]);
+  }, [artistQuery, selectedArtist, kpopArtists]);
 
   // Fetch albums when artist is selected
   useEffect(() => {

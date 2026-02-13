@@ -151,149 +151,149 @@ const Button = styled(motion.button)`
 `;
 
 export default function SecurityPage() {
-    const [loading, setLoading] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleSubmit = async (e: any) => {
-        e.preventDefault();
-        setLoading(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    setLoading(true);
 
-        const formData = new FormData(e.target);
-        const report: SecurityReport = {
-            title: formData.get('title') as string,
-            severity: formData.get('severity') as 'low' | 'medium' | 'high' | 'critical',
-            description: formData.get('description') as string,
-            reproduction_steps: formData.get('reproduction') as string,
-            submitter_email: formData.get('email') as string,
-        };
-
-        const result = await submitSecurityReport(report);
-
-        if (result.success) {
-            setSubmitted(true);
-            toast.custom((t) => (
-                <div style={{
-                    background: '#1E293B',
-                    color: 'white',
-                    padding: '16px',
-                    borderRadius: '8px',
-                    border: '1px solid #10B981',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px'
-                }}>
-                    <Shield size={24} color="#10B981" />
-                    <div>
-                        <strong>Reporte Recibido</strong>
-                        <div style={{ fontSize: '0.9em', opacity: 0.8 }}>Gracias por ayudarnos a ser más seguros.</div>
-                    </div>
-                </div>
-            ));
-        } else {
-            toast.error(result.message);
-        }
-        setLoading(false);
+    const formData = new FormData(e.target);
+    const report: SecurityReport = {
+      title: formData.get('title') as string,
+      severity: formData.get('severity') as 'low' | 'medium' | 'high' | 'critical',
+      description: formData.get('description') as string,
+      reproduction_steps: formData.get('reproduction') as string,
+      submitter_email: formData.get('email') as string,
     };
 
-    if (submitted) {
-        return (
-            <Container style={{ textAlign: 'center', paddingTop: '8rem' }}>
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring' }}
-                >
-                    <CheckCircle size={80} color="#10B981" style={{ marginBottom: '2rem' }} />
-                </motion.div>
-                <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Reporte Enviado Cifradamente</h1>
-                <Text style={{ fontSize: '1.2rem' }}>
-                    Nuestro equipo de seguridad revisará tu reporte. Si es crítico, te contactaremos en menos de 24 horas.
-                </Text>
-                <Button
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => setSubmitted(false)}
-                    style={{ background: '#334155', margin: '2rem auto' }}
-                >
-                    Enviar otro reporte
-                </Button>
-            </Container>
-        );
+    const result = await submitSecurityReport(report);
+
+    if (result.success) {
+      setSubmitted(true);
+      toast.custom(() => (
+        <div style={{
+          background: '#1E293B',
+          color: 'white',
+          padding: '16px',
+          borderRadius: '8px',
+          border: '1px solid #10B981',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <Shield size={24} color="#10B981" />
+          <div>
+            <strong>Reporte Recibido</strong>
+            <div style={{ fontSize: '0.9em', opacity: 0.8 }}>Gracias por ayudarnos a ser más seguros.</div>
+          </div>
+        </div>
+      ));
+    } else {
+      toast.error(result.message);
     }
+    setLoading(false);
+  };
 
+  if (submitted) {
     return (
-        <Container>
-            <Header>
-                <Title>
-                    <Shield size={48} />
-                    Centro de Seguridad
-                </Title>
-                <Text style={{ fontSize: '1.2rem' }}>
-                    Política de Divulgación de Vulnerabilidades y Ética Hacker
-                </Text>
-            </Header>
-
-            <Section>
-                <SubTitle><Lock size={24} color="#FBBF24" /> Puerto Seguro (Safe Harbor)</SubTitle>
-                <Text>
-                    En StanStore, consideramos la seguridad como una prioridad fundamental. Fomentamos la investigación de seguridad ética.
-                    Si sigues esta política, nos comprometemos a:
-                </Text>
-                <List>
-                    <ListItem>No emprender acciones legales contra ti.</ListItem>
-                    <ListItem>Trabajar contigo para entender y resolver el problema rápidamente.</ListItem>
-                    <ListItem>Reconocerte públicamente si eres el primero en reportar un problema único (si lo deseas).</ListItem>
-                </List>
-                <Text style={{ fontStyle: 'italic', fontSize: '0.9rem', color: '#64748B' }}>
-                    Estándar compatible con RFC 9116. Consulta nuestro <a href="/.well-known/security.txt" style={{ color: '#FBBF24' }}>security.txt</a>.
-                </Text>
-            </Section>
-
-            <Section>
-                <SubTitle><AlertTriangle size={24} color="#F43F5E" /> Reportar una Vulnerabilidad</SubTitle>
-                <Form onSubmit={handleSubmit}>
-                    <InputGroup>
-                        <Label>Título del Hallazgo</Label>
-                        <Input name="title" required placeholder="Ej. XSS en la barra de búsqueda" />
-                    </InputGroup>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                        <InputGroup>
-                            <Label>Severidad Estimada</Label>
-                            <Select name="severity">
-                                <option value="low">Baja (Info)</option>
-                                <option value="medium">Media (Warning)</option>
-                                <option value="high">Alta (Error)</option>
-                                <option value="critical">Crítica (Fatal)</option>
-                            </Select>
-                        </InputGroup>
-
-                        <InputGroup>
-                            <Label>Tu Email (Opcional - Para recompensa)</Label>
-                            <Input name="email" type="email" placeholder="hacker@etico.com" />
-                        </InputGroup>
-                    </div>
-
-                    <InputGroup>
-                        <Label>Descripción Detallada</Label>
-                        <TextArea name="description" required placeholder="Describe qué encontraste y por qué es un riesgo..." />
-                    </InputGroup>
-
-                    <InputGroup>
-                        <Label>Pasos para Reproducir (Proof of Concept)</Label>
-                        <TextArea name="reproduction" placeholder="1. Ir a la página X..." />
-                    </InputGroup>
-
-                    <Button
-                        type="submit"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        disabled={loading}
-                    >
-                        {loading ? 'Cifrando y Enviando...' : <><Send size={18} /> Enviar Reporte Seguro</>}
-                    </Button>
-                </Form>
-            </Section>
-        </Container>
+      <Container style={{ textAlign: 'center', paddingTop: '8rem' }}>
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring' }}
+        >
+          <CheckCircle size={80} color="#10B981" style={{ marginBottom: '2rem' }} />
+        </motion.div>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Reporte Enviado Cifradamente</h1>
+        <Text style={{ fontSize: '1.2rem' }}>
+          Nuestro equipo de seguridad revisará tu reporte. Si es crítico, te contactaremos en menos de 24 horas.
+        </Text>
+        <Button
+          whileHover={{ scale: 1.05 }}
+          onClick={() => setSubmitted(false)}
+          style={{ background: '#334155', margin: '2rem auto' }}
+        >
+          Enviar otro reporte
+        </Button>
+      </Container>
     );
+  }
+
+  return (
+    <Container>
+      <Header>
+        <Title>
+          <Shield size={48} />
+          Centro de Seguridad
+        </Title>
+        <Text style={{ fontSize: '1.2rem' }}>
+          Política de Divulgación de Vulnerabilidades y Ética Hacker
+        </Text>
+      </Header>
+
+      <Section>
+        <SubTitle><Lock size={24} color="#FBBF24" /> Puerto Seguro (Safe Harbor)</SubTitle>
+        <Text>
+          En StanStore, consideramos la seguridad como una prioridad fundamental. Fomentamos la investigación de seguridad ética.
+          Si sigues esta política, nos comprometemos a:
+        </Text>
+        <List>
+          <ListItem>No emprender acciones legales contra ti.</ListItem>
+          <ListItem>Trabajar contigo para entender y resolver el problema rápidamente.</ListItem>
+          <ListItem>Reconocerte públicamente si eres el primero en reportar un problema único (si lo deseas).</ListItem>
+        </List>
+        <Text style={{ fontStyle: 'italic', fontSize: '0.9rem', color: '#64748B' }}>
+          Estándar compatible con RFC 9116. Consulta nuestro <a href="/.well-known/security.txt" style={{ color: '#FBBF24' }}>security.txt</a>.
+        </Text>
+      </Section>
+
+      <Section>
+        <SubTitle><AlertTriangle size={24} color="#F43F5E" /> Reportar una Vulnerabilidad</SubTitle>
+        <Form onSubmit={handleSubmit}>
+          <InputGroup>
+            <Label>Título del Hallazgo</Label>
+            <Input name="title" required placeholder="Ej. XSS en la barra de búsqueda" />
+          </InputGroup>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <InputGroup>
+              <Label>Severidad Estimada</Label>
+              <Select name="severity">
+                <option value="low">Baja (Info)</option>
+                <option value="medium">Media (Warning)</option>
+                <option value="high">Alta (Error)</option>
+                <option value="critical">Crítica (Fatal)</option>
+              </Select>
+            </InputGroup>
+
+            <InputGroup>
+              <Label>Tu Email (Opcional - Para recompensa)</Label>
+              <Input name="email" type="email" placeholder="hacker@etico.com" />
+            </InputGroup>
+          </div>
+
+          <InputGroup>
+            <Label>Descripción Detallada</Label>
+            <TextArea name="description" required placeholder="Describe qué encontraste y por qué es un riesgo..." />
+          </InputGroup>
+
+          <InputGroup>
+            <Label>Pasos para Reproducir (Proof of Concept)</Label>
+            <TextArea name="reproduction" placeholder="1. Ir a la página X..." />
+          </InputGroup>
+
+          <Button
+            type="submit"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            disabled={loading}
+          >
+            {loading ? 'Cifrando y Enviando...' : <><Send size={18} /> Enviar Reporte Seguro</>}
+          </Button>
+        </Form>
+      </Section>
+    </Container>
+  );
 }
