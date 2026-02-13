@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import styled, { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 
 const FanModeGlobalStyle = createGlobalStyle<{ $cursorUrl: string }>`
   body {

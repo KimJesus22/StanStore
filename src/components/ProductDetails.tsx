@@ -425,6 +425,10 @@ export default function ProductDetails({ product }: { product: Product }) {
           <SpotifyPlayer albumId={product.spotify_album_id} />
         )}
 
+        {product.youtube_video_id && (
+          <YouTubePlayer videoId={product.youtube_video_id} />
+        )}
+
         {/* Reviews Section */}
         <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: 700 }}>Opiniones de los fans</h2>

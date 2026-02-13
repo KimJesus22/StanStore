@@ -23,7 +23,6 @@ interface ContractData {
 
 export const generateContractPDF = (data: ContractData) => {
     const doc = new jsPDF();
-    const lineHeight = 7;
     let y = 20;
 
     // --- Header ---
