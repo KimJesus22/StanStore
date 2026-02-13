@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import styled from 'styled-components';
 
@@ -6,7 +8,8 @@ const PlayerContainer = styled.div`
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  background: #000;
+  background: ${({ theme }) => theme.colors.secondaryBackground};
+  border: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 interface SpotifyPlayerProps {

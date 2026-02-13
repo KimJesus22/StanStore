@@ -59,8 +59,10 @@ const StatLabel = styled.div`
 
 export default function AdminDashboard() {
   // const t = useTranslations('Admin'); // Ensure you have translations or use fallback
-  const [salesData, setSalesData] = useState([]);
-  const [categoryData, setCategoryData] = useState([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [salesData, setSalesData] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [categoryData, setCategoryData] = useState<any[]>([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [loading, setLoading] = useState(true);

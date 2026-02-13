@@ -214,6 +214,8 @@ const StockBadge = styled.div`
 
 
 import SpotifyPlayer from './SpotifyPlayer';
+import ArtistInfo from './ArtistInfo';
+import TrackPreviews from './TrackPreviews';
 import YouTubePlayer from './YouTubePlayer';
 import FanModeEffects from './FanModeEffects';
 import { Sparkles } from 'lucide-react';
@@ -425,6 +427,12 @@ export default function ProductDetails({ product }: { product: Product }) {
         {product.spotify_album_id && (
           <SpotifyPlayer albumId={product.spotify_album_id} />
         )}
+
+        {product.spotify_album_id && (
+          <TrackPreviews albumId={product.spotify_album_id} />
+        )}
+
+        <ArtistInfo artistName={product.artist} />
 
         {product.youtube_video_id && (
           <YouTubePlayer videoId={product.youtube_video_id} />

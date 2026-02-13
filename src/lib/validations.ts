@@ -23,5 +23,6 @@ export const ProductSchema = z.object({
     category: z.string().min(2, 'La categoría es requerida'),
     artist: z.string().min(1, 'El artista es requerido'),
     description: z.string().min(10, 'La descripción debe ser más detallada'),
-    image_url: z.string().url('Debe ser una URL válida'),
+    image_url: z.string().min(1, 'La imagen es requerida'),
+    spotify_album_id: z.string().optional(),
 });

@@ -18,6 +18,7 @@ export async function createProduct(formData: {
     artist: string;
     description: string;
     image_url: string;
+    spotify_album_id?: string;
 }) {
     try {
         // 1. Validate Input
