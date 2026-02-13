@@ -28,7 +28,7 @@ VALUES
         false,
         'El cuarto álbum de estudio de BTS, "Map of the Soul: 7", es un viaje introspectivo que explora los siete años de carrera del grupo. Incluye éxitos como "ON" y "Black Swan". Versión aleatoria.',
         50,
-        'H8Zh_Pz20_Q'
+        'mPVDGOVjRQ0'
     ),
     (
         'f1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5d',
@@ -76,7 +76,7 @@ VALUES
         false,
         'Edición limitada del álbum "5-STAR" de Stray Kids. Incluye photocards especiales, póster y beneficios de preventa. Un must-have para cualquier Stay.',
         100,
-        'QGZ2w7Wb8f4'
+        'JsOOis4bBFg'
     ),
     (
         'd1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b61',
@@ -114,7 +114,7 @@ VALUES
         false,
         'El primer álbum de estudio de LE SSERAFIM. Muestra la determinación del grupo de forjar su propio camino sin importar lo que digan los demás.',
         30,
-        '0J4Tz_x2T1g'
+        'UBURTj20HXI'
     ),
     (
         'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b64',

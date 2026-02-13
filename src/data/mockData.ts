@@ -11,7 +11,7 @@ export const mockProducts: Product[] = [
         is_new: false,
         description: 'El cuarto álbum de estudio de BTS, "Map of the Soul: 7", es un viaje introspectivo que explora los siete años de carrera del grupo. Incluye éxitos como "ON" y "Black Swan". Versión aleatoria.',
         stock: 50,
-        youtube_video_id: 'H8Zh_Pz20_Q',
+        youtube_video_id: 'mPVDGOVjRQ0',
     },
     {
         id: 'f1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5d',
@@ -59,7 +59,7 @@ export const mockProducts: Product[] = [
         is_new: false,
         description: 'Edición limitada del álbum "5-STAR" de Stray Kids. Incluye photocards especiales, póster y beneficios de preventa. Un must-have para cualquier Stay.',
         stock: 100,
-        youtube_video_id: 'QGZ2w7Wb8f4',
+        youtube_video_id: 'JsOOis4bBFg',
     },
     {
         id: 'd1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b61',
@@ -95,7 +95,7 @@ export const mockProducts: Product[] = [
         is_new: false,
         description: 'El primer álbum de estudio de LE SSERAFIM. Muestra la determinación del grupo de forjar su propio camino sin importar lo que digan los demás.',
         stock: 30,
-        youtube_video_id: '0J4Tz_x2T1g',
+        youtube_video_id: 'UBURTj20HXI',
     },
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b64',

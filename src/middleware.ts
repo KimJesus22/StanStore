@@ -77,7 +77,7 @@ export default function middleware(request: NextRequest) {
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://m.stripe.network;
     style-src 'self' 'unsafe-inline';
-    img-src 'self' blob: data: https://*.supabase.co https://res.cloudinary.com; 
+    img-src 'self' blob: data: https://*.supabase.co https://res.cloudinary.com https://i.ytimg.com; 
     font-src 'self';
     object-src 'none';
     base-uri 'self';
@@ -86,7 +86,7 @@ export default function middleware(request: NextRequest) {
     block-all-mixed-content;
     upgrade-insecure-requests;
     connect-src 'self' https://*.supabase.co https://api.stripe.com https://maps.googleapis.com; 
-    frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
+    frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.youtube.com;
   `;
 
     const contentSecurityPolicyHeaderValue = cspHeader
