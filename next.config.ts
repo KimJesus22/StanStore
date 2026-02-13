@@ -21,6 +21,8 @@ const nextConfig: NextConfig = {
   images: {
     // loader: 'custom',
     // loaderFile: './src/lib/cloudinaryLoader.ts',
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: 'https',
@@ -29,6 +31,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: '**', // Allow all domains for demo purposes since StanStore might fetch from anywhere
+      },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
       },
     ],
   },

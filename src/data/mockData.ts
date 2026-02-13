@@ -71,7 +71,7 @@ export const mockProducts: Product[] = [
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b62',
         name: 'The Name Chapter: FREEFALL',
         price: 35.00,
-        image_url: 'https://placehold.co/600x600/333/FFF?text=TXT+FREEFALL',
+        image_url: '/images/The Name Chapter FREEFALL.png',
         category: 'album',
         artist: 'TXT',
         is_new: true,
