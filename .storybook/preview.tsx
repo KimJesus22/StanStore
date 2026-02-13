@@ -3,6 +3,7 @@ import React from "react";
 import { ThemeProvider } from "styled-components";
 import { NextIntlClientProvider } from "next-intl";
 import GlobalStyles from "../src/styles/StorybookGlobalStyles";
+import { CurrencyProvider } from "../src/context/CurrencyContext";
 
 // Mock básico del tema (deberías importar tu tema real si lo tienes en un archivo separado)
 const theme = {
@@ -41,10 +42,12 @@ const preview: Preview = {
     decorators: [
         (Story) => (
             <NextIntlClientProvider locale="es" messages={messages}>
-                <ThemeProvider theme={theme}>
-                    <GlobalStyles />
-                    <Story />
-                </ThemeProvider>
+                <CurrencyProvider>
+                    <ThemeProvider theme={theme}>
+                        <GlobalStyles />
+                        <Story />
+                    </ThemeProvider>
+                </CurrencyProvider>
             </NextIntlClientProvider>
         ),
     ],
