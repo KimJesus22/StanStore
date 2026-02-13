@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useCurrency } from '@/context/CurrencyContext';
 
 const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
@@ -191,6 +192,7 @@ const CheckoutButton = styled(motion.button)`
 export default function CartDrawer() {
   const t = useTranslations('Cart');
   const { isCartOpen, closeCart, items, removeFromCart } = useCartStore();
+  const { convertPrice } = useCurrency();
   const [mounted, setMounted] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
@@ -284,7 +286,7 @@ export default function CartDrawer() {
                         <ItemName>{item.name}</ItemName>
                         <ItemArtist>{item.artist}</ItemArtist>
                         <ItemPrice>
-                          ${item.price.toFixed(2)} x {item.quantity}
+                          {convertPrice(item.price)} x {item.quantity}
                         </ItemPrice>
                       </ItemDetails>
                       <RemoveButton
@@ -302,7 +304,7 @@ export default function CartDrawer() {
             <Footer>
               <TotalRow>
                 <span>{t('total')}</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{convertPrice(total)}</span>
               </TotalRow>
               <CheckoutButton
                 disabled={items.length === 0 || checkoutLoading}

@@ -17,6 +17,19 @@ const rateLimit = new Map();
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const MAX_REQUESTS = 20; // 20 requests per minute per IP for API routes
 
+// Extend NextRequest to include geo property (Vercel specific)
+declare module 'next/server' {
+    interface NextRequest {
+        geo?: {
+            country?: string;
+            region?: string;
+            city?: string;
+            latitude?: string;
+            longitude?: string;
+        };
+    }
+}
+
 export default function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
 
@@ -40,14 +53,31 @@ export default function middleware(request: NextRequest) {
         }
     }
 
-    // 2. CSP Headers
-    const response = intlMiddleware(request); // Run next-intl middleware first to get the response
+    // 2. Security: Block suspicious IPs from /admin (Simulated Blacklist)
+    const BLACKLISTED_IPS = ['1.2.3.4', '5.6.7.8']; // Example IPs
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+
+    if (pathname.startsWith('/admin') && BLACKLISTED_IPS.includes(ip)) {
+        return new NextResponse('Access Denied: Suspicious Activity Detected', { status: 403 });
+    }
+
+    // 3. CSP Headers & Geo-Detection
+    const response = intlMiddleware(request);
+
+    // Geo-Detection (Vercel specific) - fallback to 'US' if not present
+    const country = request.geo?.country || 'US';
+    const currency = country === 'MX' ? 'MXN' : 'USD';
+
+    // Set currency cookie if not present or different
+    if (!request.cookies.has('NEXT_CURRENCY')) {
+        response.cookies.set('NEXT_CURRENCY', currency);
+    }
 
     const cspHeader = `
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://m.stripe.network;
     style-src 'self' 'unsafe-inline';
-    img-src 'self' blob: data: https://*.supabase.co;
+    img-src 'self' blob: data: https://*.supabase.co https://res.cloudinary.com; 
     font-src 'self';
     object-src 'none';
     base-uri 'self';

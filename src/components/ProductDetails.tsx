@@ -14,8 +14,9 @@ import Image from 'next/image';
 import ReviewForm from './ReviewForm';
 import ReviewList from './ReviewList';
 import { verifyPurchase } from '@/app/actions/reviews';
+import { useCurrency } from '@/context/CurrencyContext';
 
-const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+const BLUR_DATA_URL = "data:image/png;base664,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 const Container = styled.div`
   max-width: 1200px;
@@ -213,9 +214,10 @@ interface ProductDetailsProps {
   product: Product | null;
 }
 
-export default function ProductDetails({ product }: ProductDetailsProps) {
+export default function ProductDetails({ product }: { product: Product }) {
   const t = useTranslations('Product');
-  const { addToCart } = useCartStore();
+  const addToCart = useCartStore((state) => state.addToCart);
+  const { convertPrice } = useCurrency();
   const [quantity, setQuantity] = useState(1);
   const [currentStock, setCurrentStock] = useState(product?.stock || 0);
   const [canReview, setCanReview] = useState(false);
@@ -352,7 +354,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
           </StockBadge>
         )}
 
-        <Price>${product.price.toFixed(2)}</Price>
+        <Price>{convertPrice(product.price)}</Price>
 
         <Description>
           {product.description || "Sin descripción disponible para este producto."}

@@ -9,6 +9,7 @@ import { ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useCurrency } from '@/context/CurrencyContext';
 
 const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
@@ -121,6 +122,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const addToCart = useCartStore((state) => state.addToCart);
+  const { convertPrice } = useCurrency();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent Link navigation
@@ -162,7 +164,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
         <Artist>{product.artist}</Artist>
         <ProductName>{product.name}</ProductName>
         <Footer>
-          <Price>${product.price.toFixed(2)}</Price>
+          <Price>{convertPrice(product.price)}</Price>
           <AddButton
             className="add-to-cart-btn"
             onClick={handleAddToCart}
