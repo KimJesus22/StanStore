@@ -16,24 +16,26 @@ const mockProduct: Product = {
     stock: 10,
 };
 
+import { CurrencyProvider } from '@/context/CurrencyContext';
+
+// ... existing code
+
 const meta: Meta<typeof ProductCard> = {
     title: 'Components/ProductCard',
     component: ProductCard,
     tags: ['autodocs'],
+    decorators: [
+        (Story) => (
+            <CurrencyProvider>
+                <Story />
+            </CurrencyProvider>
+        ),
+    ],
     argTypes: {
-        isLoading: {
-            control: 'boolean',
-            description: 'Muestra el estado de carga (skeleton)',
-        },
-        product: {
-            control: 'object',
-            description: 'Datos del producto',
-        },
+        // ... existing argTypes
     },
     args: {
-        product: mockProduct,
-        index: 0,
-        isLoading: false,
+        // ... existing args
     },
     parameters: {
         layout: 'centered',
