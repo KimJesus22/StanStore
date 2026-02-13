@@ -91,9 +91,9 @@ VALUES
     ),
     (
         'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b63',
-        'UNFORGIVEN (3rd Mini Album)',
+        'LE SSERAFIM - Unforgiven 1st Studio Album',
         28.50,
-        'https://placehold.co/600x600/800000/FFF?text=LE+SSERAFIM',
+        '/images/LE SSERAFIM 1st Studio Album UNFORGIVEN.jpg',
         'album',
         'LE SSERAFIM',
         false,
@@ -102,9 +102,9 @@ VALUES
     ),
     (
         'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b64',
-        'Drama (The 4th Mini Album)',
+        'Drama - The 4th Mini Album [Scene Ver.]',
         26.00,
-        'https://placehold.co/600x600/aa00ff/FFF?text=aespa+Drama',
+        '/images/Drama - The 4th Mini Album [Scene Ver.].jpg',
         'album',
         'aespa',
         true,

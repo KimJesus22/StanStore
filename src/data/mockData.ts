@@ -80,9 +80,9 @@ export const mockProducts: Product[] = [
     },
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b63',
-        name: 'UNFORGIVEN (3rd Mini Album)',
+        name: 'LE SSERAFIM - Unforgiven 1st Studio Album',
         price: 28.50,
-        image_url: 'https://placehold.co/600x600/800000/FFF?text=LE+SSERAFIM',
+        image_url: '/images/LE SSERAFIM 1st Studio Album UNFORGIVEN.jpg',
         category: 'album',
         artist: 'LE SSERAFIM',
         is_new: false,
@@ -91,9 +91,9 @@ export const mockProducts: Product[] = [
     },
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b64',
-        name: 'Drama (The 4th Mini Album)',
+        name: 'Drama - The 4th Mini Album [Scene Ver.]',
         price: 26.00,
-        image_url: 'https://placehold.co/600x600/aa00ff/FFF?text=aespa+Drama',
+        image_url: '/images/Drama - The 4th Mini Album [Scene Ver.].jpg',
         category: 'album',
         artist: 'aespa',
         is_new: true,
