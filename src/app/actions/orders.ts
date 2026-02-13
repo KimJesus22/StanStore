@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
+import Stripe from 'stripe';
 
 // Use Service Role to ensure we can save orders even if auth context is lost in Server Action
 // (Common issue in basic Next.js + Supabase setups without full auth helpers)
@@ -18,13 +19,6 @@ interface OrderItem {
     image_url: string;
 }
 
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    apiVersion: '2025-01-27.acacia' as any,
-});
-
 export async function saveOrder(orderData: {
     userId: string;
     total: number;
@@ -32,6 +26,11 @@ export async function saveOrder(orderData: {
     sessionId?: string; // Optional for legacy, required for Legal Tech
 }) {
     try {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            apiVersion: '2025-01-27.acacia' as any,
+        });
+
         const { userId, total, items, sessionId } = orderData;
         let agreedAt: string | null = null;
         let userAgent: string | null = null;

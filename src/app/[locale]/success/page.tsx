@@ -51,7 +51,7 @@ const Button = styled(Link)`
 
 function SuccessContent() {
   const { items, clearCart } = useCartStore();
-  const { user } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuthStore();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
@@ -73,6 +73,9 @@ function SuccessContent() {
   }, [items]);
 
   useEffect(() => {
+    // Esperar a que auth termine de cargar antes de procesar
+    if (authLoading) return;
+
     if (sessionId && items.length > 0 && user && !isSaving && !saved) {
       const processOrder = async () => {
         setIsSaving(true);
@@ -124,7 +127,7 @@ function SuccessContent() {
         return () => clearTimeout(timer);
       }
     }
-  }, [sessionId, items, user, clearCart, isSaving, saved]);
+  }, [sessionId, items, user, authLoading, clearCart, isSaving, saved]);
 
   return (
     <>

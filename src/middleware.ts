@@ -64,14 +64,12 @@ export default function middleware(request: NextRequest) {
     // 3. CSP Headers & Geo-Detection
     const response = intlMiddleware(request);
 
-    // Geo-Detection (Vercel specific) - fallback to 'US' if not present
-    const country = request.geo?.country || 'US';
+    // Geo-Detection (Vercel specific) - usa header x-vercel-ip-country como fuente principal
+    const country = request.headers.get('x-vercel-ip-country') || request.geo?.country || 'US';
     const currency = country === 'MX' ? 'MXN' : 'USD';
 
-    // Set currency cookie if not present or different
-    if (!request.cookies.has('NEXT_CURRENCY')) {
-        response.cookies.set('NEXT_CURRENCY', currency);
-    }
+    // Siempre actualizar la cookie de moneda basada en la ubicación actual
+    response.cookies.set('NEXT_CURRENCY', currency);
 
     const cspHeader = `
     default-src 'self';

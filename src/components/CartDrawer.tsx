@@ -6,7 +6,7 @@ import { X, Trash2, ShoppingBag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
 import { useCurrency } from '@/context/CurrencyContext';
 
@@ -210,6 +210,7 @@ const TermsCheckbox = styled.div`
 
 export default function CartDrawer() {
   const t = useTranslations('Cart');
+  const locale = useLocale();
   const { isCartOpen, closeCart, items, removeFromCart } = useCartStore();
   const { convertPrice } = useCurrency();
   const [mounted, setMounted] = useState(false);
@@ -243,7 +244,8 @@ export default function CartDrawer() {
 
       const { url, error } = await createCheckoutSession(
         items.map(item => ({ id: item.id, quantity: item.quantity })),
-        legalMetadata
+        legalMetadata,
+        locale
       );
 
       if (error) {

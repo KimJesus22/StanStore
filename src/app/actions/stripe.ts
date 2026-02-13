@@ -6,7 +6,8 @@ import { logAuditAction } from '@/app/actions/audit';
 
 export async function createCheckoutSession(
     cartItems: { id: string; quantity: number }[],
-    legalMetadata?: { agreedAt: string; userAgent: string }
+    legalMetadata?: { agreedAt: string; userAgent: string },
+    locale: string = 'es'
 ) {
     try {
         const stripeKey = process.env.STRIPE_SECRET_KEY;
@@ -77,8 +78,8 @@ export async function createCheckoutSession(
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/`,
+            success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/`,
             metadata: {
                 // We serialize the items to retrieve them in the webhook
                 items: JSON.stringify(cartItems.map(item => ({ id: item.id, quantity: item.quantity }))),
