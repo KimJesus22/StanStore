@@ -43,7 +43,7 @@ export const mockProducts: Product[] = [
         artist: 'BLACKPINK',
         is_new: false,
         description: 'Hoodie oficial del tour mundial BORN PINK de BLACKPINK. Fabricado con algodón de alta calidad, cómodo y estiloso. Diseño exclusivo del tour.',
-        stock: 0,
+        stock: 25,
     },
     {
         id: 'c1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b60',

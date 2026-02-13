@@ -52,7 +52,7 @@ VALUES
         'BLACKPINK',
         false,
         'Hoodie oficial del tour mundial BORN PINK de BLACKPINK. Fabricado con algodón de alta calidad, cómodo y estiloso. Diseño exclusivo del tour.',
-        0
+        25
     ),
     (
         'c1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b60',
