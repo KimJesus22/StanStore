@@ -247,6 +247,65 @@ export default function ProfilePage() {
     fetchOrders();
   }, [user]);
 
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Load profile data (decrypted)
+  useEffect(() => {
+    async function loadProfile() {
+      const session = useAuthStore.getState().session;
+      if (!user || !session?.access_token) return;
+      try {
+        // Dynamically import server action to avoid build issues if mixed
+        const { getProfile } = await import('@/app/actions/profile');
+        const data = await getProfile(session.access_token);
+        if (data) {
+          setPhone(data.phone || '');
+          setAddress(data.address || '');
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      } finally {
+        setLoadingProfile(false);
+      }
+    }
+    loadProfile();
+  }, [user]);
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const session = useAuthStore.getState().session;
+    if (!session?.access_token) {
+      toast.error('Sesión no válida');
+      return;
+    }
+
+    setSaving(true);
+    const toastId = toast.loading('Guardando datos encriptados...');
+
+    try {
+      const formData = new FormData();
+      formData.append('phone', phone);
+      formData.append('address', address);
+
+      const { updateProfile } = await import('@/app/actions/profile');
+      const result = await updateProfile(session.access_token, formData);
+
+      if (result.error) {
+        toast.error(result.error, { id: toastId });
+      } else {
+        toast.success('Perfil actualizado y encriptado', { id: toastId });
+      }
+    } catch (error) {
+      toast.error('Error al guardar', { id: toastId });
+      console.error(error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleLogout = async () => {
     await signOut();
     toast.success('Sesión cerrada correctamente');
@@ -321,6 +380,38 @@ export default function ProfilePage() {
           </ThemeOption>
         ))}
       </ThemeGrid>
+
+      <SectionTitle>
+        <User size={20} /> Datos Personales (Encriptados)
+      </SectionTitle>
+
+      <ProfileCard as="form" onSubmit={handleUpdateProfile} style={{ textAlign: 'left', padding: '2rem' }}>
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Teléfono</label>
+          <input
+            type="text"
+            value={loadingProfile ? 'Cargando...' : phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+52 55 1234 5678"
+            style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd' }}
+          />
+        </div>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Dirección de Envío</label>
+          <textarea
+            value={loadingProfile ? 'Cargando...' : address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Calle, Número, Colonia, Ciudad..."
+            style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd', minHeight: '80px' }}
+          />
+        </div>
+        <ButtonBase type="submit" disabled={saving || loadingProfile} style={{ background: '#10CFBD', color: 'white', border: 'none' }}>
+          {saving ? 'Encriptando y Guardando...' : 'Guardar Datos Seguros'}
+        </ButtonBase>
+        <p style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#888' }}>
+          <span role="img" aria-label="lock">🔒</span> Tus datos se encriptan con AES-256 antes de guardarse. Nadie, ni siquiera los administradores, pueden verlos sin tu sesión activa.
+        </p>
+      </ProfileCard>
 
       <SectionTitle>
         <Package color="#10CFBD" /> Mis Pedidos ({orders.length})
