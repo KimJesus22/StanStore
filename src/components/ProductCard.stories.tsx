@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, storybook/use-storybook-testing-library, storybook/no-renderer-packages
+// eslint-disable-next-line storybook/no-renderer-packages
 import type { Meta, StoryObj } from '@storybook/react';
 import ProductCard from './ProductCard';
 import { Product } from '@/types';
@@ -17,8 +17,31 @@ const mockProduct: Product = {
 };
 
 import { CurrencyProvider } from '@/context/CurrencyContext';
+import { NextIntlClientProvider } from 'next-intl';
+import { ThemeProvider } from 'styled-components';
+import GlobalStyles from '@/styles/StorybookGlobalStyles';
 
-// ... existing code
+// Mock theme and messages locally to avoid import issues
+const theme = {
+    name: 'light',
+    colors: {
+        background: "#ffffff",
+        secondaryBackground: "#f5f5f5",
+        text: "#000000",
+        primary: "#0070f3",
+        secondary: "#ff4081",
+        border: "#eaeaea",
+        accent: "#0070f3",
+        muted: "#888888",
+    },
+};
+
+const messages = {
+    "ProductCard": {
+        "addToCart": "Añadir al carrito",
+        "outOfStock": "Agotado",
+    }
+};
 
 const meta: Meta<typeof ProductCard> = {
     title: 'Components/ProductCard',
@@ -26,9 +49,14 @@ const meta: Meta<typeof ProductCard> = {
     tags: ['autodocs'],
     decorators: [
         (Story) => (
-            <CurrencyProvider>
-                <Story />
-            </CurrencyProvider>
+            <NextIntlClientProvider locale="es" messages={messages}>
+                <CurrencyProvider>
+                    <ThemeProvider theme={theme}>
+                        <GlobalStyles />
+                        <Story />
+                    </ThemeProvider>
+                </CurrencyProvider>
+            </NextIntlClientProvider>
         ),
     ],
     argTypes: {
