@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
 import { useCurrency } from '@/context/CurrencyContext';
+import { useRouter } from 'next/navigation';
 
 const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
@@ -213,8 +214,8 @@ export default function CartDrawer() {
   const locale = useLocale();
   const { isCartOpen, closeCart, items, removeFromCart } = useCartStore();
   const { convertPrice } = useCurrency();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
@@ -226,42 +227,14 @@ export default function CartDrawer() {
 
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (items.length === 0) return;
     if (!acceptedTerms) {
       toast.error('Debes aceptar los términos y condiciones para continuar.');
       return;
     }
-
-    setCheckoutLoading(true);
-    try {
-      const { createCheckoutSession } = await import('@/app/actions/stripe');
-
-      const legalMetadata = {
-        agreedAt: new Date().toISOString(),
-        userAgent: navigator.userAgent,
-      };
-
-      const { url, error } = await createCheckoutSession(
-        items.map(item => ({ id: item.id, quantity: item.quantity })),
-        legalMetadata,
-        locale
-      );
-
-      if (error) {
-        toast.error('Error al iniciar el pago: ' + error);
-        return;
-      }
-
-      if (url) {
-        window.location.href = url;
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error('Ocurrió un error inesperado');
-    } finally {
-      setCheckoutLoading(false);
-    }
+    closeCart();
+    router.push(`/${locale}/checkout`);
   };
 
 
@@ -356,12 +329,12 @@ export default function CartDrawer() {
               </TermsCheckbox>
 
               <CheckoutButton
-                disabled={items.length === 0 || checkoutLoading || !acceptedTerms}
+                disabled={items.length === 0 || !acceptedTerms}
                 onClick={handleCheckout}
                 whileHover={{ scale: 1.02, backgroundColor: '#000' }}
                 whileTap={{ scale: 0.98 }}
               >
-                {checkoutLoading ? 'Redirigiendo...' : t('checkout')}
+                {t('checkout')}
               </CheckoutButton>
             </Footer>
           </Drawer>

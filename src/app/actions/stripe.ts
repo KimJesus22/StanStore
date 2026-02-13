@@ -3,11 +3,13 @@
 import Stripe from 'stripe';
 import { supabase } from '@/lib/supabaseClient';
 import { logAuditAction } from '@/app/actions/audit';
+import { ShippingInfo } from '@/types';
 
 export async function createCheckoutSession(
     cartItems: { id: string; quantity: number }[],
     legalMetadata?: { agreedAt: string; userAgent: string },
-    locale: string = 'es'
+    locale: string = 'es',
+    shippingInfo?: ShippingInfo
 ) {
     try {
         const stripeKey = process.env.STRIPE_SECRET_KEY;
@@ -86,6 +88,8 @@ export async function createCheckoutSession(
                 // Legal Metadata
                 agreedAt: legalMetadata?.agreedAt || '',
                 userAgent: legalMetadata?.userAgent || '',
+                // Shipping Info
+                shippingInfo: shippingInfo ? JSON.stringify(shippingInfo) : '',
             },
         });
 

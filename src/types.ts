@@ -12,3 +12,15 @@ export interface Product {
     theme_color?: string;
     youtube_video_id?: string;
 }
+
+export interface ShippingInfo {
+    country: string;
+    firstName: string;
+    lastName: string;
+    address: string;
+    apartment?: string;
+    postalCode: string;
+    city: string;
+    state: string;
+    phone: string;
+}
