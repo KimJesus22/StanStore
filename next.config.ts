@@ -18,8 +18,8 @@ const withPWA = withPWAInit({
 const nextConfig: NextConfig = {
   turbopack: {},
   images: {
-    loader: 'custom',
-    loaderFile: './src/lib/cloudinaryLoader.ts',
+    // loader: 'custom',
+    // loaderFile: './src/lib/cloudinaryLoader.ts',
     remotePatterns: [
       {
         protocol: 'https',

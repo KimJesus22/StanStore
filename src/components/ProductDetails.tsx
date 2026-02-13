@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+'use client';
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -210,9 +210,7 @@ const StockBadge = styled.div`
   border: 1px solid #fed7d7;
 `;
 
-interface ProductDetailsProps {
-  product: Product | null;
-}
+
 
 export default function ProductDetails({ product }: { product: Product }) {
   const t = useTranslations('Product');

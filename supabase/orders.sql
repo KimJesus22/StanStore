@@ -1,10 +1,13 @@
 -- Create the orders table
-CREATE TABLE public.orders (
+CREATE TABLE IF NOT EXISTS public.orders (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id),
   total NUMERIC NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('paid', 'pending', 'cancelled')),
   items JSONB NOT NULL,
+  agreement_accepted_at TIMESTAMP WITH TIME ZONE,
+  user_agent TEXT,
+  stripe_session_id TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, NOW()) NOT NULL
 );
 
@@ -12,16 +15,23 @@ CREATE TABLE public.orders (
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Users can see their own orders
-CREATE POLICY "Users can view own orders" 
-ON public.orders FOR SELECT 
-TO authenticated 
-USING (auth.uid() = user_id);
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies WHERE tablename = 'orders' AND policyname = 'Users can view own orders'
+    ) THEN
+        CREATE POLICY "Users can view own orders" ON public.orders FOR SELECT TO authenticated USING (auth.uid() = user_id);
+    END IF;
+END
+$$;
 
 -- Policy: Service role (and authenticated users via Server Action) can insert orders
--- Note: We allow authenticated users to insert their own orders for this MVP simulation
--- In a real app with Webhooks, only service_role would insert.
--- UPDATE: Allowing public insert for Demo purposes (handling anon client in legacy server actions)
-CREATE POLICY "Enable insert for all users" 
-ON public.orders FOR INSERT 
-TO public 
-WITH CHECK (true);
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies WHERE tablename = 'orders' AND policyname = 'Enable insert for all users'
+    ) THEN
+        CREATE POLICY "Enable insert for all users" ON public.orders FOR INSERT TO public WITH CHECK (true);
+    END IF;
+END
+$$;

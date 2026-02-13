@@ -2,13 +2,14 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import styled from 'styled-components';
-import { CheckCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, Loader2, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/useCartStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSearchParams } from 'next/navigation';
 import { saveOrder } from '@/app/actions/orders';
 import toast from 'react-hot-toast';
+import { generateContractPDF } from '@/utils/pdfGenerator';
 
 const Container = styled.div`
   display: flex;
@@ -53,8 +54,23 @@ function SuccessContent() {
   const { user } = useAuthStore();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
+
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [agreedAt, setAgreedAt] = useState<string | null>(null);
+  const [userAgent, setUserAgent] = useState<string | null>(null);
+
+  // Local state to hold items for PDF generation even after cart is cleared
+  const [pdfItems, setPdfItems] = useState(items);
+  const [pdfTotal, setPdfTotal] = useState(0);
+
+  useEffect(() => {
+    if (items.length > 0) {
+      setPdfItems(items);
+      setPdfTotal(items.reduce((acc, item) => acc + item.price * item.quantity, 0));
+    }
+  }, [items]);
 
   useEffect(() => {
     if (sessionId && items.length > 0 && user && !isSaving && !saved) {
@@ -75,18 +91,21 @@ function SuccessContent() {
               name: item.name,
               price: item.price,
               image_url: item.image_url
-            }))
+            })),
+            sessionId: sessionId
           });
 
-          if (result.success) {
+          if (result.success && result.order) {
             toast.success('Pedido guardado correctamente');
             setSaved(true);
+            setOrderId(result.order.id);
+            setAgreedAt(result.order.agreement_accepted_at);
+            setUserAgent(result.order.user_agent);
             clearCart();
           } else {
             console.error('Error saving order:', result.error);
-            toast.error('Error al guardar el historial del pedido, pero el pago fue exitoso.');
-            // We clear cart anyway since they paid
-            clearCart();
+            toast.error('Error al guardar el pedido, pero el pago fue exitoso.');
+            clearCart(); // Clear anyway
           }
         } catch (error) {
           console.error('Unexpected error:', error);
@@ -97,12 +116,8 @@ function SuccessContent() {
 
       processOrder();
     } else if (sessionId && items.length > 0 && !user) {
-      // Guest checkout case (or user not loaded yet)
-      // For MVP we just clear cart, but ideally we'd ask them to login to save history
+      // Guest logic
       if (!isSaving && !saved) {
-        // Maybe wait a bit for auth to load?
-        // If auth is strictly required for checkout in previous steps, this isn't an issue.
-        // If not, we just clear.
         const timer = setTimeout(() => {
           if (!user) clearCart();
         }, 2000);
@@ -116,10 +131,41 @@ function SuccessContent() {
       <CheckCircle size={64} color="#10CFBD" />
       <Title>¡Gracias por tu compra!</Title>
       <Subtitle>
-        {saved ? 'Tu pedido ha sido guardado en tu historial.' : 'Tu pedido ha sido procesado correctamente.'}
-        Recibirás un correo electrónico con los detalles de confirmación.
+        {saved ? 'Tu pedido ha sido guardado y el contrato generado.' : 'Tu pedido ha sido procesado correctamente.'}
+        <br />Recibirás un correo electrónico con los detalles.
       </Subtitle>
-      {isSaving && <p><Loader2 className="animate-spin" /> Guardando detalles...</p>}
+
+      {isSaving && <p><Loader2 className="animate-spin" /> Guardando detalles y firma digital...</p>}
+
+      {saved && (
+        <div style={{ marginBottom: '2rem' }}>
+          <button
+            onClick={() => generateContractPDF({
+              orderId: orderId!,
+              customerName: user?.email || 'Cliente',
+              items: pdfItems,
+              total: pdfTotal,
+              date: new Date(),
+              legalMetadata: {
+                agreedAt: agreedAt || new Date().toISOString(),
+                userAgent: userAgent || navigator.userAgent
+              }
+            })}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+              background: '#fff', border: '1px solid #ccc', padding: '0.75rem 1.5rem',
+              borderRadius: '50px', cursor: 'pointer', fontWeight: 600, color: '#333'
+            }}
+          >
+            <FileText size={18} />
+            Descargar Contrato Compra-Venta
+          </button>
+          <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.5rem' }}>
+            Incluye firma digital con timestamp y User-Agent.
+          </p>
+        </div>
+      )}
+
       <Button href="/">Volver a la tienda</Button>
     </>
   );

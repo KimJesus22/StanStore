@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { supabase } from '@/lib/supabaseClient';
 import SalesChart from '@/components/admin/SalesChart';
 import CategoryChart from '@/components/admin/CategoryChart';
-import { useTranslations } from 'next-intl';
+// import { useTranslations } from 'next-intl';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -57,7 +57,7 @@ const StatLabel = styled.div`
 `;
 
 export default function AdminDashboard() {
-  const t = useTranslations('Admin'); // Ensure you have translations or use fallback
+  // const t = useTranslations('Admin'); // Ensure you have translations or use fallback
   const [salesData, setSalesData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
   const [totalRevenue, setTotalRevenue] = useState(0);

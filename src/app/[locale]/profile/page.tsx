@@ -9,7 +9,7 @@ import { User, LogOut, Package, Calendar, Download, Palette } from 'lucide-react
 import toast from 'react-hot-toast';
 import { getUserData } from '@/app/actions/privacy';
 import { useTheme } from '@/context/ThemeContext';
-import { themes, ThemeType } from '@/styles/themes';
+import { themes } from '@/styles/themes';
 
 const Container = styled.div`
   max-width: 800px;

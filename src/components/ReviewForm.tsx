@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+// import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import StarRating from './StarRating';
 // Import the server action directly. Next.js handles the rest.
@@ -15,7 +15,7 @@ interface ReviewFormProps {
 }
 
 export default function ReviewForm({ productId, userId, onReviewSubmitted }: ReviewFormProps) {
-    const t = useTranslations('Product'); // Assuming we add translations later
+    // const t = useTranslations('Product'); // Assuming we add translations later
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [submitting, setSubmitting] = useState(false);

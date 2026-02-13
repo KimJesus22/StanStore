@@ -26,7 +26,7 @@ export async function updateProfile(token: string, formData: FormData) {
     const phone = formData.get('phone') as string;
     const address = formData.get('address') as string;
 
-    const updates: any = {
+    const updates: Record<string, string | null> = {
         updated_at: new Date().toISOString(),
     };
 

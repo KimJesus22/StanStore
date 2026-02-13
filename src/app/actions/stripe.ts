@@ -4,7 +4,10 @@ import Stripe from 'stripe';
 import { supabase } from '@/lib/supabaseClient';
 import { logAuditAction } from '@/app/actions/audit';
 
-export async function createCheckoutSession(cartItems: { id: string; quantity: number }[]) {
+export async function createCheckoutSession(
+    cartItems: { id: string; quantity: number }[],
+    legalMetadata?: { agreedAt: string; userAgent: string }
+) {
     try {
         const stripeKey = process.env.STRIPE_SECRET_KEY;
         if (!stripeKey) {
@@ -78,18 +81,18 @@ export async function createCheckoutSession(cartItems: { id: string; quantity: n
             cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/`,
             metadata: {
                 // We serialize the items to retrieve them in the webhook
-                // Format: "id:qty,id:qty" (Simple string format to avoid JSON limits if possible, or just JSON)
-                // Stripe metadata has a 500 char limit per key. 
-                // For a big cart, we might need multiple keys or a separate DB mapping.
-                // For this demo, JSON.stringify is likely fine for small carts.
                 items: JSON.stringify(cartItems.map(item => ({ id: item.id, quantity: item.quantity }))),
+                // Legal Metadata
+                agreedAt: legalMetadata?.agreedAt || '',
+                userAgent: legalMetadata?.userAgent || '',
             },
         });
 
         // Audit Log
         await logAuditAction('CHECKOUT_SESSION_CREATED', {
             amountTotal: lineItems.reduce((acc, item) => acc + (item.price_data.unit_amount * item.quantity), 0) / 100,
-            itemCount: cartItems.length
+            itemCount: cartItems.length,
+            legalAgreement: !!legalMetadata
         });
 
         return { url: session.url };

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useTranslations } from 'next-intl';
+// import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 
 const Banner = styled.div`
   position: fixed;
@@ -63,38 +64,38 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
 `;
 
 export default function CookieBanner() {
-    const [show, setShow] = useState(false);
-    const t = useTranslations('CookieBanner'); // Assuming we'll add these keys or use fallbacks
+  const [show, setShow] = useState(false);
+  // const t = useTranslations('CookieBanner'); // Assuming we'll add these keys or use fallbacks
 
-    useEffect(() => {
-        const consent = localStorage.getItem('cookie_consent');
-        if (consent === null) {
-            setShow(true);
-        }
-    }, []);
+  useEffect(() => {
+    const consent = localStorage.getItem('cookie_consent');
+    if (consent === null) {
+      setShow(true);
+    }
+  }, []);
 
-    const handleAccept = () => {
-        localStorage.setItem('cookie_consent', 'true');
-        setShow(false);
-        window.location.reload(); // Reload to activate scripts
-    };
+  const handleAccept = () => {
+    localStorage.setItem('cookie_consent', 'true');
+    setShow(false);
+    window.location.reload(); // Reload to activate scripts
+  };
 
-    const handleDecline = () => {
-        localStorage.setItem('cookie_consent', 'false');
-        setShow(false);
-    };
+  const handleDecline = () => {
+    localStorage.setItem('cookie_consent', 'false');
+    setShow(false);
+  };
 
-    if (!show) return null;
+  if (!show) return null;
 
-    return (
-        <Banner>
-            <Text>
-                Usamos cookies para mejorar tu experiencia y analizar nuestro tráfico. Al continuar, aceptas nuestra <a href="/privacy">Política de Privacidad</a>.
-            </Text>
-            <ButtonGroup>
-                <Button variant="secondary" onClick={handleDecline}>Rechazar</Button>
-                <Button variant="primary" onClick={handleAccept}>Aceptar Todas</Button>
-            </ButtonGroup>
-        </Banner>
-    );
+  return (
+    <Banner>
+      <Text>
+        Usamos cookies para mejorar tu experiencia y analizar nuestro tráfico. Al continuar, aceptas nuestra <Link href="/privacy">Política de Privacidad</Link>.
+      </Text>
+      <ButtonGroup>
+        <Button variant="secondary" onClick={handleDecline}>Rechazar</Button>
+        <Button variant="primary" onClick={handleAccept}>Aceptar Todas</Button>
+      </ButtonGroup>
+    </Banner>
+  );
 }

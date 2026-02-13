@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
-import { themes, ThemeType } from '@/styles/themes';
+import { themes } from '@/styles/themes';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -52,6 +52,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         if (user) {
             fetchProfileTheme();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const changeTheme = async (theme: ThemeName) => {
@@ -70,14 +71,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    if (!mounted) {
-        return <>{children}</>;
-    }
-
+    // Prevent hydration mismatch by rendering default theme initially
+    // but ALWAYS wrap in StyledThemeProvider so styled-components don't crash
     return (
         <ThemeContext.Provider value={{ currentTheme, changeTheme }}>
             <StyledThemeProvider theme={themes[currentTheme]}>
-                {children}
+                {/* To avoid hydration mismatch on content that depends on theme specific logic (not just CSS),
+                    we could use mounted check, but here we prioritize CSS stability.
+                    If necessary, suppressHydrationWarning or use a specific loader. 
+                */}
+                <div style={{ visibility: mounted ? 'visible' : 'hidden' }}>
+                    {/* Optional: Hide content until mounted to avoid Flash of Wrong Theme if critical, 
+                       but usually just rendering is better. 
+                       For now, let's just render. 
+                   */}
+                    {children}
+                </div>
             </StyledThemeProvider>
         </ThemeContext.Provider>
     );

@@ -22,24 +22,22 @@ export default function ReviewList({ productId }: ReviewListProps) {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchReviews = async () => {
-        // We can use the server action or client-side fetch since RLS allows public select
-        // Let's use client side for real-time updates simplicity or just simple fetch
-        const { data, error } = await supabase
-            .from('reviews')
-            .select('*')
-            .eq('product_id', productId)
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Error fetching reviews:', error);
-        } else {
-            setReviews(data || []);
-        }
-        setLoading(false);
-    };
-
     useEffect(() => {
+        const fetchReviews = async () => {
+            const { data, error } = await supabase
+                .from('reviews')
+                .select('*')
+                .eq('product_id', productId)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching reviews:', error);
+            } else {
+                setReviews(data || []);
+            }
+            setLoading(false);
+        };
+
         fetchReviews();
 
         // Subscribe to new reviews

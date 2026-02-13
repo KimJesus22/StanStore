@@ -18,16 +18,38 @@ interface OrderItem {
     image_url: string;
 }
 
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-01-27.acacia' as any,
+});
+
 export async function saveOrder(orderData: {
     userId: string;
     total: number;
-    items: OrderItem[]
+    items: OrderItem[];
+    sessionId?: string; // Optional for legacy, required for Legal Tech
 }) {
     try {
-        const { userId, total, items } = orderData;
+        const { userId, total, items, sessionId } = orderData;
+        let agreedAt: string | null = null;
+        let userAgent: string | null = null;
 
-        // MVP Security Check: Ideally verify payment session here
-        // For now, we trust the client's trigger after Stripe redirect (Simulated)
+        // Legal Tech: Verify Stripe Session and extract metadata
+        if (sessionId) {
+            try {
+                const session = await stripe.checkout.sessions.retrieve(sessionId);
+                if (session.payment_status === 'paid') {
+                    // Extract legal metadata
+                    agreedAt = session.metadata?.agreedAt || null;
+                    userAgent = session.metadata?.userAgent || null;
+                }
+            } catch (stripeError) {
+                console.error('Error verifying Stripe session:', stripeError);
+                // We might choose to fail here if strict legal compliance is required, 
+                // but for now we proceed with logging.
+            }
+        }
 
         // Insert into Supabase using Admin client
         const { data, error } = await supabaseAdmin
@@ -35,15 +57,17 @@ export async function saveOrder(orderData: {
             .insert({
                 user_id: userId,
                 total: total,
-                status: 'paid', // Assuming success page reached = paid
-                items: items, // JSONB snapshot
+                status: 'paid',
+                items: items,
+                agreement_accepted_at: agreedAt,
+                user_agent: userAgent,
+                stripe_session_id: sessionId
             })
             .select()
             .single();
 
         if (error) {
             console.error('Error saving order (Supabase):', error);
-            // Log full error for debugging
             return { success: false, error: error.message || 'Database error' };
         }
 

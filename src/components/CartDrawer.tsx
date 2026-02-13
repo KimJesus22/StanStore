@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import styled from 'styled-components';
@@ -189,12 +188,34 @@ const CheckoutButton = styled(motion.button)`
   }
 `;
 
+const TermsCheckbox = styled.div`
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: ${({ theme }) => theme.colors.text};
+  
+  input {
+    margin-top: 0.25rem;
+    cursor: pointer;
+    accent-color: ${({ theme }) => theme.colors.primary};
+  }
+
+  label {
+    cursor: pointer;
+    line-height: 1.4;
+  }
+`;
+
 export default function CartDrawer() {
   const t = useTranslations('Cart');
   const { isCartOpen, closeCart, items, removeFromCart } = useCartStore();
   const { convertPrice } = useCurrency();
   const [mounted, setMounted] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -206,12 +227,23 @@ export default function CartDrawer() {
 
   const handleCheckout = async () => {
     if (items.length === 0) return;
+    if (!acceptedTerms) {
+      toast.error('Debes aceptar los términos y condiciones para continuar.');
+      return;
+    }
+
     setCheckoutLoading(true);
     try {
       const { createCheckoutSession } = await import('@/app/actions/stripe');
 
+      const legalMetadata = {
+        agreedAt: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+      };
+
       const { url, error } = await createCheckoutSession(
-        items.map(item => ({ id: item.id, quantity: item.quantity }))
+        items.map(item => ({ id: item.id, quantity: item.quantity })),
+        legalMetadata
       );
 
       if (error) {
@@ -229,6 +261,8 @@ export default function CartDrawer() {
       setCheckoutLoading(false);
     }
   };
+
+
 
   return (
     <AnimatePresence>
@@ -306,8 +340,21 @@ export default function CartDrawer() {
                 <span>{t('total')}</span>
                 <span>{convertPrice(total)}</span>
               </TotalRow>
+
+              <TermsCheckbox>
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                />
+                <label htmlFor="terms">
+                  Acepto los <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>Términos y Condiciones</a> y reconozco que esta acción constituye una <strong>Firma Digital</strong> válida.
+                </label>
+              </TermsCheckbox>
+
               <CheckoutButton
-                disabled={items.length === 0 || checkoutLoading}
+                disabled={items.length === 0 || checkoutLoading || !acceptedTerms}
                 onClick={handleCheckout}
                 whileHover={{ scale: 1.02, backgroundColor: '#000' }}
                 whileTap={{ scale: 0.98 }}
