@@ -16,11 +16,12 @@ const Nav = styled.nav`
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
+  background-color: ${({ theme }) => theme.colors.background};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: all 0.3s ease;
 
   @media (max-width: 768px) {
     padding: 1rem;
@@ -30,7 +31,7 @@ const Nav = styled.nav`
 const Logo = styled(Link)`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #000;
+  color: ${({ theme }) => theme.colors.text};
   text-decoration: none;
   letter-spacing: -0.5px;
   
@@ -53,14 +54,14 @@ const IconWrapper = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #333;
+  color: ${({ theme }) => theme.colors.text};
   display: flex;
   align-items: center;
   justify-content: center;
   transition: color 0.2s ease;
 
   &:hover {
-    color: #000;
+    color: ${({ theme }) => theme.colors.primary};
   }
 
   svg {
@@ -72,12 +73,13 @@ const IconWrapper = styled.button`
 const SearchContainer = styled.div<{ $isOpen: boolean }>`
   display: flex;
   align-items: center;
-  background: ${({ $isOpen }) => ($isOpen ? '#f5f5f5' : 'transparent')};
+  background: ${({ $isOpen, theme }) => ($isOpen ? theme.colors.secondaryBackground : 'transparent')};
   border-radius: 50px;
   padding: ${({ $isOpen }) => ($isOpen ? '0.5rem 1rem' : '0')};
   transition: all 0.3s ease;
   width: ${({ $isOpen }) => ($isOpen ? '300px' : '40px')};
   overflow: hidden;
+  border: ${({ $isOpen, theme }) => ($isOpen ? `1px solid ${theme.colors.border}` : 'none')};
 
   @media (max-width: 640px) {
     width: ${({ $isOpen }) => ($isOpen ? '160px' : '40px')};
@@ -92,7 +94,7 @@ const SearchInput = styled.input<{ $isOpen: boolean }>`
   width: 100%;
   font-size: 1rem;
   display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
-  color: #111;
+  color: ${({ theme }) => theme.colors.text};
   opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
   transition: opacity 0.2s 0.1s;
 `;
@@ -101,8 +103,8 @@ const Badge = styled.span`
   position: absolute;
   top: -8px;
   right: -8px;
-  background-color: #ef4444;
-  color: white;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.background};
   font-size: 0.7rem;
   font-weight: 700;
   width: 18px;
@@ -111,7 +113,7 @@ const Badge = styled.span`
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid #fff;
+  border: 2px solid ${({ theme }) => theme.colors.background};
 `;
 
 const RelativeContainer = styled.div`

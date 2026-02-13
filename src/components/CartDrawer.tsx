@@ -29,7 +29,7 @@ const Drawer = styled(motion.div)`
   width: 100%;
   max-width: 400px;
   height: 100%;
-  background-color: #fff;
+  background-color: ${({ theme }) => theme.colors.background};
   z-index: 1000;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -38,7 +38,7 @@ const Drawer = styled(motion.div)`
 
 const Header = styled.div`
   padding: 1.5rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -50,20 +50,21 @@ const Title = styled.h2`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #666;
+  color: ${({ theme }) => theme.colors.text};
   padding: 0.5rem;
   border-radius: 50%;
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #f5f5f5;
-    color: #111;
+    background-color: ${({ theme }) => theme.colors.secondaryBackground};
+    color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -79,7 +80,7 @@ const Content = styled.div`
 const EmptyState = styled.div`
   text-align: center;
   margin-top: 3rem;
-  color: #888;
+  color: ${({ theme }) => theme.colors.text}80;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -91,7 +92,7 @@ const CartItem = styled(motion.div)`
   gap: 1rem;
   align-items: center;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 
   &:last-child {
     border-bottom: none;
@@ -103,7 +104,7 @@ const ItemImage = styled.div`
   height: 80px;
   border-radius: 8px;
   overflow: hidden;
-  background-color: #f0f0f0;
+  background-color: ${({ theme }) => theme.colors.secondaryBackground};
   flex-shrink: 0;
   position: relative;
 
@@ -122,12 +123,12 @@ const ItemName = styled.h4`
   font-size: 0.95rem;
   font-weight: 600;
   margin-bottom: 0.25rem;
-  color: #111;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const ItemArtist = styled.div`
   font-size: 0.75rem;
-  color: #888;
+  color: ${({ theme }) => theme.colors.text}90;
   text-transform: uppercase;
   margin-bottom: 0.5rem;
 `;
@@ -135,7 +136,7 @@ const ItemArtist = styled.div`
 const ItemPrice = styled.div`
   font-size: 0.9rem;
   font-weight: 700;
-  color: #10CFBD;
+  color: ${({ theme }) => theme.colors.primary};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -144,20 +145,20 @@ const ItemPrice = styled.div`
 const RemoveButton = styled.button`
   background: none;
   border: none;
-  color: #999;
+  color: ${({ theme }) => theme.colors.text}60;
   cursor: pointer;
   padding: 0.25rem;
   transition: color 0.2s;
 
   &:hover {
-    color: #ef4444;
+    color: #ef4444; /* Keep red for destructive action */
   }
 `;
 
 const Footer = styled.div`
   padding: 1.5rem;
-  border-top: 1px solid #eee;
-  background-color: #fff;
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
+  background-color: ${({ theme }) => theme.colors.background};
 `;
 
 const TotalRow = styled.div`
@@ -167,12 +168,13 @@ const TotalRow = styled.div`
   margin-bottom: 1.5rem;
   font-size: 1.1rem;
   font-weight: 700;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const CheckoutButton = styled(motion.button)`
   width: 100%;
-  background-color: #111;
-  color: white;
+  background-color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.background};
   border: none;
   padding: 1rem;
   border-radius: 50px;

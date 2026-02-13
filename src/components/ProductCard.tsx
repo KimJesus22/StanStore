@@ -38,12 +38,13 @@ const Card = styled(motion.div)`
 const ImageContainer = styled.div`
   width: 100%;
   aspect-ratio: 1 / 1;
-  background-color: #fca5a5;
+  background-color: ${({ theme }) => theme.colors.secondaryBackground};
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 0.75rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: relative;
+  border: 1px solid ${({ theme }) => theme.colors.border};
 
   img {
     width: 100%;
@@ -55,7 +56,7 @@ const ImageContainer = styled.div`
 
 const Artist = styled.span`
   font-size: 0.8rem;
-  color: #888;
+  color: ${({ theme }) => theme.colors.text}80; /* 50% opacity */
   margin-bottom: 0.25rem;
   text-transform: uppercase;
   font-weight: 600;
@@ -65,7 +66,7 @@ const Artist = styled.span`
 const ProductName = styled.h3`
   font-size: 1rem;
   font-weight: 700;
-  color: #111;
+  color: ${({ theme }) => theme.colors.text};
   margin-bottom: 0.5rem;
   line-height: 1.4;
   overflow: hidden;
@@ -85,12 +86,12 @@ const Footer = styled.div`
 const Price = styled.div`
   font-size: 1rem;
   font-weight: 700;
-  color: #10CFBD;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 const AddButton = styled(motion.button)`
-  background-color: #111;
-  color: #fff;
+  background-color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.background};
   border: none;
   border-radius: 50%;
   width: 32px;
@@ -166,7 +167,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             className="add-to-cart-btn"
             onClick={handleAddToCart}
             aria-label="Añadir al carrito"
-            whileHover={{ scale: 1.1, backgroundColor: "#10CFBD" }}
+            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
             <ShoppingBag size={16} />

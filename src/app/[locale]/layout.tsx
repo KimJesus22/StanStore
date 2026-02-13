@@ -5,6 +5,7 @@ import StyledComponentsRegistry from '@/lib/registry';
 import Navbar from '@/components/Navbar';
 import CartDrawer from '@/components/CartDrawer';
 import AuthProvider from '@/components/AuthProvider';
+import { ThemeProvider } from '@/context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
 import { locales } from '@/navigation';
 import '../globals.css';
@@ -62,10 +63,12 @@ export default async function LocaleLayout({
             <GoogleAnalytics gaId="G-XXXXXXXXXX" />
             <Toaster position="bottom-center" />
             <AuthProvider>
-              <Navbar />
-              <CartDrawer />
-              <InstallPrompt />
-              {children}
+              <ThemeProvider>
+                <Navbar />
+                <CartDrawer />
+                <InstallPrompt />
+                {children}
+              </ThemeProvider>
             </AuthProvider>
             <CookieBanner />
           </StyledComponentsRegistry>

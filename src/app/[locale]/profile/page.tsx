@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { supabase } from '@/lib/supabaseClient';
 import styled from 'styled-components';
-import { User, LogOut, Package, Calendar, Download } from 'lucide-react';
+import { User, LogOut, Package, Calendar, Download, Palette } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getUserData } from '@/app/actions/privacy';
+import { useTheme } from '@/context/ThemeContext';
+import { themes, ThemeType } from '@/styles/themes';
 
 const Container = styled.div`
   max-width: 800px;
@@ -148,11 +150,51 @@ const LogoutButton = styled(ButtonBase)`
 `;
 
 const ExportButton = styled(ButtonBase)`
-  color: #10CFBD;
+  color: ${({ theme }) => theme.colors.primary};
+  border-color: ${({ theme }) => theme.colors.primary};
   &:hover {
-    background: #e0f2f1;
-    border-color: #10CFBD;
+    background: ${({ theme }) => theme.colors.secondaryBackground};
   }
+`;
+
+const ThemeGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+`;
+
+const ThemeOption = styled.button<{ $isActive: boolean; $primary: string; $bg: string }>`
+  background: ${({ $bg }) => $bg};
+  border: 2px solid ${({ $isActive, $primary }) => ($isActive ? $primary : 'transparent')};
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  }
+`;
+
+const ColorPreview = styled.div<{ $color: string }>`
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: ${({ $color }) => $color};
+  border: 1px solid rgba(0,0,0,0.1);
+`;
+
+const ThemeName = styled.span<{ $color: string }>`
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: ${({ $color }) => $color};
 `;
 
 interface Order {
@@ -166,6 +208,7 @@ interface Order {
 
 export default function ProfilePage() {
   const { user, isLoading, signOut, openAuthModal } = useAuthStore();
+  const { currentTheme, changeTheme } = useTheme();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const router = useRouter();
@@ -261,6 +304,25 @@ export default function ProfilePage() {
       </ProfileCard>
 
       <SectionTitle>
+        <Palette size={20} /> Personalización (Temas)
+      </SectionTitle>
+
+      <ThemeGrid>
+        {Object.entries(themes).map(([key, theme]) => (
+          <ThemeOption
+            key={key}
+            onClick={() => changeTheme(key as keyof typeof themes)}
+            $isActive={currentTheme === key}
+            $primary={theme.colors.primary}
+            $bg={theme.colors.secondaryBackground}
+          >
+            <ColorPreview $color={theme.colors.primary} />
+            <ThemeName $color={theme.colors.text}>{theme.name}</ThemeName>
+          </ThemeOption>
+        ))}
+      </ThemeGrid>
+
+      <SectionTitle>
         <Package color="#10CFBD" /> Mis Pedidos ({orders.length})
       </SectionTitle>
 
@@ -292,6 +354,6 @@ export default function ProfilePage() {
           ))
         )}
       </OrdersList>
-    </Container>
+    </Container >
   );
 }
