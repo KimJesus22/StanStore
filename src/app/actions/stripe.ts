@@ -58,14 +58,17 @@ export async function createCheckoutSession(
                 validImages.push(imageUrl);
             }
 
+            // Tipo de cambio USD → MXN (misma tasa que CurrencyContext)
+            const MXN_EXCHANGE_RATE = 20.50;
+
             lineItems.push({
                 price_data: {
-                    currency: 'mxn', // Changed to MXN as per user's card limitation error
+                    currency: 'mxn',
                     product_data: {
                         name: product.name,
                         images: validImages,
                     },
-                    unit_amount: Math.round(product.price * 100), // Stripe expects cents, so 29.99 becomes $29.99 MXN
+                    unit_amount: Math.round(product.price * MXN_EXCHANGE_RATE * 100), // USD → MXN → centavos
                 },
                 quantity: item.quantity,
             });

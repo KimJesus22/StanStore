@@ -9,6 +9,7 @@ import { User, LogOut, Package, Calendar, Download, Palette } from 'lucide-react
 import toast from 'react-hot-toast';
 import { getUserData } from '@/app/actions/privacy';
 import { useTheme } from '@/context/ThemeContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import { themes } from '@/styles/themes';
 
 const Container = styled.div`
@@ -209,6 +210,7 @@ interface Order {
 export default function ProfilePage() {
   const { user, isLoading, signOut, openAuthModal } = useAuthStore();
   const { currentTheme, changeTheme } = useTheme();
+  const { convertPrice } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const router = useRouter();
@@ -430,14 +432,14 @@ export default function ProfilePage() {
                     year: 'numeric', month: 'long', day: 'numeric'
                   })}
                 </OrderDate>
-                <OrderTotal>${Number(order.total).toFixed(2)}</OrderTotal>
+                <OrderTotal>{convertPrice(Number(order.total))}</OrderTotal>
               </OrderHeader>
               <OrderItems>
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {Array.isArray(order.items) && order.items.map((item: any, index: number) => (
                   <OrderItemRow key={index}>
                     <span>{item.quantity}x {item.name}</span>
-                    <span>${(item.price * item.quantity).toFixed(2)}</span>
+                    <span>{convertPrice(item.price * item.quantity)}</span>
                   </OrderItemRow>
                 ))}
               </OrderItems>
