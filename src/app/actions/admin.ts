@@ -60,3 +60,26 @@ export async function createProduct(formData: {
         return { success: false, error: 'Error inesperado al crear el producto' };
     }
 }
+
+export async function deleteProduct(productId: string) {
+    try {
+        const { error } = await supabaseAdmin
+            .from('products')
+            .delete()
+            .eq('id', productId);
+
+        if (error) {
+            console.error('Supabase Delete Error:', error);
+            await logAuditAction('PRODUCT_DELETION_FAILED', { error: error.message, productId });
+            return { success: false, error: 'Error al eliminar: ' + error.message };
+        }
+
+        await logAuditAction('PRODUCT_DELETED', { productId });
+        revalidatePath('/');
+        return { success: true };
+
+    } catch (error: unknown) {
+        console.error('Delete Product Error:', error);
+        return { success: false, error: 'Error inesperado al eliminar el producto' };
+    }
+}

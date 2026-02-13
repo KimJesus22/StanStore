@@ -80,13 +80,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                     we could use mounted check, but here we prioritize CSS stability.
                     If necessary, suppressHydrationWarning or use a specific loader. 
                 */}
-                <div style={{
-                    visibility: mounted ? 'visible' : 'hidden',
-                    backgroundColor: themes[currentTheme].colors.background,
-                    color: themes[currentTheme].colors.text,
-                    minHeight: '100vh',
-                    transition: 'background-color 0.3s, color 0.3s',
-                }}>
+                <div
+                    suppressHydrationWarning
+                    style={{
+                        visibility: mounted ? 'visible' : 'hidden',
+                        backgroundColor: themes[currentTheme].colors.background,
+                        color: themes[currentTheme].colors.text,
+                        minHeight: '100vh',
+                        transition: 'background-color 0.3s, color 0.3s',
+                    }}
+                >
                     {children}
                 </div>
             </StyledThemeProvider>

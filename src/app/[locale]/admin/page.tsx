@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { supabase } from '@/lib/supabaseClient';
 import SalesChart from '@/components/admin/SalesChart';
 import CategoryChart from '@/components/admin/CategoryChart';
+import AdminContent from './AdminContent';
 // import { useTranslations } from 'next-intl';
 
 const Container = styled.div`
@@ -67,28 +68,23 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data: sales, error: salesError } = await supabase.rpc('get_sales_by_date');
-        const { data: categories, error: catError } = await supabase.rpc('get_sales_by_category');
+        const { data: sales } = await supabase.rpc('get_sales_by_date');
+        const { data: categories } = await supabase.rpc('get_sales_by_category');
 
-        if (salesError) console.error('Sales Error:', salesError);
-        if (catError) console.error('Category Error:', catError);
-
-        if (sales) {
-          // Transform date for chart if needed, though RPC returns YYYY-MM-DD
+        if (sales && Array.isArray(sales)) {
           setSalesData(sales);
-          // Calculate totals from the aggregated data (approximation)
-          const revenue = sales.reduce((acc: number, curr: { total: number }) => acc + curr.total, 0);
+          const revenue = sales.reduce((acc: number, curr: { total: number }) => acc + (curr.total || 0), 0);
           setTotalRevenue(revenue);
         }
 
-        if (categories) {
+        if (categories && Array.isArray(categories)) {
           setCategoryData(categories);
-          const orders = categories.reduce((acc: number, curr: { count: number }) => acc + curr.count, 0);
+          const orders = categories.reduce((acc: number, curr: { total: number }) => acc + (curr.total || 0), 0);
           setTotalOrders(orders);
         }
 
-      } catch (error) {
-        console.error('Fetch Error:', error);
+      } catch {
+        // RPC functions may not exist yet - silently handle
       } finally {
         setLoading(false);
       }
@@ -123,6 +119,10 @@ export default function AdminDashboard() {
         <SalesChart data={salesData} />
         <CategoryChart data={categoryData} />
       </Grid>
+
+      {/* Formulario para crear productos */}
+      <AdminContent />
     </Container>
   );
 }
+
