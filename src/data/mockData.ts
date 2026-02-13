@@ -11,6 +11,7 @@ export const mockProducts: Product[] = [
         is_new: false,
         description: 'El cuarto álbum de estudio de BTS, "Map of the Soul: 7", es un viaje introspectivo que explora los siete años de carrera del grupo. Incluye éxitos como "ON" y "Black Swan". Versión aleatoria.',
         stock: 50,
+        youtube_video_id: 'H8Zh_Pz20_Q',
     },
     {
         id: 'f1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5d',
@@ -22,6 +23,7 @@ export const mockProducts: Product[] = [
         is_new: true,
         description: 'El segundo EP de NewJeans, "Get Up", presenta una mezcla refrescante de pop y R&B. Incluye las canciones "Super Shy", "ETA" y "Cool With You". El paquete incluye photobook y stickers.',
         stock: 20,
+        youtube_video_id: 'ArmDp-zijuc',
     },
     {
         id: 'a1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5e',
@@ -33,6 +35,7 @@ export const mockProducts: Product[] = [
         is_new: true,
         description: 'La versión 3 del lightstick oficial de Seventeen. Cuenta con un diseño elegante y mayor brillo. Sincronizable con la app oficial para conciertos.',
         stock: 5,
+        youtube_video_id: '-GQg25oP0S4',
     },
     {
         id: 'b1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5f',
@@ -44,6 +47,7 @@ export const mockProducts: Product[] = [
         is_new: false,
         description: 'Hoodie oficial del tour mundial BORN PINK de BLACKPINK. Fabricado con algodón de alta calidad, cómodo y estiloso. Diseño exclusivo del tour.',
         stock: 25,
+        youtube_video_id: 'POe9SOEKotk',
     },
     {
         id: 'c1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b60',
@@ -55,6 +59,7 @@ export const mockProducts: Product[] = [
         is_new: false,
         description: 'Edición limitada del álbum "5-STAR" de Stray Kids. Incluye photocards especiales, póster y beneficios de preventa. Un must-have para cualquier Stay.',
         stock: 100,
+        youtube_video_id: 'QGZ2w7Wb8f4',
     },
     {
         id: 'd1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b61',
@@ -66,6 +71,7 @@ export const mockProducts: Product[] = [
         is_new: true,
         description: 'El nuevo lightstick oficial de TWICE, CANDYBONG Infinity. Diseño mejorado con panel táctil y nuevos modos de iluminación. Perfecto para iluminar los estadios.',
         stock: 12,
+        youtube_video_id: 'w4cTYnOPdNk',
     },
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b62',
@@ -77,6 +83,7 @@ export const mockProducts: Product[] = [
         is_new: true,
         description: 'El tercer álbum de estudio de TOMORROW X TOGETHER. Una exploración conceptual de la juventud y el crecimiento. Incluye photocard aleatoria.',
         stock: 45,
+        youtube_video_id: 'ISnyONG1dEc',
     },
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b63',
@@ -88,6 +95,7 @@ export const mockProducts: Product[] = [
         is_new: false,
         description: 'El primer álbum de estudio de LE SSERAFIM. Muestra la determinación del grupo de forjar su propio camino sin importar lo que digan los demás.',
         stock: 30,
+        youtube_video_id: '0J4Tz_x2T1g',
     },
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b64',
@@ -99,6 +107,7 @@ export const mockProducts: Product[] = [
         is_new: true,
         description: 'El cuarto mini álbum de aespa. Incluye el éxito principal "Drama" y muestra una faceta más madura y poderosa del grupo.',
         stock: 60,
+        youtube_video_id: 'D8VEhcPeSlc',
     },
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b65',
@@ -110,5 +119,6 @@ export const mockProducts: Product[] = [
         is_new: true,
         description: 'El quinto mini álbum de ENHYPEN. Una continuación de su serie BLOOD, explorando temas de amor y sacrificio con un sonido fresco.',
         stock: 55,
+        youtube_video_id: 'XBwYJiEOmPo',
     },
 ];

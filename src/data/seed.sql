@@ -6,10 +6,18 @@ BEGIN
     END IF;
 END $$;
 
--- 2. Insertar/Actualizar TODOS los productos para asegurar stock correcto
-INSERT INTO products (id, name, price, image_url, category, artist, is_new, description, stock)
+-- 2. Asegurar que la columna 'youtube_video_id' existe
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'products' AND column_name = 'youtube_video_id') THEN
+        ALTER TABLE products ADD COLUMN youtube_video_id TEXT;
+    END IF;
+END $$;
+
+-- 3. Insertar/Actualizar TODOS los productos
+INSERT INTO products (id, name, price, image_url, category, artist, is_new, description, stock, youtube_video_id)
 VALUES 
-    -- Productos Originales (Restaurando Stock)
+    -- Productos Originales
     (
         'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b5c',
         'Map of the Soul: 7',
@@ -19,7 +27,8 @@ VALUES
         'BTS',
         false,
         'El cuarto álbum de estudio de BTS, "Map of the Soul: 7", es un viaje introspectivo que explora los siete años de carrera del grupo. Incluye éxitos como "ON" y "Black Swan". Versión aleatoria.',
-        50
+        50,
+        'H8Zh_Pz20_Q'
     ),
     (
         'f1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5d',
@@ -30,7 +39,8 @@ VALUES
         'NewJeans',
         true,
         'El segundo EP de NewJeans, "Get Up", presenta una mezcla refrescante de pop y R&B. Incluye las canciones "Super Shy", "ETA" y "Cool With You". El paquete incluye photobook y stickers.',
-        20
+        20,
+        'ArmDp-zijuc'
     ),
     (
         'a1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5e',
@@ -41,7 +51,8 @@ VALUES
         'Seventeen',
         true,
         'La versión 3 del lightstick oficial de Seventeen. Cuenta con un diseño elegante y mayor brillo. Sincronizable con la app oficial para conciertos.',
-        5
+        5,
+        '-GQg25oP0S4'
     ),
     (
         'b1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5f',
@@ -52,7 +63,8 @@ VALUES
         'BLACKPINK',
         false,
         'Hoodie oficial del tour mundial BORN PINK de BLACKPINK. Fabricado con algodón de alta calidad, cómodo y estiloso. Diseño exclusivo del tour.',
-        25
+        25,
+        'POe9SOEKotk'
     ),
     (
         'c1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b60',
@@ -63,7 +75,8 @@ VALUES
         'Stray Kids',
         false,
         'Edición limitada del álbum "5-STAR" de Stray Kids. Incluye photocards especiales, póster y beneficios de preventa. Un must-have para cualquier Stay.',
-        100
+        100,
+        'QGZ2w7Wb8f4'
     ),
     (
         'd1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b61',
@@ -74,7 +87,8 @@ VALUES
         'TWICE',
         true,
         'El nuevo lightstick oficial de TWICE, CANDYBONG Infinity. Diseño mejorado con panel táctil y nuevos modos de iluminación. Perfecto para iluminar los estadios.',
-        12
+        12,
+        'w4cTYnOPdNk'
     ),
     
     -- Nuevos Productos (TXT, LE SSERAFIM, aespa, ENHYPEN)
@@ -87,7 +101,8 @@ VALUES
         'TXT',
         true,
         'El tercer álbum de estudio de TOMORROW X TOGETHER. Una exploración conceptual de la juventud y el crecimiento. Incluye photocard aleatoria.',
-        45
+        45,
+        'ISnyONG1dEc'
     ),
     (
         'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b63',
@@ -98,7 +113,8 @@ VALUES
         'LE SSERAFIM',
         false,
         'El primer álbum de estudio de LE SSERAFIM. Muestra la determinación del grupo de forjar su propio camino sin importar lo que digan los demás.',
-        30
+        30,
+        '0J4Tz_x2T1g'
     ),
     (
         'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b64',
@@ -109,7 +125,8 @@ VALUES
         'aespa',
         true,
         'El cuarto mini álbum de aespa. Incluye el éxito principal "Drama" y muestra una faceta más madura y poderosa del grupo.',
-        60
+        60,
+        'D8VEhcPeSlc'
     ),
     (
         'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b65',
@@ -120,11 +137,13 @@ VALUES
         'ENHYPEN',
         true,
         'El quinto mini álbum de ENHYPEN. Una continuación de su serie BLOOD, explorando temas de amor y sacrificio con un sonido fresco.',
-        55
+        55,
+        'XBwYJiEOmPo'
     )
 ON CONFLICT (id) DO UPDATE SET 
     stock = EXCLUDED.stock,
     price = EXCLUDED.price,
     description = EXCLUDED.description,
     image_url = EXCLUDED.image_url,
-    artist = EXCLUDED.artist;
+    artist = EXCLUDED.artist,
+    youtube_video_id = EXCLUDED.youtube_video_id;

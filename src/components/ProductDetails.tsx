@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabaseClient';
 import Image from 'next/image';
 import ReviewForm from './ReviewForm';
 import ReviewList from './ReviewList';
+import SimilarProducts from './SimilarProducts';
 import { verifyPurchase } from '@/app/actions/reviews';
 import { useCurrency } from '@/context/CurrencyContext';
 
@@ -454,6 +455,8 @@ export default function ProductDetails({ product }: { product: Product }) {
           )}
 
           <ReviewList productId={product.id} />
+
+          <SimilarProducts productId={product.id} />
         </div>
 
       </InfoWrapper>
