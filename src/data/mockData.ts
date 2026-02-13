@@ -104,7 +104,7 @@ export const mockProducts: Product[] = [
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b65',
         name: 'ORANGE BLOOD',
         price: 32.00,
-        image_url: 'https://placehold.co/600x600/ff8800/FFF?text=ENHYPEN+ORANGE+BLOOD',
+        image_url: '/images/ORANGE BLOOD.png',
         category: 'album',
         artist: 'ENHYPEN',
         is_new: true,

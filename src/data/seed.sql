@@ -115,7 +115,7 @@ VALUES
         'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b65',
         'ORANGE BLOOD',
         32.00,
-        'https://placehold.co/600x600/ff8800/FFF?text=ENHYPEN+ORANGE+BLOOD',
+        '/images/ORANGE BLOOD.png',
         'album',
         'ENHYPEN',
         true,
