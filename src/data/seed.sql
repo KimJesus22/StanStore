@@ -1,6 +1,12 @@
--- Insertar nuevos productos (TXT, LE SSERAFIM, aespa)
--- Ejecutar en SQL Editor de Supabase: https://supabase.com/dashboard/project/jgwaooxpszriuregytvu/sql
+-- 1. Asegurar que la columna 'stock' existe
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'products' AND column_name = 'stock') THEN
+        ALTER TABLE products ADD COLUMN stock INTEGER DEFAULT 0;
+    END IF;
+END $$;
 
+-- 2. Insertar nuevos productos (TXT, LE SSERAFIM, aespa)
 INSERT INTO products (id, name, price, image_url, category, artist, is_new, description, stock)
 VALUES 
     (
@@ -36,4 +42,7 @@ VALUES
         'El cuarto mini álbum de aespa. Incluye el éxito principal "Drama" y muestra una faceta más madura y poderosa del grupo.',
         60
     )
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET 
+    stock = EXCLUDED.stock,
+    price = EXCLUDED.price,
+    description = EXCLUDED.description;
