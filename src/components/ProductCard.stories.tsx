@@ -76,7 +76,11 @@ type Story = StoryObj<typeof ProductCard>;
 /**
  * Estado por defecto del componente, mostrando un producto disponible.
  */
-export const Normal: Story = {};
+export const Normal: Story = {
+    args: {
+        product: mockProduct,
+    },
+};
 
 /**
  * Estado "Sin Stock". Muestra un overlay y deshabilita la interacción.
