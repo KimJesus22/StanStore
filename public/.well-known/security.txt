@@ -1,0 +1,9 @@
+Contact: mailto:security@stanstore.com
+MsgVerify: https://stanstore.com/key.pub
+Encryption: https://stanstore.com/pgp-key.txt
+Canonical: https://stanstore.com/.well-known/security.txt
+Policy: https://stanstore.com/security
+Hiring: https://stanstore.com/jobs
+Brief: Welcome to StanStore's Vulnerability Disclosure Program. We commit to a Safe Harbor for ethical researchers.
+Expires: 2026-12-31T23:59:59.000Z
+Languages: es, en
