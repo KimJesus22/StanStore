@@ -26,38 +26,66 @@ Este proyecto está construido sobre una arquitectura robusta, escalable y segur
 
 ```mermaid
 graph TD
-    subgraph Client ["Cliente (Browser/PWA)"]
-        User[Usuario]
+    subgraph ClientSide ["Client (Browser / PWA 📱)"]
+        UI[User Interface <br/> (React / Styled Components)]
+        SW[Service Worker <br/> (Offline Cache)]
     end
 
-    subgraph Vercel ["Vercel Infrastructure"]
-        Edge[Edge Network/CDN]
-        NextJS[Next.js App Router]
+    subgraph VercelInfra ["Vercel Infrastructure ☁️"]
+        EdgeMW[Edge Middleware <br/> (GeoIP, Auth, Security Headers)]
+        NextServer[Next.js 15 Server <br/> (App Router & Server Actions)]
+        API[API Routes <br/> (Webhooks)]
     end
 
-    subgraph BaaS ["Backend Services"]
-        Supabase[(Supabase: Auth & DB)]
-        Stripe[Stripe: Pagos]
-        Cloudinary[Cloudinary: Media]
-        Sentry[Sentry: Observabilidad]
+    subgraph ExternalServices ["External Services 🚀"]
+        subgraph SupabaseEnv ["Supabase (BaaS)"]
+            Auth[Auth <br/> (JWT / Oauth)]
+            DB[(PostgreSQL DB <br/> + RLS Policies + RPC)]
+            Storage[Storage Buckets]
+        end
+        
+        subgraph StripeEnv ["Stripe Payments 💳"]
+            Checkout[Hosted Checkout]
+            WebhookEvent[Webhook Event <br/> (checkout.session.completed)]
+        end
+
+        subgraph MediaObs ["Media & Observability 👁️"]
+            Cloudinary[Cloudinary <br/> (Auto-Format & Optimize)]
+            Sentry[Sentry <br/> (Error Monitoring)]
+        end
     end
 
-    subgraph CI_CD ["DevOps Pipeline"]
-        GitHub[GitHub Actions]
-    end
-
-    User -->|HTTPS Request| Edge
-    Edge -->|Route| NextJS
+    %% Flows
+    UI -->|1. Request| EdgeMW
+    EdgeMW -->|2. Route| NextServer
     
-    NextJS -->|Server Actions| Supabase
-    NextJS -->|Checkout Session| Stripe
-    NextJS -->|Image Optimization| Cloudinary
+    %% Data & Logic
+    NextServer <-->|3. Server Actions (AES Encrypt/Decrypt)| DB
+    NextServer -->|4. Auth Check| Auth
     
-    NextJS -.->|Error Reporting| Sentry
-    User -.->|Client Errors| Sentry
+    %% Payments
+    NextServer -->|5. Create Session (Metadata)| Checkout
+    Checkout -->|6. User Payment| UI
+    StripeEnv -.->|7. Webhook POST| API
+    API -->|8. RPC: decrement_stock| DB
 
-    GitHub -->|CI: Test & Lint| GitHub
-    GitHub -->|CD: Auto Deploy| Vercel
+    %% Assets & Errors
+    UI -->|9. Image Request (Loader)| Cloudinary
+    UI -.->|10. Capture Exception| Sentry
+    NextServer -.->|11. Capture Exception| Sentry
+
+    %% Realtime
+    DB -.->|12. Realtime Updates (Stock)| UI
+
+    %% Styling
+    classDef client fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
+    classDef server fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
+    classDef service fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    classDef security fill:#ffebee,stroke:#c62828,stroke-width:2px,stroke-dasharray: 5 5;
+
+    class UI,SW client;
+    class EdgeMW,NextServer,API server;
+    class Auth,DB,Storage,Checkout,WebhookEvent,Cloudinary,Sentry service;
 ```
 
 ---
