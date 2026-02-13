@@ -41,6 +41,17 @@ VALUES
         true,
         'El cuarto mini álbum de aespa. Incluye el éxito principal "Drama" y muestra una faceta más madura y poderosa del grupo.',
         60
+    ),
+    (
+        'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b65',
+        'ORANGE BLOOD',
+        32.00,
+        'https://placehold.co/600x600/ff8800/FFF?text=ENHYPEN+ORANGE+BLOOD',
+        'album',
+        'ENHYPEN',
+        true,
+        'El quinto mini álbum de ENHYPEN. Una continuación de su serie BLOOD, explorando temas de amor y sacrificio con un sonido fresco.',
+        55
     )
 ON CONFLICT (id) DO UPDATE SET 
     stock = EXCLUDED.stock,
