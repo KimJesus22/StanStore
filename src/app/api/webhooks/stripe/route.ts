@@ -5,14 +5,14 @@ import Stripe from 'stripe';
 import { supabase } from '@/lib/supabaseClient';
 import { logAuditAction } from '@/app/actions/audit';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    apiVersion: '2025-01-27.acacia' as any,
-});
-
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-
 export async function POST(req: Request) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        apiVersion: '2025-01-27.acacia' as any,
+    });
+
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
     const body = await req.text();
     const headersList = await headers();
     const sig = headersList.get('stripe-signature') as string;
