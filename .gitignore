@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# docker
+docker-compose.override.yml
+
+*storybook.log
+storybook-static
+public/sw.js
+public/sw.js.map

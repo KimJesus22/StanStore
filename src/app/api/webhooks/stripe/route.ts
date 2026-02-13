@@ -5,6 +5,13 @@ import Stripe from 'stripe';
 import { supabase } from '@/lib/supabaseClient';
 import { logAuditAction } from '@/app/actions/audit';
 
+/**
+ * @swagger
+ * /api/webhooks/stripe:
+ *   post:
+ *     description: Webhook para recibir eventos de Stripe.
+ *     x-hidden: true
+ */
 export async function POST(req: Request) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

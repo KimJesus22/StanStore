@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: stanstore-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 3000:3000
+    env_file:
+      - .env.local
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/stanstore
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - stanstore-network
+
+  db:
+    container_name: stanstore-db
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: stanstore
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - stanstore-network
+
+volumes:
+  postgres_data:
+
+networks:
+  stanstore-network:
+    driver: bridge

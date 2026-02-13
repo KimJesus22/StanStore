@@ -115,40 +115,91 @@ const AddButton = styled(motion.button)`
 `;
 
 interface ProductCardProps {
+  /**
+   * El producto a mostrar en la tarjeta.
+   */
   product: Product;
-  index?: number; // Para staggered animation
+  /**
+   * Índice para animación escalonada (staggered).
+   */
+  index?: number;
+  /**
+   * Si es true, muestra un estado de carga (skeleton).
+   */
+  isLoading?: boolean;
 }
 
-export default function ProductCard({ product, index = 0 }: ProductCardProps) {
+const SkeletonCard = styled.div`
+  width: 100%;
+  height: 350px;
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  animation: pulse 1.5s infinite;
+
+  @keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+`;
+
+const OutOfStockOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #333;
+  text-transform: uppercase;
+  border-radius: 12px;
+`;
+
+export default function ProductCard({ product, index = 0, isLoading = false }: ProductCardProps) {
   const addToCart = useCartStore((state) => state.addToCart);
   const { convertPrice } = useCurrency();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent Link navigation
     e.stopPropagation();
-    addToCart(product);
-    toast.success('Producto añadido correctamente', {
-      style: {
-        border: '1px solid #10CFBD',
-        padding: '16px',
-        color: '#111',
-      },
-      iconTheme: {
-        primary: '#10CFBD',
-        secondary: '#FFFAEE',
-      },
-    });
+    if (product.stock > 0) {
+      addToCart(product);
+      toast.success('Producto añadido correctamente', {
+        style: {
+          border: '1px solid #10CFBD',
+          padding: '16px',
+          color: '#111',
+        },
+        iconTheme: {
+          primary: '#10CFBD',
+          secondary: '#FFFAEE',
+        },
+      });
+    }
   };
 
+  if (isLoading) {
+    return <SkeletonCard />;
+  }
+
+  const isOutOfStock = product.stock === 0;
+
   return (
-    <CardLink href={`/product/${product.id}`}>
+    <CardLink href={isOutOfStock ? '#' : `/product/${product.id}`} style={{ pointerEvents: isOutOfStock ? 'none' : 'auto' }}>
       <Card
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: index * 0.1 }}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: isOutOfStock ? 1 : 1.05 }}
       >
         <ImageContainer>
+          {isOutOfStock && <OutOfStockOverlay>Agotado</OutOfStockOverlay>}
           <Image
             src={product.image_url}
             alt={product.name}
@@ -157,22 +208,24 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             priority={index < 4}
             placeholder="blur"
             blurDataURL={BLUR_DATA_URL}
-            style={{ objectFit: 'cover' }}
+            style={{ objectFit: 'cover', filter: isOutOfStock ? 'grayscale(100%)' : 'none' }}
           />
         </ImageContainer>
         <Artist>{product.artist}</Artist>
         <ProductName>{product.name}</ProductName>
         <Footer>
           <Price>{convertPrice(product.price)}</Price>
-          <AddButton
-            className="add-to-cart-btn"
-            onClick={handleAddToCart}
-            aria-label="Añadir al carrito"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <ShoppingBag size={16} />
-          </AddButton>
+          {!isOutOfStock && (
+            <AddButton
+              className="add-to-cart-btn"
+              onClick={handleAddToCart}
+              aria-label="Añadir al carrito"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <ShoppingBag size={16} />
+            </AddButton>
+          )}
         </Footer>
       </Card>
     </CardLink>

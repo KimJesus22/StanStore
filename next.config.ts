@@ -16,6 +16,7 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   turbopack: {},
   images: {
     // loader: 'custom',
@@ -40,9 +41,13 @@ const nextConfig: NextConfig = {
   },
 };
 
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 import { withSentryConfig } from "@sentry/nextjs";
 
-export default withSentryConfig(withNextIntl(withPWA(nextConfig)), {
+export default withSentryConfig(withBundleAnalyzer(withNextIntl(withPWA(nextConfig))), {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 

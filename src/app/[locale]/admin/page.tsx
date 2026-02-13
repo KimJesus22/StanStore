@@ -3,9 +3,22 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { supabase } from '@/lib/supabaseClient';
-import SalesChart from '@/components/admin/SalesChart';
-import CategoryChart from '@/components/admin/CategoryChart';
-import AdminContent from './AdminContent';
+import dynamic from 'next/dynamic';
+
+const SalesChart = dynamic(() => import('@/components/admin/SalesChart'), {
+  loading: () => <div style={{ height: 300, background: '#f5f5f5', borderRadius: 8 }} />,
+  ssr: false
+});
+
+const CategoryChart = dynamic(() => import('@/components/admin/CategoryChart'), {
+  loading: () => <div style={{ height: 300, background: '#f5f5f5', borderRadius: 8 }} />,
+  ssr: false
+});
+
+const AdminContent = dynamic(() => import('./AdminContent'), {
+  loading: () => <p>Cargando gestión de productos...</p>,
+  ssr: false
+});
 // import { useTranslations } from 'next-intl';
 
 const Container = styled.div`
