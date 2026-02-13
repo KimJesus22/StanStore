@@ -76,6 +76,14 @@ export async function createCheckoutSession(cartItems: { id: string; quantity: n
             mode: 'payment',
             success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/`,
+            metadata: {
+                // We serialize the items to retrieve them in the webhook
+                // Format: "id:qty,id:qty" (Simple string format to avoid JSON limits if possible, or just JSON)
+                // Stripe metadata has a 500 char limit per key. 
+                // For a big cart, we might need multiple keys or a separate DB mapping.
+                // For this demo, JSON.stringify is likely fine for small carts.
+                items: JSON.stringify(cartItems.map(item => ({ id: item.id, quantity: item.quantity }))),
+            },
         });
 
         // Audit Log
