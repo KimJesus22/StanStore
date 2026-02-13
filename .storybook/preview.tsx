@@ -27,30 +27,34 @@ const messages = {
     }
 };
 
-const preview: Preview = {
-    parameters: {
-        controls: {
-            matchers: {
-                color: /(background|color)$/i,
-                date: /Date$/i,
-            },
-        },
-        nextjs: {
-            appDirectory: true,
+export const parameters = {
+    controls: {
+        matchers: {
+            color: /(background|color)$/i,
+            date: /Date$/i,
         },
     },
-    decorators: [
-        (Story) => (
-            <NextIntlClientProvider locale="es" messages={messages}>
-                <CurrencyProvider>
-                    <ThemeProvider theme={theme}>
-                        <GlobalStyles />
-                        <Story />
-                    </ThemeProvider>
-                </CurrencyProvider>
-            </NextIntlClientProvider>
-        ),
-    ],
+    nextjs: {
+        appDirectory: true,
+    },
+};
+
+export const decorators = [
+    (Story) => (
+        <NextIntlClientProvider locale="es" messages={messages}>
+            <CurrencyProvider>
+                <ThemeProvider theme={theme}>
+                    <GlobalStyles />
+                    <Story />
+                </ThemeProvider>
+            </CurrencyProvider>
+        </NextIntlClientProvider>
+    ),
+];
+
+const preview: Preview = {
+    parameters,
+    decorators,
 };
 
 export default preview;
