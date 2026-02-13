@@ -8,4 +8,7 @@ export interface Product {
     is_new: boolean;
     description?: string;
     stock: number;
+    spotify_album_id?: string;
+    theme_color?: string;
+    youtube_video_id?: string;
 }

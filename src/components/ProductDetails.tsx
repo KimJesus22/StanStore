@@ -212,6 +212,32 @@ const StockBadge = styled.div`
 
 
 
+import SpotifyPlayer from './SpotifyPlayer';
+import YouTubePlayer from './YouTubePlayer';
+import FanModeEffects from './FanModeEffects';
+import { Sparkles } from 'lucide-react';
+
+const FanButton = styled.button<{ $isActive: boolean, $themeColor?: string }>`
+  background: ${props => props.$isActive ? (props.$themeColor || '#10CFBD') : 'transparent'};
+  color: ${props => props.$isActive ? '#fff' : (props.$themeColor || '#10CFBD')};
+  border: 2px solid ${props => props.$themeColor || '#10CFBD'};
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+  
+  &:hover {
+      transform: scale(1.05);
+      background: ${props => props.$themeColor || '#10CFBD'};
+      color: #fff;
+  }
+`;
+
 export default function ProductDetails({ product }: { product: Product }) {
   const t = useTranslations('Product');
   const addToCart = useCartStore((state) => state.addToCart);
@@ -220,6 +246,7 @@ export default function ProductDetails({ product }: { product: Product }) {
   const [currentStock, setCurrentStock] = useState(product?.stock || 0);
   const [canReview, setCanReview] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isFanMode, setIsFanMode] = useState(false);
 
   useEffect(() => {
     const checkUserEligibility = async () => {
@@ -228,7 +255,6 @@ export default function ProductDetails({ product }: { product: Product }) {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUserId(user.id);
-        // Verify via Server Action if user bought the product
         const purchased = await verifyPurchase(product.id, user.id);
         setCanReview(purchased);
       }
@@ -240,7 +266,6 @@ export default function ProductDetails({ product }: { product: Product }) {
   useEffect(() => {
     if (!product) return;
 
-    // Subscription to changes in this product
     const channel = supabase
       .channel(`product-${product.id}`)
       .on(
@@ -284,12 +309,7 @@ export default function ProductDetails({ product }: { product: Product }) {
       return;
     }
 
-    // In a real app we might want to reserve stock here via RPC
-    // For now we just check local realtime state
-
     for (let i = 0; i < quantity; i++) {
-      // We might want to pass currentStock to cart too, but let's stick to Product interface
-      // spreading product effectively passes initial stock, not realtime, but for cart display it's usually fine
       addToCart(product);
     }
 
@@ -324,6 +344,12 @@ export default function ProductDetails({ product }: { product: Product }) {
 
   return (
     <Container>
+      <FanModeEffects
+        isActive={isFanMode}
+        artist={product.artist}
+        themeColor={product.theme_color}
+      />
+
       <ImageWrapper>
         <Image
           src={product.image_url}
@@ -342,6 +368,17 @@ export default function ProductDetails({ product }: { product: Product }) {
           <ArrowLeft size={20} />
           {t('back')}
         </BackLink>
+
+        {product.theme_color && (
+          <FanButton
+            onClick={() => setIsFanMode(!isFanMode)}
+            $isActive={isFanMode}
+            $themeColor={product.theme_color}
+          >
+            <Sparkles size={18} />
+            {isFanMode ? 'MODO FAN ACTIVADO' : 'ACTIVAR MODO FAN'}
+          </FanButton>
+        )}
 
         <Artist>{product.artist}</Artist>
         <ProductName>{product.name}</ProductName>
@@ -384,6 +421,10 @@ export default function ProductDetails({ product }: { product: Product }) {
           </AddToCartButton>
         </Controls>
 
+        {product.spotify_album_id && (
+          <SpotifyPlayer albumId={product.spotify_album_id} />
+        )}
+
         {/* Reviews Section */}
         <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: 700 }}>Opiniones de los fans</h2>
@@ -393,7 +434,7 @@ export default function ProductDetails({ product }: { product: Product }) {
               productId={product.id}
               userId={userId}
               onReviewSubmitted={() => {
-                setCanReview(false); // Hide form after submission? Or just let them see their review in the list
+                setCanReview(false);
                 toast.success('¡Reseña enviada!');
               }}
             />
