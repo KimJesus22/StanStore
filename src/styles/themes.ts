@@ -3,11 +3,11 @@ export const themes = {
         name: 'Clancy',
         colors: {
             primary: '#D13639', // Red
-            background: '#1A1A1A', // Black
-            text: '#F2F2F2',
+            background: '#FFFFFF',
+            text: '#1A1A1A',
             accent: '#FCE300', // Yellow
-            secondaryBackground: '#2A2A2A',
-            border: '#444444',
+            secondaryBackground: '#F5F5F5',
+            border: '#E0E0E0',
         },
     },
     ScaledAndIcy: {

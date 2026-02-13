@@ -23,20 +23,20 @@ const Container = styled.div`
 
 const Title = styled.h1`
   font-size: 2.5rem;
-  color: #111;
+  color: ${({ theme }) => theme.colors.text};
   margin: 1.5rem 0 0.5rem;
 `;
 
 const Subtitle = styled.p`
-  color: #666;
+  color: ${({ theme }) => theme.colors.text}80;
   font-size: 1.1rem;
   margin-bottom: 2.5rem;
   max-width: 600px;
 `;
 
 const Button = styled(Link)`
-  background: #111;
-  color: white;
+  background: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.background};
   padding: 1rem 2rem;
   border-radius: 50px;
   text-decoration: none;
@@ -45,7 +45,7 @@ const Button = styled(Link)`
 
   &:hover {
     transform: translateY(-2px);
-    background: #000;
+    opacity: 0.9;
   }
 `;
 

@@ -27,12 +27,12 @@ const Header = styled.header`
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
-  color: #111;
+  color: ${({ theme }) => theme.colors.text};
   margin-bottom: 0.5rem;
 `;
 
 const Subtitle = styled.p`
-  color: #666;
+  color: ${({ theme }) => theme.colors.text}80;
   font-size: 1rem;
 `;
 
@@ -50,14 +50,14 @@ const Grid = styled.div`
 const NoResults = styled.div`
   text-align: center;
   padding: 4rem 0;
-  color: #666;
+  color: ${({ theme }) => theme.colors.text}80;
   font-size: 1.1rem;
 `;
 
 const LoadingState = styled.div`
   text-align: center;
   padding: 4rem 0;
-  color: #888;
+  color: ${({ theme }) => theme.colors.text}80;
   font-size: 1.1rem;
 `;
 

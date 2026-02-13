@@ -23,13 +23,14 @@ const Overlay = styled.div`
 `;
 
 const Modal = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.colors.background};
   padding: 2.5rem;
   border-radius: 20px;
   width: 100%;
   max-width: 400px;
   position: relative;
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  border: 1px solid ${({ theme }) => theme.colors.border};
   animation: slideUp 0.3s ease-out;
 
   @keyframes slideUp {
@@ -45,7 +46,7 @@ const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #666;
+  color: ${({ theme }) => theme.colors.text}80;
   padding: 0.5rem;
   border-radius: 50%;
   display: flex;
@@ -54,15 +55,15 @@ const CloseButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: #f5f5f5;
-    color: #111;
+    background: ${({ theme }) => theme.colors.secondaryBackground};
+    color: ${({ theme }) => theme.colors.text};
   }
 `;
 
 const Title = styled.h2`
   font-size: 1.8rem;
   font-weight: 700;
-  color: #111;
+  color: ${({ theme }) => theme.colors.text};
   margin-bottom: 2rem;
   text-align: center;
 `;
@@ -82,28 +83,30 @@ const IconWrapper = styled.div`
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #999;
+  color: ${({ theme }) => theme.colors.text}60;
   pointer-events: none;
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 0.875rem 1rem 0.875rem 2.75rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.2s;
   outline: none;
+  background: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }) => theme.colors.text};
 
   &:focus {
-    border-color: #111;
+    border-color: ${({ theme }) => theme.colors.primary};
     box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
   }
 `;
 
 const Button = styled.button`
-  background: #111;
-  color: white;
+  background: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.background};
   border: none;
   padding: 1rem;
   border-radius: 12px;
@@ -118,7 +121,7 @@ const Button = styled.button`
   margin-top: 0.5rem;
 
   &:hover {
-    background: #000;
+    opacity: 0.9;
     transform: translateY(-1px);
   }
 
@@ -136,13 +139,13 @@ const Footer = styled.div`
   margin-top: 1.5rem;
   text-align: center;
   font-size: 0.9rem;
-  color: #666;
+  color: ${({ theme }) => theme.colors.text}80;
 `;
 
 const LinkButton = styled.button`
   background: none;
   border: none;
-  color: #111;
+  color: ${({ theme }) => theme.colors.primary};
   font-weight: 600;
   cursor: pointer;
   margin-left: 0.25rem;

@@ -35,12 +35,13 @@ const Container = styled.div`
 
 const ImageWrapper = styled.div`
   flex: 1;
-  background-color: #fca5a5;
+  background-color: ${({ theme }) => theme.colors.secondaryBackground};
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   aspect-ratio: 1 / 1;
   position: relative;
+  border: 1px solid ${({ theme }) => theme.colors.border};
 
   img {
     width: 100%;
@@ -61,20 +62,20 @@ const BackLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #666;
+  color: ${({ theme }) => theme.colors.text}80;
   text-decoration: none;
   font-weight: 500;
   margin-bottom: 2rem;
   transition: color 0.2s;
 
   &:hover {
-    color: #111;
+    color: ${({ theme }) => theme.colors.text};
   }
 `;
 
 const Artist = styled.h2`
   font-size: 1.25rem;
-  color: #888;
+  color: ${({ theme }) => theme.colors.text}80;
   font-weight: 600;
   text-transform: uppercase;
   margin-bottom: 0.5rem;
@@ -84,7 +85,7 @@ const Artist = styled.h2`
 const ProductName = styled.h1`
   font-size: 3rem;
   font-weight: 800;
-  color: #111;
+  color: ${({ theme }) => theme.colors.text};
   margin-bottom: 1.5rem;
   line-height: 1.1;
 `;
@@ -92,14 +93,14 @@ const ProductName = styled.h1`
 const Price = styled.div`
   font-size: 2rem;
   font-weight: 700;
-  color: #10CFBD;
+  color: ${({ theme }) => theme.colors.primary};
   margin-bottom: 2rem;
 `;
 
 const Description = styled.p`
   font-size: 1.1rem;
   line-height: 1.7;
-  color: #444;
+  color: ${({ theme }) => theme.colors.text}90;
   margin-bottom: 3rem;
 `;
 
@@ -117,10 +118,10 @@ const Controls = styled.div`
 const QuantitySelector = styled.div`
   display: flex;
   align-items: center;
-  border: 1px solid #e0e0e0;
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 50px;
   padding: 0.5rem;
-  background-color: #fff;
+  background-color: ${({ theme }) => theme.colors.background};
 `;
 
 const QtyButton = styled.button`
@@ -132,12 +133,12 @@ const QtyButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #333;
+  color: ${({ theme }) => theme.colors.text};
   border-radius: 50%;
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: ${({ theme }) => theme.colors.secondaryBackground};
   }
 
   &:disabled {
@@ -155,8 +156,8 @@ const QtyValue = styled.span`
 
 const AddToCartButton = styled.button`
   flex: 1;
-  background-color: #111;
-  color: white;
+  background-color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.background};
   border: none;
   height: 56px;
   border-radius: 50px;
@@ -172,7 +173,7 @@ const AddToCartButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    background-color: #000;
+    opacity: 0.9;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
 
@@ -181,7 +182,7 @@ const AddToCartButton = styled.button`
   }
   
   &:disabled {
-    background-color: #ccc;
+    opacity: 0.4;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;

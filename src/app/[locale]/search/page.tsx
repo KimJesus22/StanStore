@@ -32,7 +32,7 @@ const Title = styled.h1`
 `;
 
 const QueryText = styled.span`
-  color: #10CFBD;
+  color: ${({ theme }) => theme.colors.primary};
   font-style: italic;
 `;
 
@@ -49,14 +49,14 @@ const EmptyState = styled.div`
   justify-content: center;
   text-align: center;
   padding: 4rem 1rem;
-  color: #666;
+  color: ${({ theme }) => theme.colors.text}80;
 `;
 
 const SuggestionTitle = styled.h3`
   margin-top: 3rem;
   margin-bottom: 1.5rem;
   font-size: 1.25rem;
-  color: #111;
+  color: ${({ theme }) => theme.colors.text};
   display: flex;
   align-items: center;
   gap: 0.5rem;
