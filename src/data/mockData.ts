@@ -5,7 +5,7 @@ export const mockProducts: Product[] = [
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b5c',
         name: 'Map of the Soul: 7',
         price: 29.99,
-        image_url: '/images/mots7.jpg',
+        image_url: '/images/Map of the soul 7.jpg',
         category: 'album',
         artist: 'BTS',
         is_new: false,

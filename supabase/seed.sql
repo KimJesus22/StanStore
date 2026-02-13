@@ -3,13 +3,13 @@ INSERT INTO public.products (id, name, price, image_url, category, artist, is_ne
 VALUES
   (
     'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b5c',
-    'Map of the Soul: 7',
-    29.99,
-    '/images/mots7.jpg',
-    'album',
+    'Map of the Soul: 7 - Ver. 4',
+    28.00,
+    '/images/Map of the soul 7.jpg',
+    'Albums',
     'BTS',
-    FALSE,
-    'El cuarto álbum de estudio de BTS, "Map of the Soul: 7", es un viaje introspectivo que explora los siete años de carrera del grupo. Incluye éxitos como "ON" y "Black Swan". Versión aleatoria.'
+    TRUE,
+    'El álbum más personal de BTS hasta la fecha.'
   ),
   (
     'f1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5d',
