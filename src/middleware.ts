@@ -65,7 +65,9 @@ export default function middleware(request: NextRequest) {
     const response = intlMiddleware(request);
 
     // Geo-Detection (Vercel specific) - usa header x-vercel-ip-country como fuente principal
-    const country = request.headers.get('x-vercel-ip-country') || request.geo?.country || 'US';
+    // En localhost no existe el header de Vercel, así que defaultea a 'MX' (tienda mexicana)
+    const vercelCountry = request.headers.get('x-vercel-ip-country');
+    const country = vercelCountry || 'MX';
     const currency = country === 'MX' ? 'MXN' : 'USD';
 
     // Siempre actualizar la cookie de moneda basada en la ubicación actual
