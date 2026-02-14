@@ -106,6 +106,8 @@ export const mockProducts: Product[] = [
         artist: 'aespa',
         is_new: true,
         description: 'El cuarto mini álbum de aespa. Incluye el éxito principal "Drama" y muestra una faceta más madura y poderosa del grupo.',
+        description_en: 'The fourth mini album by aespa. Includes the hit single "Drama" and showcases a more mature and powerful side of the group.',
+        description_ko: 'aespa의 네 번째 미니 앨범. 히트 싱글 "Drama"가 포함되어 있으며 그룹의 더욱 성숙하고 파워풀한 면모를 보여줍니다.',
         stock: 60,
         youtube_video_id: 'D8VEhcPeSlc',
     },

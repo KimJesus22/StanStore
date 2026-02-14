@@ -1,0 +1,96 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [active]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - navigation [ref=e7]:
+            - button "previous" [disabled] [ref=e8]:
+              - img "previous" [ref=e9]
+            - generic [ref=e11]:
+              - generic [ref=e12]: 1/
+              - text: "1"
+            - button "next" [disabled] [ref=e13]:
+              - img "next" [ref=e14]
+          - img
+        - generic [ref=e16]:
+          - generic [ref=e17]:
+            - img [ref=e18]
+            - generic "Latest available version is detected (16.1.6)." [ref=e20]: Next.js 16.1.6
+            - generic [ref=e21]: Turbopack
+          - img
+      - dialog "Runtime Error" [ref=e23]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - generic [ref=e28]:
+              - generic [ref=e30]: Runtime Error
+              - generic [ref=e31]:
+                - button "Copy Error Info" [ref=e32] [cursor=pointer]:
+                  - img [ref=e33]
+                - button "No related documentation found" [disabled] [ref=e35]:
+                  - img [ref=e36]
+                - button "Attach Node.js inspector" [ref=e38] [cursor=pointer]:
+                  - img [ref=e39]
+            - generic [ref=e48]: "WebSocket not available:"
+          - generic [ref=e49]:
+            - generic [ref=e50]:
+              - paragraph [ref=e52]:
+                - img [ref=e54]
+                - generic [ref=e57]: src/components/ReviewList.tsx (58:14) @ ReviewList.useEffect
+                - button "Open in editor" [ref=e58] [cursor=pointer]:
+                  - img [ref=e60]
+              - generic [ref=e63]:
+                - generic [ref=e64]: "56 | }"
+                - generic [ref=e65]: 57 | )
+                - generic [ref=e66]: "> 58 | .subscribe();"
+                - generic [ref=e67]: "| ^"
+                - generic [ref=e68]: 59 |
+                - generic [ref=e69]: "60 | return () => {"
+                - generic [ref=e70]: 61 | supabase.removeChannel(channel);
+            - generic [ref=e71]:
+              - generic [ref=e72]:
+                - paragraph [ref=e73]:
+                  - text: Call Stack
+                  - generic [ref=e74]: "130"
+                - button "Show 127 ignore-listed frame(s)" [ref=e75] [cursor=pointer]:
+                  - text: Show 127 ignore-listed frame(s)
+                  - img [ref=e76]
+              - generic [ref=e78]:
+                - generic [ref=e79]:
+                  - text: ReviewList.useEffect
+                  - button "Open ReviewList.useEffect in editor" [ref=e80] [cursor=pointer]:
+                    - img [ref=e81]
+                - text: src/components/ReviewList.tsx (58:14)
+              - generic [ref=e83]:
+                - generic [ref=e84]:
+                  - text: ProductDetails
+                  - button "Open ProductDetails in editor" [ref=e85] [cursor=pointer]:
+                    - img [ref=e86]
+                - text: src/components/ProductDetails.tsx (457:11)
+              - generic [ref=e88]:
+                - generic [ref=e89]:
+                  - text: ProductPage
+                  - button "Open ProductPage in editor" [ref=e90] [cursor=pointer]:
+                    - img [ref=e91]
+                - text: src\app\[locale]\product\[id]\page.tsx (59:10)
+        - generic [ref=e93]: "1"
+        - generic [ref=e94]: "2"
+    - generic [ref=e99] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e100]:
+        - img [ref=e101]
+      - generic [ref=e105]:
+        - button "Open issues overlay" [ref=e106]:
+          - generic [ref=e107]:
+            - generic [ref=e108]: "0"
+            - generic [ref=e109]: "1"
+          - generic [ref=e110]: Issue
+        - button "Collapse issues badge" [ref=e111]:
+          - img [ref=e112]
+  - generic [ref=e114]:
+    - generic [ref=e115]: 💔
+    - heading "¡Oops! Algo salió mal" [level=2] [ref=e116]
+    - paragraph [ref=e117]: Lo sentimos, ha ocurrido un error inesperado al cargar la página. Nuestro equipo de fans ya está investigando.
+    - button "Intentar de nuevo" [ref=e118] [cursor=pointer]
+```

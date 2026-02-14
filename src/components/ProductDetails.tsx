@@ -8,7 +8,7 @@ import { Minus, Plus, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { Link } from '@/navigation';
 import toast from 'react-hot-toast';
 import { Product } from '@/types';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { supabase } from '@/lib/supabaseClient';
 import Image from 'next/image';
 import ReviewForm from './ReviewForm';
@@ -244,7 +244,14 @@ const FanButton = styled.button<{ $isActive: boolean, $themeColor?: string }>`
 
 export default function ProductDetails({ product }: { product: Product }) {
   const t = useTranslations('Product');
+  const locale = useLocale();
   const addToCart = useCartStore((state) => state.addToCart);
+
+  const description = locale === 'ko'
+    ? (product.description_ko || product.description)
+    : locale === 'en'
+      ? (product.description_en || product.description)
+      : product.description;
   const { convertPrice } = useCurrency();
   const [quantity, setQuantity] = useState(1);
   const [currentStock, setCurrentStock] = useState(product?.stock || 0);
@@ -396,7 +403,7 @@ export default function ProductDetails({ product }: { product: Product }) {
         <Price>{convertPrice(product.price)}</Price>
 
         <Description>
-          {product.description || "Sin descripción disponible para este producto."}
+          {description || "Sin descripción disponible para este producto."}
         </Description>
 
         <Controls>

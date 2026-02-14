@@ -7,6 +7,8 @@ export interface Product {
     artist: 'BTS' | 'NewJeans' | 'Seventeen' | 'BLACKPINK' | 'TWICE' | 'Stray Kids' | string;
     is_new: boolean;
     description?: string;
+    description_en?: string;
+    description_ko?: string;
     stock: number;
     spotify_album_id?: string;
     theme_color?: string;

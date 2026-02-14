@@ -1,0 +1,88 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - link "StanStore" [ref=e4] [cursor=pointer]:
+        - /url: /en
+      - generic [ref=e5]:
+        - link "Artistas" [ref=e6] [cursor=pointer]:
+          - /url: /en/artists
+          - img [ref=e7]
+        - combobox [ref=e11] [cursor=pointer]:
+          - option "Español"
+          - option "English" [selected]
+          - option "한국어"
+        - button "Search" [ref=e13] [cursor=pointer]:
+          - img [ref=e14]
+        - button "Cart" [ref=e17] [cursor=pointer]:
+          - img [ref=e19]
+        - button "Iniciar Sesión" [ref=e23] [cursor=pointer]:
+          - img [ref=e24]
+    - generic [ref=e27]:
+      - img "NewJeans 2nd EP \"Get Up\"" [ref=e29]
+      - generic [ref=e30]:
+        - link "Back" [ref=e31] [cursor=pointer]:
+          - /url: /en
+          - img [ref=e32]
+          - text: Back
+        - heading "NewJeans" [level=2] [ref=e34]
+        - heading "NewJeans 2nd EP \"Get Up\"" [level=1] [ref=e35]
+        - generic [ref=e36]: $502.25
+        - paragraph [ref=e37]: El segundo EP de NewJeans, "Get Up", presenta una mezcla refrescante de pop y R&B. Incluye las canciones "Super Shy", "ETA" y "Cool With You". El paquete incluye photobook y stickers.
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - button [disabled] [ref=e40]:
+              - img [ref=e41]
+            - generic [ref=e42]: "1"
+            - button [ref=e43] [cursor=pointer]:
+              - img [ref=e44]
+          - button "Add to Cart" [ref=e45] [cursor=pointer]:
+            - img [ref=e46]
+            - text: Add to Cart
+        - iframe [ref=e50]:
+          - generic "YouTube Video Player" [ref=f1e3]:
+            - generic [ref=f1e5]:
+              - link "Photo image of HYBE LABELS" [ref=f1e8] [cursor=pointer]:
+                - /url: https://www.youtube.com/channel/UC3IZKseVpdzPSBaWxBxundA?embeds_referring_euri=http%3A%2F%2Flocalhost%3A3000%2F
+              - link "NewJeans (뉴진스) 'Super Shy' Official MV" [ref=f1e11] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=ArmDp-zijuc
+              - button "Share" [ref=f1e13] [cursor=pointer]:
+                - generic [ref=f1e14]:
+                  - img
+                - generic [ref=f1e15]: Share
+            - button "Play" [ref=f1e18] [cursor=pointer]:
+              - img
+            - link "Watch on YouTube" [ref=f1e19] [cursor=pointer]:
+              - /url: https://www.youtube.com/watch?v=ArmDp-zijuc&embeds_referring_euri=http%3A%2F%2Flocalhost%3A3000%2F
+              - generic [ref=f1e20]: Watch on
+              - generic [ref=f1e21]:
+                - img
+        - generic [ref=e51]:
+          - heading "Opiniones de los fans" [level=2] [ref=e52]
+          - paragraph [ref=e53]: No hay reseñas aún. ¡Sé el primero en opinar!
+          - generic [ref=e54]:
+            - heading "✨ Quizás te guste..." [level=2] [ref=e55]
+            - link "UNFORGIVEN (3rd Mini Album) UNFORGIVEN (3rd Mini Album) LE SSERAFIM $28.50 39% match" [ref=e57] [cursor=pointer]:
+              - /url: /en/product/e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b63
+              - generic [ref=e58]:
+                - img "UNFORGIVEN (3rd Mini Album)" [ref=e60]
+                - generic [ref=e61]:
+                  - heading "UNFORGIVEN (3rd Mini Album)" [level=3] [ref=e62]
+                  - paragraph [ref=e63]: LE SSERAFIM
+                  - generic [ref=e64]: $28.50
+                  - generic [ref=e65]: 39% match
+  - button "Open Next.js Dev Tools" [ref=e71] [cursor=pointer]:
+    - img [ref=e72]
+  - alert [ref=e75]
+  - generic [ref=e76]:
+    - paragraph [ref=e77]:
+      - text: Usamos cookies para mejorar tu experiencia y analizar nuestro tráfico. Al continuar, aceptas nuestra
+      - link "Política de Privacidad" [ref=e78] [cursor=pointer]:
+        - /url: /privacy
+      - text: .
+    - generic [ref=e79]:
+      - button "Rechazar" [ref=e80] [cursor=pointer]
+      - button "Aceptar Todas" [ref=e81] [cursor=pointer]
+```
