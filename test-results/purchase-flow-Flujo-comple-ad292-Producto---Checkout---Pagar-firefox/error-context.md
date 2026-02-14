@@ -68,7 +68,7 @@
                   - text: ProductDetails
                   - button "Open ProductDetails in editor" [ref=e85] [cursor=pointer]:
                     - img [ref=e86]
-                - text: src/components/ProductDetails.tsx (457:11)
+                - text: src/components/ProductDetails.tsx (464:11)
               - generic [ref=e88]:
                 - generic [ref=e89]:
                   - text: ProductPage

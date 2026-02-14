@@ -208,7 +208,7 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
             priority={index < 4}
             placeholder="blur"
             blurDataURL={BLUR_DATA_URL}
-            style={{ objectFit: 'cover', filter: isOutOfStock ? 'grayscale(100%)' : 'none' }}
+            style={{ objectFit: 'contain', filter: isOutOfStock ? 'grayscale(100%)' : 'none' }}
           />
         </ImageContainer>
         <Artist>{product.artist}</Artist>

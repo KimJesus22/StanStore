@@ -370,7 +370,7 @@ export default function ProductDetails({ product }: { product: Product }) {
           sizes="(max-width: 768px) 100vw, 50vw"
           placeholder="blur"
           blurDataURL={BLUR_DATA_URL}
-          style={{ objectFit: 'cover' }}
+          style={{ objectFit: 'contain' }}
         />
       </ImageWrapper>
 
