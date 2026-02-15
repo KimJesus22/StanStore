@@ -17,26 +17,40 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src')
     },
-    projects: [{
-      extends: true,
-      plugins: [
-        // The plugin will run tests for the stories defined in your Storybook config
-        // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-        storybookTest({
-          configDir: path.join(dirname, '.storybook')
-        })],
-      test: {
-        name: 'storybook',
-        browser: {
-          enabled: true,
-          headless: true,
-          provider: playwright({}),
-          instances: [{
-            browser: 'chromium'
-          }]
-        },
-        setupFiles: ['.storybook/vitest.setup.ts']
+    projects: [
+      {
+        test: {
+          name: 'unit',
+          environment: 'jsdom',
+          globals: true,
+          include: ['src/**/*.test.{ts,tsx}'],
+          setupFiles: ['./vitest.setup.ts'],
+          alias: {
+            '@': path.resolve(__dirname, './src')
+          }
+        }
+      },
+      {
+        extends: true,
+        plugins: [
+          // The plugin will run tests for the stories defined in your Storybook config
+          // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+          storybookTest({
+            configDir: path.join(dirname, '.storybook')
+          })],
+        test: {
+          name: 'storybook',
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({}),
+            instances: [{
+              browser: 'chromium'
+            }]
+          },
+          setupFiles: ['.storybook/vitest.setup.ts']
+        }
       }
-    }]
+    ]
   }
 });
