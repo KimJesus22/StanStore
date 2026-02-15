@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { mockProducts } from '@/data/mockData';
 import ProductCard from '@/components/ProductCard';
+import ProductSkeleton from '@/components/ProductSkeleton';
 import CategoryFilter from '@/components/CategoryFilter';
 import { supabase } from '@/lib/supabaseClient';
 import { Product } from '@/types';
@@ -55,12 +56,7 @@ const NoResults = styled.div`
   font-size: 1.1rem;
 `;
 
-const LoadingState = styled.div`
-  text-align: center;
-  padding: 4rem 0;
-  color: ${({ theme }) => theme.colors.text}80;
-  font-size: 1.1rem;
-`;
+
 
 export default function Home() {
     const t = useTranslations('Home');
@@ -128,7 +124,11 @@ export default function Home() {
             </Header>
 
             {loading ? (
-                <LoadingState>{t('loading')}</LoadingState>
+                <Grid>
+                    {Array.from({ length: 8 }).map((_, i) => (
+                        <ProductSkeleton key={i} />
+                    ))}
+                </Grid>
             ) : (
                 <>
                     <CategoryFilter

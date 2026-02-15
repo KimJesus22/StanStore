@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Music, Users, TrendingUp, ExternalLink, Loader2 } from 'lucide-react';
+import { Music, Users, TrendingUp, ExternalLink } from 'lucide-react';
+import ArtistSkeleton from '@/components/ArtistSkeleton';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -145,104 +146,97 @@ const PopularityFill = styled.div<{ $value: number }>`
   transition: width 1s ease;
 `;
 
-const LoadingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem;
-  color: ${({ theme }) => theme.colors.text}60;
-  gap: 0.75rem;
-  font-size: 1.1rem;
-`;
+
 
 interface Artist {
-    id: string;
-    name: string;
-    image: string | null;
-    imageSmall: string | null;
-    genres: string[];
-    popularity: number;
-    followers: number;
-    externalUrl: string | null;
+  id: string;
+  name: string;
+  image: string | null;
+  imageSmall: string | null;
+  genres: string[];
+  popularity: number;
+  followers: number;
+  externalUrl: string | null;
 }
 
 function formatFollowers(n: number): string {
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-    return n.toString();
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return n.toString();
 }
 
 export default function ArtistsPage() {
-    const [artists, setArtists] = useState<Artist[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetch('/api/spotify/kpop')
-            .then(r => r.json())
-            .then(data => {
-                if (data.artists) setArtists(data.artists);
-            })
-            .catch(err => console.error('Error loading artists:', err))
-            .finally(() => setLoading(false));
-    }, []);
+  useEffect(() => {
+    fetch('/api/spotify/kpop')
+      .then(r => r.json())
+      .then(data => {
+        if (data.artists) setArtists(data.artists);
+      })
+      .catch(err => console.error('Error loading artists:', err))
+      .finally(() => setLoading(false));
+  }, []);
 
-    return (
-        <PageContainer>
-            <PageTitle>
-                <Music size={32} />
-                Artistas K-Pop
-            </PageTitle>
-            <PageSubtitle>
-                Descubre los grupos y solistas más populares del K-Pop
-            </PageSubtitle>
+  return (
+    <PageContainer>
+      <PageTitle>
+        <Music size={32} />
+        Artistas K-Pop
+      </PageTitle>
+      <PageSubtitle>
+        Descubre los grupos y solistas más populares del K-Pop
+      </PageSubtitle>
 
-            {loading ? (
-                <LoadingContainer>
-                    <Loader2 size={24} className="animate-spin" />
-                    Cargando artistas...
-                </LoadingContainer>
-            ) : (
-                <Grid>
-                    {artists.map(artist => (
-                        <Card
-                            key={artist.id}
-                            href={artist.externalUrl || '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <ArtistImage $src={artist.image || ''}>
-                                <ArtistName>{artist.name}</ArtistName>
-                            </ArtistImage>
-                            <CardBody>
-                                {artist.genres.length > 0 && (
-                                    <GenresRow>
-                                        {artist.genres.map(g => (
-                                            <Genre key={g}>{g}</Genre>
-                                        ))}
-                                    </GenresRow>
-                                )}
-                                <Stats>
-                                    <Stat>
-                                        <Users size={14} />
-                                        <StatValue>{formatFollowers(artist.followers)}</StatValue>
-                                    </Stat>
-                                    <Stat>
-                                        <TrendingUp size={14} />
-                                        <StatValue>{artist.popularity}</StatValue>/100
-                                    </Stat>
-                                    <SpotifyBadge>
-                                        <ExternalLink size={12} />
-                                        Spotify
-                                    </SpotifyBadge>
-                                </Stats>
-                                <PopularityBar>
-                                    <PopularityFill $value={artist.popularity} />
-                                </PopularityBar>
-                            </CardBody>
-                        </Card>
+      {loading ? (
+        <Grid>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ArtistSkeleton key={i} />
+          ))}
+        </Grid>
+      ) : (
+        <Grid>
+          {artists.map(artist => (
+            <Card
+              key={artist.id}
+              href={artist.externalUrl || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ArtistImage $src={artist.image || ''}>
+                <ArtistName>{artist.name}</ArtistName>
+              </ArtistImage>
+              <CardBody>
+                {artist.genres.length > 0 && (
+                  <GenresRow>
+                    {artist.genres.map(g => (
+                      <Genre key={g}>{g}</Genre>
                     ))}
-                </Grid>
-            )}
-        </PageContainer>
-    );
+                  </GenresRow>
+                )}
+                <Stats>
+                  <Stat>
+                    <Users size={14} />
+                    <StatValue>{formatFollowers(artist.followers)}</StatValue>
+                  </Stat>
+                  <Stat>
+                    <TrendingUp size={14} />
+                    <StatValue>{artist.popularity}</StatValue>/100
+                  </Stat>
+                  <SpotifyBadge>
+                    <ExternalLink size={12} />
+                    Spotify
+                  </SpotifyBadge>
+                </Stats>
+                <PopularityBar>
+                  <PopularityFill $value={artist.popularity} />
+                </PopularityBar>
+              </CardBody>
+            </Card>
+          ))}
+        </Grid>
+      )}
+    </PageContainer>
+  );
 }
