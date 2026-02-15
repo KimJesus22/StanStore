@@ -1,6 +1,7 @@
 import { Metadata, ResolvingMetadata } from 'next';
 import { supabase } from '@/lib/supabaseClient';
 import ProductDetails from '@/components/ProductDetails';
+import { mockProducts } from '@/data/mockData';
 
 type Props = {
   params: Promise<{ id: string }>
@@ -56,5 +57,19 @@ export default async function ProductPage({ params }: Props) {
     .eq('id', id)
     .single();
 
-  return <ProductDetails product={product} />;
+  let displayProduct = product;
+
+  // Fallback to mockData for translations if missing in DB
+  if (product) {
+    const mockProduct = mockProducts.find((p) => p.id === product.id);
+    if (mockProduct) {
+      displayProduct = {
+        ...product,
+        description_en: product.description_en || mockProduct.description_en,
+        description_ko: product.description_ko || mockProduct.description_ko,
+      };
+    }
+  }
+
+  return <ProductDetails product={displayProduct} />;
 }
