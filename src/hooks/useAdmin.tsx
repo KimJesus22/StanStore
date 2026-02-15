@@ -20,6 +20,15 @@ export function useAdmin() {
                 return;
             }
 
+            // Security: Only allow specific domain emails to be admins
+            // This prevents external users from accessing admin features even if DB flag is set
+            const adminDomain = process.env.NEXT_PUBLIC_ADMIN_DOMAIN;
+            if (adminDomain && !user.email?.endsWith(adminDomain)) {
+                setIsAdmin(false);
+                setChecking(false);
+                return;
+            }
+
             try {
                 const { data, error } = await supabase
                     .from('profiles')

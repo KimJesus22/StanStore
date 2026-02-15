@@ -56,7 +56,7 @@ const ImageContainer = styled.div`
 
 const Artist = styled.span`
   font-size: 0.8rem;
-  color: ${({ theme }) => theme.colors.text}CC; /* 80% opacity for better contrast */
+  color: ${({ theme }) => theme.colors.text}; /* Removed opacity for max contrast */
   margin-bottom: 0.25rem;
   text-transform: uppercase;
   font-weight: 600;

@@ -32,8 +32,9 @@ const Title = styled.h1`
 `;
 
 const Subtitle = styled.p`
-  color: ${({ theme }) => theme.colors.text}CC;
+  color: ${({ theme }) => theme.colors.text}; /* Max contrast */
   font-size: 1rem;
+  opacity: 0.9; /* Slight opacity but keeping high contrast */
 `;
 
 const Grid = styled.div`

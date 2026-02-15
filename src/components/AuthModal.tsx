@@ -247,6 +247,7 @@ export default function AuthModal() {
             <Input
               type="email"
               placeholder="Correo electrónico"
+              aria-label="Correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -260,6 +261,7 @@ export default function AuthModal() {
             <Input
               type="password"
               placeholder="Contraseña"
+              aria-label="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               minLength={6}
