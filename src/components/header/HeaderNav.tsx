@@ -125,7 +125,7 @@ export default function HeaderNav() {
                         onClick={handleProfileClick}
                         title={user ? user.email || "Usuario" : "Iniciar Sesión"}
                     >
-                        <User color={user ? "#10CFBD" : "#333"} />
+                        <User color={user ? "#00796B" : "#333"} />
                     </IconWrapper>
                 </>
             ) : (

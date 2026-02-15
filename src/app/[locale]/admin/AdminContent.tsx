@@ -237,7 +237,7 @@ const ProductArtist = styled.span`
 
 const ProductPrice = styled.span`
   font-weight: 700;
-  color: #10CFBD;
+  color: #00796B;
   margin-right: 1.5rem;
   font-size: 0.95rem;
 `;

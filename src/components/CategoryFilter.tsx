@@ -21,7 +21,7 @@ const FilterButton = styled.button<{ $isActive: boolean }>`
   border-radius: 50px;
   border: none;
   background-color: ${({ $isActive }) => ($isActive ? '#10CFBD' : '#f3f4f6')};
-  color: ${({ $isActive }) => ($isActive ? '#fff' : '#4b5563')};
+  color: ${({ $isActive }) => ($isActive ? '#111' : '#4b5563')};
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
