@@ -189,6 +189,25 @@ const CheckoutButton = styled(motion.button)`
   }
 `;
 
+const ContinueShoppingButton = styled.button`
+  width: 100%;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text};
+  border: 1px solid ${({ theme }) => theme.colors.border}; /* Subtle border */
+  padding: 0.75rem;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.secondaryBackground};
+    border-color: ${({ theme }) => theme.colors.text};
+  }
+`;
+
 const TermsCheckbox = styled.div`
   margin-bottom: 1rem;
   display: flex;
@@ -336,6 +355,10 @@ export default function CartDrawer() {
               >
                 {t('checkout')}
               </CheckoutButton>
+
+              <ContinueShoppingButton onClick={closeCart}>
+                Seguir comprando
+              </ContinueShoppingButton>
             </Footer>
           </Drawer>
         </>
