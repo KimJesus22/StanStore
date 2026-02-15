@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface SimilarProduct {
     id: string;
@@ -19,17 +20,14 @@ interface SimilarProduct {
 const Section = styled.section`
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 const SectionTitle = styled.h2`
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
-    background: linear-gradient(135deg, #a855f7, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: ${({ theme }) => theme.colors.text};
 `;
 
 const ScrollContainer = styled.div`
@@ -43,11 +41,11 @@ const ScrollContainer = styled.div`
         height: 6px;
     }
     &::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
+        background: ${({ theme }) => theme.colors.border};
         border-radius: 3px;
     }
     &::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #a855f7, #ec4899);
+        background: ${({ theme }) => theme.colors.primary};
         border-radius: 3px;
     }
 `;
@@ -55,18 +53,19 @@ const ScrollContainer = styled.div`
 const ProductCard = styled.div`
     min-width: 200px;
     max-width: 200px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: ${({ theme }) => theme.colors.background};
+    border: 1px solid ${({ theme }) => theme.colors.border};
     border-radius: 16px;
     overflow: hidden;
     transition: all 0.3s ease;
     scroll-snap-align: start;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 
     &:hover {
         transform: translateY(-4px);
-        border-color: rgba(168, 85, 247, 0.4);
-        box-shadow: 0 8px 25px rgba(168, 85, 247, 0.15);
+        border-color: ${({ theme }) => theme.colors.primary};
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     }
 `;
 
@@ -75,7 +74,7 @@ const ImageWrapper = styled.div`
     width: 100%;
     height: 200px;
     overflow: hidden;
-    background: rgba(0, 0, 0, 0.2);
+    background: ${({ theme }) => theme.colors.secondaryBackground};
 `;
 
 const CardContent = styled.div`
@@ -85,7 +84,7 @@ const CardContent = styled.div`
 const ProductName = styled.h3`
     font-size: 0.85rem;
     font-weight: 600;
-    color: #f1f1f1;
+    color: ${({ theme }) => theme.colors.text};
     margin-bottom: 0.25rem;
     line-height: 1.3;
     display: -webkit-box;
@@ -96,20 +95,22 @@ const ProductName = styled.h3`
 
 const ArtistName = styled.p`
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: ${({ theme }) => theme.colors.text};
+    opacity: 0.7;
     margin-bottom: 0.5rem;
 `;
 
 const Price = styled.span`
     font-size: 0.9rem;
     font-weight: 700;
-    color: #a855f7;
+    color: ${({ theme }) => theme.colors.primary};
 `;
 
 const SimilarityBadge = styled.span`
     font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.9);
-    background: rgba(168, 85, 247, 0.15);
+    color: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => theme.colors.secondaryBackground};
+    border: 1px solid ${({ theme }) => theme.colors.border};
     padding: 2px 6px;
     border-radius: 8px;
     float: right;
@@ -121,9 +122,9 @@ const LoadingShimmer = styled.div`
     height: 280px;
     background: linear-gradient(
         90deg,
-        rgba(255, 255, 255, 0.03) 0%,
-        rgba(255, 255, 255, 0.08) 50%,
-        rgba(255, 255, 255, 0.03) 100%
+        ${({ theme }) => theme.colors.secondaryBackground} 0%,
+        ${({ theme }) => theme.colors.border} 50%,
+        ${({ theme }) => theme.colors.secondaryBackground} 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -140,6 +141,7 @@ export default function SimilarProducts({ productId }: { productId: string }) {
     const [products, setProducts] = useState<SimilarProduct[]>([]);
     const [loading, setLoading] = useState(true);
     const locale = useLocale();
+    const { convertPrice } = useCurrency();
 
     useEffect(() => {
         async function fetchSimilar() {
@@ -193,7 +195,7 @@ export default function SimilarProducts({ productId }: { productId: string }) {
                                 <CardContent>
                                     <ProductName>{product.name}</ProductName>
                                     <ArtistName>{product.artist}</ArtistName>
-                                    <Price>${product.price.toFixed(2)}</Price>
+                                    <Price>{convertPrice(product.price)}</Price>
                                     <SimilarityBadge>
                                         {Math.round(product.similarity * 100)}% match
                                     </SimilarityBadge>
