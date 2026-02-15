@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from '../LanguageSwitcher';
+import CurrencySwitcher from '../CurrencySwitcher';
 
 const NavContainer = styled.div`
   display: flex;
@@ -100,6 +101,7 @@ export default function HeaderNav() {
                 <Music size={20} />
             </IconWrapper>
 
+            <CurrencySwitcher />
             <LanguageSwitcher />
 
             <IconWrapper aria-label={t('cart')} onClick={toggleCart}>

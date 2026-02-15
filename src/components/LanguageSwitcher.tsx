@@ -43,9 +43,9 @@ export default function LanguageSwitcher() {
       onChange={onSelectChange}
       disabled={isPending}
     >
-      <option value="es">Español</option>
-      <option value="en">English</option>
-      <option value="ko">한국어</option>
+      <option value="es">🇲🇽 Español</option>
+      <option value="en">🇺🇸 English</option>
+      <option value="ko">🇰🇷 한국어</option>
     </Select>
   );
 }

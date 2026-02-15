@@ -66,11 +66,18 @@ export default function middleware(request: NextRequest) {
 
     // Geo-Detection (Vercel specific) - usa header x-vercel-ip-country como fuente principal
     // En localhost no existe el header de Vercel, así que defaultea a 'MX' (tienda mexicana)
-    const vercelCountry = request.headers.get('x-vercel-ip-country');
-    const country = vercelCountry || 'MX';
-    const currency = country === 'MX' ? 'MXN' : 'USD';
 
-    // Siempre actualizar la cookie de moneda basada en la ubicación actual
+    // Verificar si ya existe una preferencia de moneda
+    const existingCurrency = request.cookies.get('NEXT_CURRENCY')?.value;
+    let currency = existingCurrency;
+
+    if (!currency) {
+        const vercelCountry = request.headers.get('x-vercel-ip-country');
+        const country = vercelCountry || 'MX';
+        currency = country === 'MX' ? 'MXN' : 'USD';
+    }
+
+    // Asegurar que la cookie esté presente (o renovarla)
     response.cookies.set('NEXT_CURRENCY', currency);
 
     const cspHeader = `
