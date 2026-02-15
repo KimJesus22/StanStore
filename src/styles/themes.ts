@@ -13,7 +13,8 @@ export const themes = {
     ScaledAndIcy: {
         name: 'Scaled and Icy',
         colors: {
-            primary: '#00B7D6', // Light Blue
+            // Darkened from #00B7D6 to #00796B for text contrast (4.5:1)
+            primary: '#00796B',
             background: '#F9F9F9', // White/Grey
             text: '#2D2D2D',
             accent: '#F48FB1', // Pink
@@ -24,7 +25,8 @@ export const themes = {
     Minimalist: {
         name: 'Minimalist K-Pop',
         colors: {
-            primary: '#A8D0E6', // Pastel Blue
+            // Darkened from #A8D0E6 to #457B9D for text contrast
+            primary: '#457B9D',
             background: '#FFFFFF',
             text: '#333333',
             accent: '#F8B195', // Peach

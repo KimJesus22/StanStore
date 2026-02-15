@@ -32,7 +32,7 @@ const Title = styled.h1`
 `;
 
 const Subtitle = styled.p`
-  color: ${({ theme }) => theme.colors.text}80;
+  color: ${({ theme }) => theme.colors.text}CC;
   font-size: 1rem;
 `;
 
