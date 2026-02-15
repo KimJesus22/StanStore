@@ -166,7 +166,7 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
   const { convertPrice } = useCurrency();
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent Link navigation
+    e.preventDefault();
     e.stopPropagation();
     if (product.stock > 0) {
       addToCart(product);
@@ -189,15 +189,15 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
   }
 
   const isOutOfStock = product.stock === 0;
+  const productUrl = `/product/${product.id}`;
 
   return (
-    <CardLink href={isOutOfStock ? '#' : `/product/${product.id}`} style={{ pointerEvents: isOutOfStock ? 'none' : 'auto' }}>
-      <Card
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: index * 0.1 }}
-        whileHover={{ scale: isOutOfStock ? 1 : 1.05 }}
-      >
+    <Card
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.1 }}
+    >
+      <Link href={isOutOfStock ? '#' : productUrl} style={{ textDecoration: 'none', color: 'inherit', flex: 1, pointerEvents: isOutOfStock ? 'none' : 'auto' }}>
         <ImageContainer>
           {isOutOfStock && <OutOfStockOverlay>Agotado</OutOfStockOverlay>}
           <Image
@@ -213,21 +213,21 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
         </ImageContainer>
         <Artist>{product.artist}</Artist>
         <ProductName>{product.name}</ProductName>
-        <Footer>
-          <Price>{convertPrice(product.price)}</Price>
-          {!isOutOfStock && (
-            <AddButton
-              className="add-to-cart-btn"
-              onClick={handleAddToCart}
-              aria-label={`Añadir ${product.name} al carrito`}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <ShoppingBag size={16} />
-            </AddButton>
-          )}
-        </Footer>
-      </Card>
-    </CardLink>
+      </Link>
+      <Footer>
+        <Price>{convertPrice(product.price)}</Price>
+        {!isOutOfStock && (
+          <AddButton
+            className="add-to-cart-btn"
+            onClick={handleAddToCart}
+            aria-label={`Añadir ${product.name} al carrito`}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <ShoppingBag size={16} />
+          </AddButton>
+        )}
+      </Footer>
+    </Card>
   );
 }
