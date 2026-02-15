@@ -56,7 +56,7 @@ const ImageContainer = styled.div`
 
 const Artist = styled.span`
   font-size: 0.8rem;
-  color: ${({ theme }) => theme.colors.text}80; /* 50% opacity */
+  color: ${({ theme }) => theme.colors.text}CC; /* 80% opacity for better contrast */
   margin-bottom: 0.25rem;
   text-transform: uppercase;
   font-weight: 600;
@@ -219,7 +219,7 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
             <AddButton
               className="add-to-cart-btn"
               onClick={handleAddToCart}
-              aria-label="Añadir al carrito"
+              aria-label={`Añadir ${product.name} al carrito`}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >

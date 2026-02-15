@@ -129,7 +129,7 @@ const ItemName = styled.h4`
 
 const ItemArtist = styled.div`
   font-size: 0.75rem;
-  color: ${({ theme }) => theme.colors.text}90;
+  color: ${({ theme }) => theme.colors.text}CC;
   text-transform: uppercase;
   margin-bottom: 0.5rem;
 `;
@@ -146,7 +146,7 @@ const ItemPrice = styled.div`
 const RemoveButton = styled.button`
   background: none;
   border: none;
-  color: ${({ theme }) => theme.colors.text}60;
+  color: ${({ theme }) => theme.colors.text}99;
   cursor: pointer;
   padding: 0.25rem;
   transition: color 0.2s;
@@ -258,7 +258,7 @@ export default function CartDrawer() {
           >
             <Header>
               <Title>{t('title')} ({items.length})</Title>
-              <CloseButton onClick={closeCart}>
+              <CloseButton onClick={closeCart} aria-label={t('close')}>
                 <X size={24} />
               </CloseButton>
             </Header>
@@ -300,7 +300,7 @@ export default function CartDrawer() {
                       </ItemDetails>
                       <RemoveButton
                         onClick={() => removeFromCart(item.id)}
-                        aria-label="Eliminar producto"
+                        aria-label={`Eliminar ${item.name} del carrito`}
                       >
                         <Trash2 size={18} />
                       </RemoveButton>

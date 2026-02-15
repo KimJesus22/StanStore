@@ -411,6 +411,7 @@ export default function ProductDetails({ product }: { product: Product }) {
             <QtyButton
               onClick={() => handleQuantityChange(-1)}
               disabled={quantity <= 1 || isOutOfStock}
+              aria-label="Disminuir cantidad"
             >
               <Minus size={18} />
             </QtyButton>
@@ -418,6 +419,7 @@ export default function ProductDetails({ product }: { product: Product }) {
             <QtyButton
               onClick={() => handleQuantityChange(1)}
               disabled={isOutOfStock || quantity >= currentStock}
+              aria-label="Aumentar cantidad"
             >
               <Plus size={18} />
             </QtyButton>
