@@ -63,7 +63,7 @@ const BackLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: ${({ theme }) => theme.colors.text}80;
+  color: ${({ theme }) => theme.colors.text}E6; /* ~90% opacity */
   text-decoration: none;
   font-weight: 500;
   margin-bottom: 2rem;
@@ -76,7 +76,7 @@ const BackLink = styled(Link)`
 
 const Artist = styled.h2`
   font-size: 1.25rem;
-  color: ${({ theme }) => theme.colors.text}80;
+  color: ${({ theme }) => theme.colors.text}E6;
   font-weight: 600;
   text-transform: uppercase;
   margin-bottom: 0.5rem;

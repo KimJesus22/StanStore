@@ -200,7 +200,7 @@ export default function HeaderSearch() {
         />
         {isSearchOpen && query && (
           <ClearButton onClick={clearSearch} aria-label={t('clearSearch')} className="desktop-clear-btn" style={{ display: 'none' }}>
-            <X size={16} color="#999" />
+            <X size={16} color="#555" />
           </ClearButton>
         )}
         <style jsx>{`
@@ -229,7 +229,7 @@ export default function HeaderSearch() {
               />
               {query && (
                 <ClearButton onClick={clearSearch} aria-label={t('clearSearch')}>
-                  <X size={18} color="#999" />
+                  <X size={18} color="#555" />
                 </ClearButton>
               )}
             </MobileSearchInputWrapper>

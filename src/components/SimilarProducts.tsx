@@ -96,7 +96,7 @@ const ProductName = styled.h3`
 
 const ArtistName = styled.p`
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.8);
     margin-bottom: 0.5rem;
 `;
 
@@ -108,7 +108,7 @@ const Price = styled.span`
 
 const SimilarityBadge = styled.span`
     font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.9);
     background: rgba(168, 85, 247, 0.15);
     padding: 2px 6px;
     border-radius: 8px;
