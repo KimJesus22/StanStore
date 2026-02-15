@@ -168,17 +168,34 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
     if (product.stock > 0) {
       addToCart(product);
-      toast.success('Producto añadido correctamente', {
+      toast.success(`✅ ${product.name} añadido al carrito`, {
         style: {
-          border: '1px solid #10CFBD',
-          padding: '16px',
-          color: '#111',
+          background: '#10B981',
+          color: '#FFFFFF',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          fontWeight: 500,
         },
         iconTheme: {
-          primary: '#10CFBD',
-          secondary: '#FFFAEE',
+          primary: '#FFFFFF',
+          secondary: '#10B981',
+        },
+      });
+    } else {
+      toast.error('Producto sin stock', {
+        style: {
+          background: '#EF4444',
+          color: '#FFFFFF',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          fontWeight: 500,
+        },
+        iconTheme: {
+          primary: '#FFFFFF',
+          secondary: '#EF4444',
         },
       });
     }
