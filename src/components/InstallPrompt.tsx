@@ -144,7 +144,7 @@ export default function InstallPrompt() {
         </Content>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <InstallButton onClick={handleInstallClick}>Instalar</InstallButton>
-          <CloseButton onClick={handleClose}>
+          <CloseButton onClick={handleClose} aria-label="Cerrar aviso de instalación">
             <X size={18} />
           </CloseButton>
         </div>

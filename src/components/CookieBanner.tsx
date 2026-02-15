@@ -32,7 +32,7 @@ const Text = styled.p`
   margin: 0;
   
   a {
-    color: #10CFBD;
+    color: #4FD1C5;
     text-decoration: underline;
     &:hover {
       text-decoration: none;

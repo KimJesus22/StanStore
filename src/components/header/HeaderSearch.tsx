@@ -131,107 +131,111 @@ const ClearButton = styled.button`
 `;
 
 export default function HeaderSearch() {
-    const t = useTranslations('Navbar');
-    const router = useRouter();
+  const t = useTranslations('Navbar');
+  const router = useRouter();
 
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [query, setQuery] = useState('');
-    const debouncedQuery = useDebounce(query, 500);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 500);
 
-    const inputRef = useRef<HTMLInputElement>(null);
-    const mobileInputRef = useRef<HTMLInputElement>(null);
-    const searchContainerRef = useRef<HTMLDivElement>(null);
-    const mobileSearchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mobileInputRef = useRef<HTMLInputElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
 
-    useOnClickOutside([searchContainerRef, mobileSearchRef], () => {
-        if (isSearchOpen) {
-            setIsSearchOpen(false);
-        }
-    });
+  useOnClickOutside([searchContainerRef, mobileSearchRef], () => {
+    if (isSearchOpen) {
+      setIsSearchOpen(false);
+    }
+  });
 
-    useEffect(() => {
-        if (isSearchOpen) {
-            if (window.innerWidth <= 640) {
-                // Small delay to ensure render
-                setTimeout(() => mobileInputRef.current?.focus(), 50);
-            } else {
-                setTimeout(() => inputRef.current?.focus(), 50);
-            }
-        }
-    }, [isSearchOpen]);
+  useEffect(() => {
+    if (isSearchOpen) {
+      if (window.innerWidth <= 640) {
+        // Small delay to ensure render
+        setTimeout(() => mobileInputRef.current?.focus(), 50);
+      } else {
+        setTimeout(() => inputRef.current?.focus(), 50);
+      }
+    }
+  }, [isSearchOpen]);
 
-    useEffect(() => {
-        if (debouncedQuery) {
-            router.push(`/search?q=${encodeURIComponent(debouncedQuery)}`);
-        }
-    }, [debouncedQuery, router]);
+  useEffect(() => {
+    if (debouncedQuery) {
+      router.push(`/search?q=${encodeURIComponent(debouncedQuery)}`);
+    }
+  }, [debouncedQuery, router]);
 
-    const toggleSearch = () => {
-        setIsSearchOpen(!isSearchOpen);
-    };
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+  };
 
-    const clearSearch = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setQuery('');
-        // Keep focus
-        if (window.innerWidth <= 640) {
-            mobileInputRef.current?.focus();
-        } else {
-            inputRef.current?.focus();
-        }
-    };
+  const clearSearch = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setQuery('');
+    // Keep focus
+    if (window.innerWidth <= 640) {
+      mobileInputRef.current?.focus();
+    } else {
+      inputRef.current?.focus();
+    }
+  };
 
-    return (
-        <>
-            <SearchContainer $isOpen={isSearchOpen} ref={searchContainerRef}>
-                <IconWrapper onClick={toggleSearch} aria-label={t('search')}>
-                    <Search />
-                </IconWrapper>
-                <SearchInput
-                    $isOpen={isSearchOpen}
-                    placeholder={`${t('search')}...`}
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    ref={inputRef}
-                />
-                {isSearchOpen && query && (
-                    <ClearButton onClick={clearSearch} aria-label={t('clearSearch')} className="desktop-clear-btn" style={{ display: 'none' }}>
-                        <X size={16} color="#999" />
-                    </ClearButton>
-                )}
-                <style jsx>{`
+  return (
+    <>
+      <SearchContainer $isOpen={isSearchOpen} ref={searchContainerRef}>
+        <label htmlFor="search-input" style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', border: 0 }}>
+          {t('search')}
+        </label>
+        <IconWrapper onClick={toggleSearch} aria-label={t('search')}>
+          <Search />
+        </IconWrapper>
+        <SearchInput
+          id="search-input"
+          $isOpen={isSearchOpen}
+          placeholder={`${t('search')}...`}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          ref={inputRef}
+        />
+        {isSearchOpen && query && (
+          <ClearButton onClick={clearSearch} aria-label={t('clearSearch')} className="desktop-clear-btn" style={{ display: 'none' }}>
+            <X size={16} color="#999" />
+          </ClearButton>
+        )}
+        <style jsx>{`
           @media (min-width: 641px) {
             .desktop-clear-btn { display: flex !important; }
           }
         `}</style>
-            </SearchContainer>
+      </SearchContainer>
 
-            <AnimatePresence>
-                {isSearchOpen && (
-                    <MobileSearchPanel
-                        ref={mobileSearchRef}
-                        initial={{ height: 0, opacity: 0, y: -20 }}
-                        animate={{ height: 'auto', opacity: 1, y: 0 }}
-                        exit={{ height: 0, opacity: 0, y: -20 }}
-                        transition={{ duration: 0.25, type: "spring", bounce: 0 }}
-                    >
-                        <MobileSearchInputWrapper>
-                            <Search size={20} color="#666" />
-                            <MobileInput
-                                ref={mobileInputRef}
-                                placeholder={`${t('search')}...`}
-                                value={query}
-                                onChange={(e) => setQuery(e.target.value)}
-                            />
-                            {query && (
-                                <ClearButton onClick={clearSearch} aria-label={t('clearSearch')}>
-                                    <X size={18} color="#999" />
-                                </ClearButton>
-                            )}
-                        </MobileSearchInputWrapper>
-                    </MobileSearchPanel>
-                )}
-            </AnimatePresence>
-        </>
-    );
+      <AnimatePresence>
+        {isSearchOpen && (
+          <MobileSearchPanel
+            ref={mobileSearchRef}
+            initial={{ height: 0, opacity: 0, y: -20 }}
+            animate={{ height: 'auto', opacity: 1, y: 0 }}
+            exit={{ height: 0, opacity: 0, y: -20 }}
+            transition={{ duration: 0.25, type: "spring", bounce: 0 }}
+          >
+            <MobileSearchInputWrapper>
+              <Search size={20} color="#666" />
+              <MobileInput
+                ref={mobileInputRef}
+                placeholder={`${t('search')}...`}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              {query && (
+                <ClearButton onClick={clearSearch} aria-label={t('clearSearch')}>
+                  <X size={18} color="#999" />
+                </ClearButton>
+              )}
+            </MobileSearchInputWrapper>
+          </MobileSearchPanel>
+        )}
+      </AnimatePresence>
+    </>
+  );
 }
