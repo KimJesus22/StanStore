@@ -14,6 +14,7 @@ import type { Metadata, Viewport } from 'next';
 import InstallPrompt from '@/components/InstallPrompt';
 import CookieBanner from '@/components/CookieBanner';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import Footer from '@/components/Footer';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,6 +71,7 @@ export default async function LocaleLayout({
                   <CartDrawer />
                   <InstallPrompt />
                   {children}
+                  <Footer />
                 </CurrencyProvider>
               </AuthProvider>
               <CookieBanner />
