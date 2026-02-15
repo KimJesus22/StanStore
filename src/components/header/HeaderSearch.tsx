@@ -226,6 +226,7 @@ export default function HeaderSearch() {
                 placeholder={`${t('search')}...`}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                aria-label={t('search')}
               />
               {query && (
                 <ClearButton onClick={clearSearch} aria-label={t('clearSearch')}>

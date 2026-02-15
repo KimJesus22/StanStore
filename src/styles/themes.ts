@@ -5,7 +5,7 @@ export const themes = {
             primary: '#D13639', // Red
             background: '#FFFFFF',
             text: '#1A1A1A',
-            accent: '#FCE300', // Yellow
+            accent: '#F57F17', // Darkened Yellow for contrast
             secondaryBackground: '#F5F5F5',
             border: '#E0E0E0',
         },
@@ -17,7 +17,7 @@ export const themes = {
             primary: '#00796B',
             background: '#F9F9F9', // White/Grey
             text: '#2D2D2D',
-            accent: '#F48FB1', // Pink
+            accent: '#C2185B', // Darkened Pink for contrast
             secondaryBackground: '#FFFFFF',
             border: '#E0E0E0',
         },
@@ -29,7 +29,7 @@ export const themes = {
             primary: '#457B9D',
             background: '#FFFFFF',
             text: '#333333',
-            accent: '#F8B195', // Peach
+            accent: '#D84315', // Darkened Peach for contrast
             secondaryBackground: '#FAFAFA',
             border: '#EEEEEE',
         },
