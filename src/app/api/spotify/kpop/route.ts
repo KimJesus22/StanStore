@@ -31,24 +31,10 @@ const KPOP_ARTIST_IDS = [
 
 export async function GET() {
     try {
-        const token = await getSpotifyToken();
+        const { getMultipleArtists } = await import('@/lib/spotify');
+        const artistsData = await getMultipleArtists(KPOP_ARTIST_IDS);
 
-        // Fetch artists in batches (max 50 per request)
-        const res = await fetch(
-            `https://api.spotify.com/v1/artists?ids=${KPOP_ARTIST_IDS.join(',')}`,
-            {
-                headers: { Authorization: `Bearer ${token}` },
-                next: { revalidate: 3600 }, // cache 1 hour
-            }
-        );
-
-        if (!res.ok) {
-            throw new Error(`Spotify error: ${res.status}`);
-        }
-
-        const data = await res.json();
-
-        const artists = data.artists
+        const artists = artistsData
             .filter((a: SpotifyArtist | null) => a !== null)
             .map((a: SpotifyArtist) => ({
                 id: a.id,

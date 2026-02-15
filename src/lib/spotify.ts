@@ -74,11 +74,13 @@ async function spotifyFetch<T>(endpoint: string): Promise<T> {
     const token = await getSpotifyToken();
     const res = await fetch(`https://api.spotify.com/v1${endpoint}`, {
         headers: { Authorization: `Bearer ${token}` },
-        next: { revalidate: 300 }, // cache 5 min
+        next: { revalidate: 3600 },
     });
 
     if (!res.ok) {
-        throw new Error(`Spotify API error: ${res.status} ${res.statusText}`);
+        const errorBody = await res.text();
+        console.error(`Spotify API Error (${endpoint}):`, res.status, errorBody);
+        throw new Error(`Spotify API error: ${res.status} ${res.statusText} - ${errorBody}`);
     }
 
     return res.json();
@@ -163,4 +165,11 @@ export async function getAlbumTracks(albumId: string) {
             artists: t.artists?.map((a) => a.name) || [],
         })),
     };
+}
+export async function getMultipleArtists(ids: string[]) {
+    // Spotify allows up to 50 IDs
+    const data = await spotifyFetch<{ artists: SpotifyArtist[] }>(
+        `/artists?ids=${ids.join(',')}`
+    );
+    return data.artists;
 }

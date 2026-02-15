@@ -63,17 +63,17 @@ export default async function LocaleLayout({
           <StyledComponentsRegistry>
             <GoogleAnalytics gaId="G-XXXXXXXXXX" />
             <Toaster position="bottom-center" />
-            <AuthProvider>
-              <CurrencyProvider>
-                <ThemeProvider>
+            <ThemeProvider>
+              <AuthProvider>
+                <CurrencyProvider>
                   <Navbar />
                   <CartDrawer />
                   <InstallPrompt />
                   {children}
-                </ThemeProvider>
-              </CurrencyProvider>
-            </AuthProvider>
-            <CookieBanner />
+                </CurrencyProvider>
+              </AuthProvider>
+              <CookieBanner />
+            </ThemeProvider>
           </StyledComponentsRegistry>
         </NextIntlClientProvider>
       </body>

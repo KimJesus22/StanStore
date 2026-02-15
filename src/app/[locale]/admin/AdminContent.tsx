@@ -302,7 +302,12 @@ export default function AdminPage() {
   const [selectedAlbum, setSelectedAlbum] = useState<SpotifyAlbum | null>(null);
   const [showAlbumDropdown, setShowAlbumDropdown] = useState(false);
   const [searchingArtist, setSearchingArtist] = useState(false);
+
   const [searchingAlbum, setSearchingAlbum] = useState(false);
+
+  // Currency State
+  const [currency, setCurrency] = useState<'USD' | 'MXN'>('MXN');
+  const EXCHANGE_RATE_MXN = 20.50;
 
   const fetchProducts = async () => {
     const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
@@ -416,9 +421,14 @@ export default function AdminPage() {
       }
 
       const formData = new FormData(e.currentTarget);
+      let price = parseFloat(formData.get('price') as string);
+      if (currency === 'MXN') {
+        price = price / EXCHANGE_RATE_MXN;
+      }
+
       const data = {
         name: formData.get('name') as string,
-        price: parseFloat(formData.get('price') as string),
+        price: price,
         category: formData.get('category') as string,
         artist: selectedArtist?.name || artistQuery || (formData.get('artist') as string),
         image_url: imageUrl,
@@ -475,8 +485,46 @@ export default function AdminPage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <FormGroup>
-              <Label><DollarSign size={16} /> Precio (USD)</Label>
-              <Input name="price" type="number" step="0.01" placeholder="0.00" required />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <Label style={{ marginBottom: 0 }}><DollarSign size={16} /> Precio</Label>
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value as 'USD' | 'MXN')}
+                  style={{
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '6px',
+                    border: '1px solid #e0e0e0',
+                    fontSize: '0.85rem',
+                    background: '#f9f9f9',
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="MXN">MXN</option>
+                  <option value="USD">USD</option>
+                </select>
+              </div>
+              <div style={{ position: 'relative' }}>
+                <Input
+                  name="price"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  required
+                  style={{ paddingRight: '3.5rem' }}
+                />
+                <span style={{
+                  position: 'absolute',
+                  right: '1rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#888',
+                  fontSize: '0.9rem',
+                  fontWeight: 600
+                }}>
+                  {currency}
+                </span>
+              </div>
               {errors.price && <ErrorMsg>{errors.price[0]}</ErrorMsg>}
             </FormGroup>
 
