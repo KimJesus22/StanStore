@@ -8,6 +8,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useTranslations } from 'next-intl';
 import { AnimatePresence, motion } from 'framer-motion';
+import Spinner from '@/components/Spinner';
 
 const SearchContainer = styled.div<{ $isOpen: boolean }>`
   position: relative;
@@ -137,6 +138,7 @@ export default function HeaderSearch() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 500);
+  const isSearching = query !== debouncedQuery && query.length > 0;
 
   const inputRef = useRef<HTMLInputElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
@@ -198,10 +200,18 @@ export default function HeaderSearch() {
           onChange={(e) => setQuery(e.target.value)}
           ref={inputRef}
         />
-        {isSearchOpen && query && (
-          <ClearButton onClick={clearSearch} aria-label={t('clearSearch')} className="desktop-clear-btn" style={{ display: 'none' }}>
-            <X size={16} color="#555" />
-          </ClearButton>
+        {isSearchOpen && (
+          <div style={{ display: 'flex', alignItems: 'center', marginRight: '0.5rem' }}>
+            {isSearching ? (
+              <Spinner size={16} color="#666" />
+            ) : (
+              query && (
+                <ClearButton onClick={clearSearch} aria-label={t('clearSearch')} className="desktop-clear-btn" style={{ display: 'none' }}>
+                  <X size={16} color="#555" />
+                </ClearButton>
+              )
+            )}
+          </div>
         )}
         <style jsx>{`
           @media (min-width: 641px) {
@@ -228,10 +238,14 @@ export default function HeaderSearch() {
                 onChange={(e) => setQuery(e.target.value)}
                 aria-label={t('search')}
               />
-              {query && (
-                <ClearButton onClick={clearSearch} aria-label={t('clearSearch')}>
-                  <X size={18} color="#555" />
-                </ClearButton>
+              {isSearching ? (
+                <Spinner size={18} color="#666" />
+              ) : (
+                query && (
+                  <ClearButton onClick={clearSearch} aria-label={t('clearSearch')}>
+                    <X size={18} color="#555" />
+                  </ClearButton>
+                )
               )}
             </MobileSearchInputWrapper>
           </MobileSearchPanel>
