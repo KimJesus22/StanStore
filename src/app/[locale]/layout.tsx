@@ -11,10 +11,18 @@ import { Toaster } from 'react-hot-toast';
 import { locales } from '@/navigation';
 import '../globals.css';
 import type { Metadata, Viewport } from 'next';
-import InstallPrompt from '@/components/InstallPrompt';
-import CookieBanner from '@/components/CookieBanner';
-import GoogleAnalytics from '@/components/GoogleAnalytics';
-import Footer from '@/components/Footer';
+import dynamicLoader from 'next/dynamic';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { WebVitals } from '@/components/WebVitals';
+
+// Lazy loading de componentes "Below the Fold" o interactivos no críticos
+const Footer = dynamicLoader(() => import('@/components/Footer'), {
+  loading: () => <div style={{ padding: '2rem' }}><Skeleton $height="300px" /></div>
+});
+
+const CookieBanner = dynamicLoader(() => import('@/components/CookieBanner'), { ssr: false } as any);
+const InstallPrompt = dynamicLoader(() => import('@/components/InstallPrompt'), { ssr: false });
+const GoogleAnalytics = dynamicLoader(() => import('@/components/GoogleAnalytics'), { ssr: false });
 
 export const dynamic = 'force-dynamic';
 
@@ -68,6 +76,7 @@ export default async function LocaleLayout({
               <AuthProvider>
                 <CurrencyProvider>
                   <Navbar />
+                  <WebVitals />
                   <CartDrawer />
                   <InstallPrompt />
                   {children}

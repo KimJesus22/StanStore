@@ -189,7 +189,7 @@ export default function SimilarProducts({ productId }: { productId: string }) {
                                         alt={product.name}
                                         fill
                                         style={{ objectFit: 'cover' }}
-                                        sizes="200px"
+                                        sizes="(max-width: 768px) 150px, 200px"
                                     />
                                 </ImageWrapper>
                                 <CardContent>

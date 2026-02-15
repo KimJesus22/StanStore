@@ -11,9 +11,33 @@ import { Product } from '@/types';
 import { useTranslations, useLocale } from 'next-intl';
 import { supabase } from '@/lib/supabaseClient';
 import Image from 'next/image';
-import ReviewForm from './ReviewForm';
-import ReviewList from './ReviewList';
-import SimilarProducts from './SimilarProducts';
+import dynamic from 'next/dynamic';
+import { Skeleton } from './ui/Skeleton';
+
+const SpotifyPlayer = dynamic(() => import('./SpotifyPlayer'), {
+  ssr: false,
+  loading: () => <Skeleton $height="80px" />
+});
+const ArtistInfo = dynamic(() => import('./ArtistInfo'), {
+  loading: () => <Skeleton $height="150px" />
+});
+const TrackPreviews = dynamic(() => import('./TrackPreviews'), {
+  ssr: false,
+  loading: () => <Skeleton $height="200px" />
+});
+const YouTubePlayer = dynamic(() => import('./YouTubePlayer'), {
+  ssr: false,
+  loading: () => <Skeleton $height="300px" />
+});
+const FanModeEffects = dynamic(() => import('./FanModeEffects'), { ssr: false });
+const ReviewForm = dynamic(() => import('./ReviewForm'), { ssr: false });
+const ReviewList = dynamic(() => import('./ReviewList'), {
+  loading: () => <Skeleton $height="100px" />
+});
+const SimilarProducts = dynamic(() => import('./SimilarProducts'), {
+  loading: () => <Skeleton $height="250px" />
+});
+
 import { verifyPurchase } from '@/app/actions/reviews';
 import { useCurrency } from '@/context/CurrencyContext';
 
@@ -214,11 +238,6 @@ const StockBadge = styled.div`
 
 
 
-import SpotifyPlayer from './SpotifyPlayer';
-import ArtistInfo from './ArtistInfo';
-import TrackPreviews from './TrackPreviews';
-import YouTubePlayer from './YouTubePlayer';
-import FanModeEffects from './FanModeEffects';
 import { Sparkles } from 'lucide-react';
 
 const FanButton = styled.button<{ $isActive: boolean, $themeColor?: string }>`
@@ -367,7 +386,7 @@ export default function ProductDetails({ product }: { product: Product }) {
           alt={product.name}
           fill
           priority
-          sizes="(max-width: 768px) 100vw, 50vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
           placeholder="blur"
           blurDataURL={BLUR_DATA_URL}
           style={{ objectFit: 'contain' }}

@@ -221,8 +221,8 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
             src={product.image_url}
             alt={product.name}
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority={index < 4}
+            sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
+            priority={false}
             placeholder="blur"
             blurDataURL={BLUR_DATA_URL}
             style={{ objectFit: 'contain', filter: isOutOfStock ? 'grayscale(100%)' : 'none' }}
