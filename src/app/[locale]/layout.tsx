@@ -10,7 +10,7 @@ import { CurrencyProvider } from '@/context/CurrencyContext';
 import { Toaster } from 'react-hot-toast';
 import { locales } from '@/navigation';
 import '../globals.css';
-import type { Metadata, Viewport } from 'next';
+import type { Viewport } from 'next';
 import dynamicLoader from 'next/dynamic';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { WebVitals } from '@/components/WebVitals';

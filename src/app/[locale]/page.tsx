@@ -1,6 +1,6 @@
 import HomeContent from './HomeContent';
 
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 

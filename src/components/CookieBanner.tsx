@@ -95,7 +95,7 @@ export default function CookieBanner() {
     <Banner>
       <Text>
         {t.rich('message', {
-          link: (chunks: any) => <Link href="/privacy">{chunks}</Link>
+          link: (chunks: React.ReactNode) => <Link href="/privacy">{chunks}</Link>
         })}
       </Text>
       <ButtonGroup>

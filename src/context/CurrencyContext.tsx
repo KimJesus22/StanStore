@@ -20,6 +20,17 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     const [exchangeRate, setExchangeRate] = useState(1); // 1 USD = 1 USD
     const locale = useLocale(); // Get current locale from next-intl (e.g., 'es', 'en')
 
+    const rates = {
+        USD: 0.055,
+        KRW: 75,
+        MXN: 1,
+    };
+
+    // Moved up to be accessible by useEffect
+    const updateExchangeRate = React.useCallback((curr: Currency) => {
+        setExchangeRate(rates[curr]);
+    }, []);
+
     useEffect(() => {
         // Check localStorage first
         const savedCurrency = localStorage.getItem('app_currency') as Currency;
@@ -39,17 +50,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
                 updateExchangeRate('USD');
             }
         }
-    }, []);
-
-    const rates = {
-        USD: 0.055,
-        KRW: 75,
-        MXN: 1,
-    };
-
-    const updateExchangeRate = (curr: Currency) => {
-        setExchangeRate(rates[curr]);
-    };
+    }, [updateExchangeRate]);
 
     const handleCurrencyChange = (newCurrency: Currency) => {
         setCurrency(newCurrency);
