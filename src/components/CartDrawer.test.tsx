@@ -25,7 +25,7 @@ vi.mock('next-intl', () => ({
 
 vi.mock('@/context/CurrencyContext', () => ({
     useCurrency: () => ({
-        convertPrice: (price: number) => `$${price}`,
+        formatPrice: (price: number) => `$${price}`,
     }),
 }));
 
@@ -34,7 +34,8 @@ const mockRemoveFromCart = vi.fn();
 const mockCloseCart = vi.fn();
 
 // We will use a variable to control the store state in the mock
-let mockStoreState = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let mockStoreState: any = {
     items: [],
     isCartOpen: true,
     closeCart: mockCloseCart,

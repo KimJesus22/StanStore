@@ -271,7 +271,7 @@ export default function ProductDetails({ product }: { product: Product }) {
     : locale === 'en'
       ? (product.description_en || product.description)
       : product.description;
-  const { convertPrice } = useCurrency();
+  const { formatPrice } = useCurrency();
   const [quantity, setQuantity] = useState(1);
   const [currentStock, setCurrentStock] = useState(product?.stock || 0);
   const [canReview, setCanReview] = useState(false);
@@ -419,7 +419,7 @@ export default function ProductDetails({ product }: { product: Product }) {
           </StockBadge>
         )}
 
-        <Price>{convertPrice(product.price)}</Price>
+        <Price>{formatPrice(product.price)}</Price>
 
         <Description>
           {description || "Sin descripción disponible para este producto."}
@@ -469,7 +469,7 @@ export default function ProductDetails({ product }: { product: Product }) {
 
         {/* Reviews Section */}
         <div style={{ marginTop: '4rem', borderTop: '1px solid #eee', paddingTop: '2rem' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: 700 }}>Opiniones de los fans</h2>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: 700 }}>{t('reviewsTitle')}</h2>
 
           {canReview && userId && (
             <ReviewForm

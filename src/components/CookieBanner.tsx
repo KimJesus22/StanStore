@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-// import { useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 const Banner = styled.div`
@@ -65,7 +65,7 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
 
 export default function CookieBanner() {
   const [show, setShow] = useState(false);
-  // const t = useTranslations('CookieBanner'); // Assuming we'll add these keys or use fallbacks
+  const t = useTranslations('CookieBanner');
 
   useEffect(() => {
     const consent = localStorage.getItem('cookie_consent');
@@ -90,11 +90,13 @@ export default function CookieBanner() {
   return (
     <Banner>
       <Text>
-        Usamos cookies para mejorar tu experiencia y analizar nuestro tráfico. Al continuar, aceptas nuestra <Link href="/privacy">Política de Privacidad</Link>.
+        {t.rich('message', {
+          link: (chunks: any) => <Link href="/privacy">{chunks}</Link>
+        })}
       </Text>
       <ButtonGroup>
-        <Button variant="secondary" onClick={handleDecline}>Rechazar</Button>
-        <Button variant="primary" onClick={handleAccept}>Aceptar Todas</Button>
+        <Button variant="secondary" onClick={handleDecline}>{t('decline')}</Button>
+        <Button variant="primary" onClick={handleAccept}>{t('accept')}</Button>
       </ButtonGroup>
     </Banner>
   );

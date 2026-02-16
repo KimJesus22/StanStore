@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCurrency } from '@/context/CurrencyContext';
 
 interface SimilarProduct {
@@ -141,7 +141,8 @@ export default function SimilarProducts({ productId }: { productId: string }) {
     const [products, setProducts] = useState<SimilarProduct[]>([]);
     const [loading, setLoading] = useState(true);
     const locale = useLocale();
-    const { convertPrice } = useCurrency();
+    const t = useTranslations('Product');
+    const { formatPrice } = useCurrency();
 
     useEffect(() => {
         async function fetchSimilar() {
@@ -167,7 +168,7 @@ export default function SimilarProducts({ productId }: { productId: string }) {
 
     return (
         <Section>
-            <SectionTitle>✨ Quizás te guste...</SectionTitle>
+            <SectionTitle>{t('similarProducts')}</SectionTitle>
             <ScrollContainer>
                 {loading ? (
                     <>
@@ -195,7 +196,7 @@ export default function SimilarProducts({ productId }: { productId: string }) {
                                 <CardContent>
                                     <ProductName>{product.name}</ProductName>
                                     <ArtistName>{product.artist}</ArtistName>
-                                    <Price>{convertPrice(product.price)}</Price>
+                                    <Price>{formatPrice(product.price)}</Price>
                                     <SimilarityBadge>
                                         {Math.round(product.similarity * 100)}% match
                                     </SimilarityBadge>

@@ -2,7 +2,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, Mock } from 'vitest';
 import { CurrencyProvider, useCurrency } from '@/context/CurrencyContext';
-import CurrencySwitcher from '@/components/CurrencySwitcher';
+import CurrencySelector from '@/components/CurrencySelector';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { getCookie, setCookie } from 'cookies-next';
 
@@ -57,14 +57,14 @@ vi.mock('@/components/LanguageSwitcher', () => ({
 
 // --- Test Component ---
 const TestComponent = () => {
-    const { currency, convertPrice } = useCurrency();
+    const { currency, formatPrice } = useCurrency();
     return (
         <div>
             <span data-testid="currency-value">{currency}</span>
-            <span data-testid="price-display">{convertPrice(100)}</span>
+            <span data-testid="price-display">{formatPrice(100)}</span>
 
             <LanguageSwitcher />
-            <CurrencySwitcher />
+            <CurrencySelector />
         </div>
     );
 };
@@ -127,6 +127,6 @@ describe('I18n & Currency Integration', () => {
 
         expect(setCookie).toHaveBeenCalledWith('NEXT_CURRENCY', 'KRW');
         expect(screen.getByTestId('currency-value')).toHaveTextContent('KRW');
-        expect(screen.getByTestId('price-display')).toHaveTextContent('₩130,000');
+        expect(screen.getByTestId('price-display')).toHaveTextContent('₩130,000'); // formatPrice logic uses rate 1300 but input is 100 on test
     });
 });

@@ -14,7 +14,15 @@
         "backHome": "Volver al inicio",
         "outOfStock": "Agotado",
         "onlyLeft": "¡Solo quedan {count} unidades!",
-        "stockLimit": "No puedes añadir más de {stock} unidades"
+        "stockLimit": "No puedes añadir más de {stock} unidades",
+        "reviewsTitle": "Opiniones de los fans",
+        "similarProducts": "✨ Quizás te guste..."
+    },
+    "CookieBanner": {
+        "message": "Usamos cookies para mejorar tu experiencia y analizar nuestro tráfico. Al continuar, aceptas nuestra {link}.",
+        "privacyPolicy": "Política de Privacidad",
+        "decline": "Rechazar",
+        "accept": "Aceptar Todas"
     },
     "Cart": {
         "title": "Tu Carrito",
@@ -28,5 +36,10 @@
         "loading": "Cargando productos...",
         "noResults": "No se encontraron productos para esta categoría.",
         "categoryAll": "Todos"
+    },
+    "Metadata": {
+        "title": "StanStore - Merch de K-Pop",
+        "description": "La mejor tienda para álbumes de K-Pop, lightsticks y merch exclusivo.",
+        "homeTitle": "Comprar Merch de K-Pop | StanStore"
     }
 }

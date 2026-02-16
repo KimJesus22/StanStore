@@ -339,7 +339,7 @@ const TermsCheckbox = styled.label`
 
 export default function CheckoutForm() {
     const { items } = useCartStore();
-    const { convertPrice } = useCurrency();
+    const { formatPrice } = useCurrency();
     const locale = useLocale();
 
     const [loading, setLoading] = useState(false);
@@ -602,13 +602,13 @@ export default function CheckoutForm() {
                             <ItemName>{item.name}</ItemName>
                             <ItemArtist>{item.artist}</ItemArtist>
                         </ItemInfo>
-                        <ItemPrice>{convertPrice(item.price * item.quantity)}</ItemPrice>
+                        <ItemPrice>{formatPrice(item.price * item.quantity)}</ItemPrice>
                     </SummaryItem>
                 ))}
 
                 <TotalRow>
                     <span>Total</span>
-                    <span>{convertPrice(total)}</span>
+                    <span>{formatPrice(total)}</span>
                 </TotalRow>
 
                 <PayButton
@@ -620,7 +620,7 @@ export default function CheckoutForm() {
                             <Loader2 size={18} className="animate-spin" /> Procesando...
                         </>
                     ) : (
-                        `Pagar ${convertPrice(total)}`
+                        `Pagar ${formatPrice(total)}`
                     )}
                 </PayButton>
             </SummaryPanel>

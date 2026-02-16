@@ -28,5 +28,10 @@
         "loading": "상품 불러오는 중...",
         "noResults": "이 카테고리의 상품이 없습니다.",
         "categoryAll": "전체"
+    },
+    "Metadata": {
+        "title": "StanStore - K-Pop 굿즈",
+        "description": "K-Pop 앨범, 라이트스틱 및 독점 굿즈를 위한 최고의 상점.",
+        "homeTitle": "K-Pop 굿즈 구매 | StanStore"
     }
 }

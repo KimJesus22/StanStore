@@ -232,7 +232,7 @@ export default function CartDrawer() {
   const t = useTranslations('Cart');
   const locale = useLocale();
   const { isCartOpen, closeCart, items, removeFromCart } = useCartStore();
-  const { convertPrice } = useCurrency();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
@@ -314,7 +314,7 @@ export default function CartDrawer() {
                         <ItemName>{item.name}</ItemName>
                         <ItemArtist>{item.artist}</ItemArtist>
                         <ItemPrice>
-                          {convertPrice(item.price)} x {item.quantity}
+                          {formatPrice(item.price)} x {item.quantity}
                         </ItemPrice>
                       </ItemDetails>
                       <RemoveButton
@@ -332,7 +332,7 @@ export default function CartDrawer() {
             <Footer>
               <TotalRow>
                 <span>{t('total')}</span>
-                <span>{convertPrice(total)}</span>
+                <span>{formatPrice(total)}</span>
               </TotalRow>
 
               <TermsCheckbox>

@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
+import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import StyledComponentsRegistry from '@/lib/registry';
 import Navbar from '@/components/Navbar';
@@ -26,14 +26,26 @@ const GoogleAnalytics = dynamicLoader(() => import('@/components/GoogleAnalytics
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: "StanStore",
-  description: "Tienda de K-Pop y Merch",
-  manifest: "/manifest.json",
-  icons: {
-    apple: "/icons/icon-192x192.svg",
-  }
-};
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    title: {
+      default: t('title'),
+      template: `%s | StanStore`
+    },
+    description: t('description'),
+    manifest: "/manifest.json",
+    icons: {
+      apple: "/icons/icon-192x192.svg",
+    }
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#10CFBD",

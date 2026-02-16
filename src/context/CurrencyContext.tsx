@@ -2,13 +2,14 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getCookie, setCookie } from 'cookies-next';
+import { useLocale } from 'next-intl';
 
 type Currency = 'USD' | 'MXN' | 'KRW';
 
 interface CurrencyContextType {
     currency: Currency;
     setCurrency: (currency: Currency) => void;
-    convertPrice: (priceInUSD: number) => string;
+    formatPrice: (amountInMXN: number) => string;
     exchangeRate: number;
 }
 
@@ -17,40 +18,49 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     const [currency, setCurrency] = useState<Currency>('USD');
     const [exchangeRate, setExchangeRate] = useState(1); // 1 USD = 1 USD
+    const locale = useLocale(); // Get current locale from next-intl (e.g., 'es', 'en')
 
     useEffect(() => {
-        // Read cookie set by middleware
-        const cookieCurrency = getCookie('NEXT_CURRENCY') as Currency;
-        if (cookieCurrency === 'MXN') {
-            setCurrency('MXN');
-            setExchangeRate(20.50);
-        } else if (cookieCurrency === 'KRW') {
-            setCurrency('KRW');
-            setExchangeRate(1300);
+        // Check localStorage first
+        const savedCurrency = localStorage.getItem('app_currency') as Currency;
+
+        if (savedCurrency && ['USD', 'MXN', 'KRW'].includes(savedCurrency)) {
+            setCurrency(savedCurrency);
+            updateExchangeRate(savedCurrency);
         } else {
-            setCurrency('USD');
-            setExchangeRate(1);
+            // Fallback to cookie set by middleware
+            const cookieCurrency = getCookie('NEXT_CURRENCY') as Currency;
+            if (cookieCurrency && ['USD', 'MXN', 'KRW'].includes(cookieCurrency)) {
+                setCurrency(cookieCurrency);
+                updateExchangeRate(cookieCurrency);
+            } else {
+                // Default to USD if nothing found
+                setCurrency('USD');
+                updateExchangeRate('USD');
+            }
         }
     }, []);
 
-    const handleCurrencyChange = (newCurrency: Currency) => {
-        setCurrency(newCurrency);
-        setCookie('NEXT_CURRENCY', newCurrency);
-        if (newCurrency === 'MXN') {
-            setExchangeRate(20.50);
-        } else if (newCurrency === 'KRW') {
-            setExchangeRate(1300);
-        } else {
-            setExchangeRate(1);
-        }
+    const rates = {
+        USD: 0.055,
+        KRW: 75,
+        MXN: 1,
     };
 
-    const convertPrice = (priceInUSD: number) => {
-        const converted = priceInUSD * exchangeRate;
+    const updateExchangeRate = (curr: Currency) => {
+        setExchangeRate(rates[curr]);
+    };
 
-        let locale = 'en-US';
-        if (currency === 'MXN') locale = 'es-MX';
-        if (currency === 'KRW') locale = 'ko-KR';
+    const handleCurrencyChange = (newCurrency: Currency) => {
+        setCurrency(newCurrency);
+        updateExchangeRate(newCurrency);
+        setCookie('NEXT_CURRENCY', newCurrency);
+        localStorage.setItem('app_currency', newCurrency);
+    };
+
+    const formatPrice = (amountInMXN: number) => {
+        const rate = rates[currency];
+        const converted = amountInMXN * rate;
 
         return new Intl.NumberFormat(locale, {
             style: 'currency',
@@ -61,7 +71,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <CurrencyContext.Provider value={{ currency, setCurrency: handleCurrencyChange, convertPrice, exchangeRate }}>
+        <CurrencyContext.Provider value={{ currency, setCurrency: handleCurrencyChange, formatPrice, exchangeRate }}>
             {children}
         </CurrencyContext.Provider>
     );

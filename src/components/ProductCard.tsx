@@ -158,7 +158,7 @@ const OutOfStockOverlay = styled.div`
 
 export default function ProductCard({ product, index = 0, isLoading = false }: ProductCardProps) {
   const addToCart = useCartStore((state) => state.addToCart);
-  const { convertPrice } = useCurrency();
+  const { formatPrice } = useCurrency();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -227,7 +227,7 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
         <ProductName>{product.name}</ProductName>
       </Link>
       <Footer>
-        <Price>{convertPrice(product.price)}</Price>
+        <Price>{formatPrice(product.price)}</Price>
         {!isOutOfStock && (
           <AddButton
             className="add-to-cart-btn"

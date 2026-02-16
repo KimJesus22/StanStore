@@ -58,8 +58,7 @@ export async function createCheckoutSession(
                 validImages.push(imageUrl);
             }
 
-            // Tipo de cambio USD → MXN (misma tasa que CurrencyContext)
-            const MXN_EXCHANGE_RATE = 20.50;
+            // Base price is already in MXN, no exchange needed.
 
             lineItems.push({
                 price_data: {
@@ -68,7 +67,7 @@ export async function createCheckoutSession(
                         name: product.name,
                         images: validImages,
                     },
-                    unit_amount: Math.round(product.price * MXN_EXCHANGE_RATE * 100), // USD → MXN → centavos
+                    unit_amount: Math.round(product.price * 100), // MXN → centavos
                 },
                 quantity: item.quantity,
             });

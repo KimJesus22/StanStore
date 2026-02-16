@@ -172,7 +172,7 @@ interface Order {
 export default function ProfilePage() {
   const { user, isLoading, signOut, openAuthModal } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
-  const { convertPrice } = useCurrency();
+  const { formatPrice } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const router = useRouter();
@@ -385,14 +385,14 @@ export default function ProfilePage() {
                     year: 'numeric', month: 'long', day: 'numeric'
                   })}
                 </OrderDate>
-                <OrderTotal>{convertPrice(Number(order.total))}</OrderTotal>
+                <OrderTotal>{formatPrice(Number(order.total))}</OrderTotal>
               </OrderHeader>
               <OrderItems>
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {Array.isArray(order.items) && order.items.map((item: any, index: number) => (
                   <OrderItemRow key={index}>
                     <span>{item.quantity}x {item.name}</span>
-                    <span>{convertPrice(item.price * item.quantity)}</span>
+                    <span>{formatPrice(item.price * item.quantity)}</span>
                   </OrderItemRow>
                 ))}
               </OrderItems>
