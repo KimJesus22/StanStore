@@ -12,6 +12,17 @@ vi.mock('next-intl', () => ({
     useTranslations: () => (key: string) => key,
 }));
 
+vi.mock('@/lib/validations', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/lib/validations')>();
+    return {
+        ...actual,
+    };
+});
+
+vi.mock('@/app/actions/audit', () => ({
+    logAuditAction: vi.fn(),
+}));
+
 vi.mock('@/hooks/useDarkMode', () => ({
     useDarkMode: () => ({
         theme: 'light',
