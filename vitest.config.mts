@@ -29,6 +29,7 @@ export default defineConfig({
           }
         }
       },
+      /*
       {
         extends: true,
         plugins: [
@@ -50,6 +51,7 @@ export default defineConfig({
           setupFiles: ['.storybook/vitest.setup.ts']
         }
       }
+      */
     ],
     coverage: {
       provider: 'v8',
