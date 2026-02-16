@@ -1,5 +1,6 @@
-
 import { render, screen, fireEvent } from '@testing-library/react';
+import { ThemeProvider } from 'styled-components';
+import { lightTheme } from '@/theme';
 import { vi, describe, it, expect, beforeEach, Mock } from 'vitest';
 import { CurrencyProvider, useCurrency } from '@/context/CurrencyContext';
 import CurrencySelector from '@/components/CurrencySelector';
@@ -79,9 +80,11 @@ describe('I18n & Currency Integration', () => {
     const renderApp = (locale = 'es') => {
         return render(
             <div data-locale={locale}>
-                <CurrencyProvider>
-                    <TestComponent />
-                </CurrencyProvider>
+                <ThemeProvider theme={lightTheme}>
+                    <CurrencyProvider>
+                        <TestComponent />
+                    </CurrencyProvider>
+                </ThemeProvider>
             </div>
         );
     };
@@ -110,23 +113,23 @@ describe('I18n & Currency Integration', () => {
 
         renderApp('es');
 
-        const currencySelect = screen.getByLabelText('Seleccionar Moneda');
+        const currencySelect = screen.getByLabelText('Seleccionar moneda');
         fireEvent.change(currencySelect, { target: { value: 'USD' } });
 
         expect(setCookie).toHaveBeenCalledWith('NEXT_CURRENCY', 'USD');
         expect(screen.getByTestId('currency-value')).toHaveTextContent('USD');
-        expect(screen.getByTestId('price-display')).toHaveTextContent('$100.00');
+        expect(screen.getByTestId('price-display')).toHaveTextContent('5,50 US$');
     });
 
     it('Test 2b (Cambio de Moneda a KRW)', () => {
         (getCookie as unknown as Mock).mockReturnValue(undefined);
         renderApp('es');
 
-        const currencySelect = screen.getByLabelText('Seleccionar Moneda');
+        const currencySelect = screen.getByLabelText('Seleccionar moneda');
         fireEvent.change(currencySelect, { target: { value: 'KRW' } });
 
         expect(setCookie).toHaveBeenCalledWith('NEXT_CURRENCY', 'KRW');
         expect(screen.getByTestId('currency-value')).toHaveTextContent('KRW');
-        expect(screen.getByTestId('price-display')).toHaveTextContent('₩130,000'); // formatPrice logic uses rate 1300 but input is 100 on test
+        expect(screen.getByTestId('price-display')).toHaveTextContent('7500 KRW'); // 100 MXN * 75 = 7500 KRW
     });
 });

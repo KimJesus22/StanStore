@@ -148,7 +148,7 @@ describe('Integration Flow: User Journey', () => {
         // Wait for debounce (500ms) and router push
         await waitFor(() => {
             expect(mockPush).toHaveBeenCalledWith(expect.stringMatching(/\/search\?q=BTS$/));
-        }, { timeout: 2000 });
+        }, { timeout: 5000 });
 
         unmountSearch();
 

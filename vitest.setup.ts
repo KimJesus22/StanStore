@@ -8,7 +8,7 @@ vi.mock('@/lib/supabaseClient', () => ({
 
 // Polyfill TextEncoder for jsdom environment (Node 18 should have it globally but some libs might need this)
 import { TextEncoder, TextDecoder } from 'util';
-Object.assign(global, { TextEncoder, TextDecoder });
+Object.assign(globalThis, { TextEncoder, TextDecoder });
 
 // Polyfill matchMedia for jsdom
 Object.defineProperty(window, 'matchMedia', {
