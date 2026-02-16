@@ -9,7 +9,14 @@ export const pathnames = {
         en: '/privacy-policy',
         es: '/politica-de-privacidad',
         ko: '/privacy-policy'
-    }
+    },
+    '/artists': '/artists',
+    '/profile': '/profile',
+    '/track-order': '/track-order',
+    '/terms': '/terms',
+    '/admin': '/admin',
+    '/search': '/search',
+    '/product/[id]': '/product/[id]'
 } as const;
 
 export const { Link, redirect, usePathname, useRouter } =

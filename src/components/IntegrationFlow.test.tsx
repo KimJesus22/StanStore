@@ -23,13 +23,29 @@ vi.mock('next/navigation', () => ({
     useSearchParams: () => new URLSearchParams(),
     usePathname: () => '/',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Link: ({ children, href, ...props }: { children: React.ReactNode; href: string;[key: string]: unknown }) => <a href={href} {...(props as any)}>{children}</a>,
+    Link: ({ children, href, ...props }: { children: React.ReactNode; href: any;[key: string]: unknown }) => {
+        const hrefStr = typeof href === 'object' && href.pathname && href.params
+            ? href.pathname.replace('[id]', href.params.id)
+            : href;
+         
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return <a href={hrefStr} {...(props as any)}>{children}</a>;
+    },
 }));
 
 // Mock Navigation (custom wrapper)
 vi.mock('@/navigation', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Link: ({ children, href, ...props }: { children: React.ReactNode; href: string;[key: string]: unknown }) => <a href={href} {...(props as any)}>{children}</a>,
+    Link: ({ children, href, ...props }: { children: React.ReactNode; href: any;[key: string]: unknown }) => {
+        const hrefStr = typeof href === 'object' && href.pathname && href.params
+            ? href.pathname.replace('[id]', href.params.id)
+            : href;
+         
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return <a href={hrefStr} {...(props as any)}>{children}</a>;
+    },
     useRouter: () => ({
         push: mockPush,
     }),
@@ -96,7 +112,7 @@ vi.mock('next/dynamic', () => ({
     default: (fn: () => React.ComponentType<unknown>) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const _Component = fn();
-        return function MockDynamicComponent(_props: Record<string, unknown>) {
+        return function MockDynamicComponent() {
             return <div data-testid="dynamic-component" />;
         };
     },
@@ -147,7 +163,7 @@ describe('Integration Flow: User Journey', () => {
 
         // Wait for debounce (500ms) and router push
         await waitFor(() => {
-            expect(mockPush).toHaveBeenCalledWith(expect.stringMatching(/\/search\?q=BTS$/));
+            expect(mockPush).toHaveBeenCalledWith({ pathname: '/search', query: { q: 'BTS' } });
         }, { timeout: 5000 });
 
         unmountSearch();

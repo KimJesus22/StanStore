@@ -33,7 +33,8 @@ export default function LanguageSwitcher() {
   const onSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const nextLocale = e.target.value;
     startTransition(() => {
-      router.replace(pathname, { locale: nextLocale });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      router.replace(pathname as any, { locale: nextLocale });
     });
   };
 

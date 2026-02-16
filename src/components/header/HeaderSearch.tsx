@@ -164,7 +164,7 @@ export default function HeaderSearch() {
 
   useEffect(() => {
     if (debouncedQuery) {
-      router.push(`/search?q=${encodeURIComponent(debouncedQuery)}`);
+      router.push({ pathname: '/search', query: { q: debouncedQuery } });
     }
   }, [debouncedQuery, router]);
 

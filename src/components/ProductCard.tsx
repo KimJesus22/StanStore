@@ -201,7 +201,7 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
   }
 
   const isOutOfStock = product.stock === 0;
-  const productUrl = `/product/${product.id}`;
+
 
   return (
     <Card
@@ -209,23 +209,45 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
     >
-      <Link href={isOutOfStock ? '#' : productUrl} style={{ textDecoration: 'none', color: 'inherit', flex: 1, pointerEvents: isOutOfStock ? 'none' : 'auto' }}>
-        <ImageContainer>
-          {isOutOfStock && <OutOfStockOverlay>Agotado</OutOfStockOverlay>}
-          <Image
-            src={product.image_url}
-            alt={product.name}
-            fill
-            sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
-            priority={false}
-            placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
-            style={{ objectFit: 'contain', filter: isOutOfStock ? 'grayscale(100%)' : 'none' }}
-          />
-        </ImageContainer>
-        <Artist>{product.artist}</Artist>
-        <ProductName>{product.name}</ProductName>
-      </Link>
+      {isOutOfStock ? (
+        <div style={{ textDecoration: 'none', color: 'inherit', flex: 1, cursor: 'not-allowed' }}>
+          <ImageContainer>
+            <OutOfStockOverlay>Agotado</OutOfStockOverlay>
+            <Image
+              src={product.image_url}
+              alt={product.name}
+              fill
+              sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
+              priority={false}
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+              style={{ objectFit: 'contain', filter: 'grayscale(100%)' }}
+            />
+          </ImageContainer>
+          <Artist>{product.artist}</Artist>
+          <ProductName>{product.name}</ProductName>
+        </div>
+      ) : (
+        <Link
+          href={{ pathname: '/product/[id]', params: { id: product.id } }}
+          style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}
+        >
+          <ImageContainer>
+            <Image
+              src={product.image_url}
+              alt={product.name}
+              fill
+              sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
+              priority={false}
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+              style={{ objectFit: 'contain' }}
+            />
+          </ImageContainer>
+          <Artist>{product.artist}</Artist>
+          <ProductName>{product.name}</ProductName>
+        </Link>
+      )}
       <Footer>
         <Price>{formatPrice(product.price)}</Price>
         {!isOutOfStock && (
