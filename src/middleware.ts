@@ -1,5 +1,5 @@
 import createMiddleware from 'next-intl/middleware';
-import { locales, localePrefix } from './navigation';
+import { locales, localePrefix, pathnames } from './navigation';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Create the next-intl middleware
@@ -9,7 +9,8 @@ const intlMiddleware = createMiddleware({
 
     // Used when no locale matches
     defaultLocale: 'es',
-    localePrefix
+    localePrefix,
+    pathnames
 });
 
 // Simple in-memory rate limit map (for demo purposes)

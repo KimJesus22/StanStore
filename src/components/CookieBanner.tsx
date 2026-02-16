@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { Link } from '@/navigation';
 
 const Banner = styled.div`
   position: fixed;
@@ -68,20 +68,24 @@ export default function CookieBanner() {
   const t = useTranslations('CookieBanner');
 
   useEffect(() => {
-    const consent = localStorage.getItem('cookie_consent');
-    if (consent === null) {
+    // Check consent on mount (client-side only)
+    const consent = localStorage.getItem('NEXT_COOKIE_CONSENT');
+
+    // Only show if no consent is found
+    if (!consent) {
       setShow(true);
     }
   }, []);
 
   const handleAccept = () => {
-    localStorage.setItem('cookie_consent', 'true');
+    localStorage.setItem('NEXT_COOKIE_CONSENT', 'true');
     setShow(false);
-    window.location.reload(); // Reload to activate scripts
+    // Optional: Trigger analytics or reload if needed
+    // window.location.reload(); 
   };
 
   const handleDecline = () => {
-    localStorage.setItem('cookie_consent', 'false');
+    localStorage.setItem('NEXT_COOKIE_CONSENT', 'false');
     setShow(false);
   };
 
