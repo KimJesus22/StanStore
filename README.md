@@ -1,196 +1,69 @@
-# StanStore 🎵 | E-commerce Seguro y Moderno
+# StanStore 🎵 | E-commerce Seguro, Moderno y Potenciado con IA
 
 ![Estado del Despliegue](https://img.shields.io/badge/deploy-vercel-black?style=for-the-badge&logo=vercel)
 ![Licencia](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
+![Vitest](https://img.shields.io/badge/Coverage-86%25-brightgreen?style=for-the-badge&logo=vitest)
 
-**StanStore** es una plataforma de comercio electrónico moderna enfocada en mercancía exclusiva. Este proyecto no solo es una tienda funcional, sino una **demostración de ingeniería de software segura**, implementando las mejores prácticas de ciberseguridad en el desarrollo web moderno.
-
-![Dashboard Preview](./public/screenshots/preview.png)
-*(Reemplaza esta imagen con una captura real de tu interfaz)*
+**StanStore** es una plataforma de comercio electrónico de vanguardia para mercancía exclusiva. Diseñada con un enfoque de **defensa en profundidad**, combina una arquitectura de micro-interacciones fluida con rigurosos estándares de ciberseguridad y capacidades modernas de Inteligencia Artificial.
 
 ## 🚀 Tecnologías (Tech Stack)
 
-Este proyecto está construido sobre una arquitectura robusta, escalable y segura:
+-   **Frontend**: [Next.js 16 (App Router)](https://nextjs.org/) - Rendimiento extremo con Server Actions y SSR.
+-   **IA & Búsqueda**: [@xenova/transformers](https://huggingface.co/docs/transformers.js) - Generación de embeddings locales para búsqueda semántica avanzada.
+-   **Base de Datos**: [Supabase](https://supabase.com/) (PostgreSQL) - Gestión de datos con Row Level Security (RLS).
+-   **Pagos**: [Stripe](https://stripe.com/) - Procesamiento seguro y cumplimiento PCI.
+-   **Estilos & UI**: Styled Components + [Framer Motion](https://www.framer.com/motion/) para una experiencia de usuario "premium".
+-   **Calidad**: [Vitest](https://vitest.dev/) para unit testing y [Playwright](https://playwright.dev/) para flujos de integración E2E.
 
--   **Frontend**: [Next.js 15 (App Router)](https://nextjs.org/) - Renderizado híbrido (SSR/CSR) y Server Actions.
--   **Lenguaje**: [TypeScript](https://www.typescriptlang.org/) - Tipado estático estricto para reducir bugs en tiempo de ejecución.
--   **Base de Datos**: [Supabase](https://supabase.com/) (PostgreSQL) - Persistencia de datos relacional y autenticación.
--   **Pagos**: [Stripe](https://stripe.com/) - Procesamiento de pagos seguro y cumplimiento de PCI-DSS (vía delegación).
--   **Estilos**: [Styled Components](https://styled-components.com/) - CSS-in-JS con aislamiento de estilos y temas dinámicos.
--   **Animaciones**: [Framer Motion](https://www.framer.com/motion/) - Transiciones fluidas, gestos y efectos de micro-interacción.
--   **Validación**: [Zod](https://zod.dev/) - Validación de esquemas en tiempo de ejecución.
--   **Protección XSS**: Renderizado seguro por defecto en React y sanitización de inputs.
--   **Audit Logs (Nuevo)**: Sistema de registro inmutable que captura IP, User-Agent y detalles de acciones críticas (Login, Pagos, Admin) para análisis forense y compliance.
+## 🧠 Inteligencia Artificial (Búsqueda Semántica)
 
-## 🏗️ Arquitectura del Sistema
+A diferencia de las búsquedas tradicionales por texto exacto, StanStore utiliza **Embeddings**:
+- **Tecnología**: Implementado con modelos de HuggingFace ejecutándose vía `transformers.js`.
+- **Funcionamiento**: Los productos se vectorizan para permitir búsquedas por "intención" o "concepto".
+- **Mantenimiento**: Scripts automatizados en `scripts/generate-embeddings.ts` para mantener el índice actualizado.
 
-```mermaid
-graph TD
-    subgraph ClientSide ["Client (Browser / PWA 📱)"]
-        UI[User Interface <br/> (React / Styled Components)]
-        SW[Service Worker <br/> (Offline Cache)]
-    end
+## ⚡ Performance & UX (Optimización LCP/CLS)
 
-    subgraph VercelInfra ["Vercel Infrastructure ☁️"]
-        EdgeMW[Edge Middleware <br/> (GeoIP, Auth, Security Headers)]
-        NextServer[Next.js 15 Server <br/> (App Router & Server Actions)]
-        API[API Routes <br/> (Webhooks)]
-    end
-
-    subgraph ExternalServices ["External Services 🚀"]
-        subgraph SupabaseEnv ["Supabase (BaaS)"]
-            Auth[Auth <br/> (JWT / Oauth)]
-            DB[(PostgreSQL DB <br/> + RLS Policies + RPC)]
-            Storage[Storage Buckets]
-        end
-        
-        subgraph StripeEnv ["Stripe Payments 💳"]
-            Checkout[Hosted Checkout]
-            WebhookEvent[Webhook Event <br/> (checkout.session.completed)]
-        end
-
-        subgraph MediaObs ["Media & Observability 👁️"]
-            Cloudinary[Cloudinary <br/> (Auto-Format & Optimize)]
-            Sentry[Sentry <br/> (Error Monitoring)]
-        end
-    end
-
-    %% Flows
-    UI -->|1. Request| EdgeMW
-    EdgeMW -->|2. Route| NextServer
-    
-    %% Data & Logic
-    NextServer <-->|3. Server Actions (AES Encrypt/Decrypt)| DB
-    NextServer -->|4. Auth Check| Auth
-    
-    %% Payments
-    NextServer -->|5. Create Session (Metadata)| Checkout
-    Checkout -->|6. User Payment| UI
-    StripeEnv -.->|7. Webhook POST| API
-    API -->|8. RPC: decrement_stock| DB
-
-    %% Assets & Errors
-    UI -->|9. Image Request (Loader)| Cloudinary
-    UI -.->|10. Capture Exception| Sentry
-    NextServer -.->|11. Capture Exception| Sentry
-
-    %% Realtime
-    DB -.->|12. Realtime Updates (Stock)| UI
-
-    %% Styling
-    classDef client fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
-    classDef server fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
-    classDef service fill:#fff3e0,stroke:#e65100,stroke-width:2px;
-    classDef security fill:#ffebee,stroke:#c62828,stroke-width:2px,stroke-dasharray: 5 5;
-
-    class UI,SW client;
-    class EdgeMW,NextServer,API server;
-    class Auth,DB,Storage,Checkout,WebhookEvent,Cloudinary,Sentry service;
-```
-
----
+Hemos optimizado cada milisegundo para mejorar la conversión:
+- **Priorización de Carga**: Uso de `priority={true}` en imágenes LCP y `sizes` dinámicos para reducir el consumo de datos en móviles.
+- **Componentes Diferidos**: Reproductores pesados (Spotify, YouTube) y secciones secundarias se cargan bajo demanda (Next Dynamic) para no bloquear el hilo principal.
+- **Web Vitals**: Monitorización en tiempo real mediante `WebVitals.tsx` con alertas visuales en consola para métricas críticas (LCP, CLS, INP).
 
 ## 🛡️ Ingeniería de Seguridad (Security Hardening)
 
-Como proyecto enfocado en la ciberseguridad, se han implementado múltiples capas de defensa en profundidad según el top 10 de OWASP:
+Siguiendo el top 10 de OWASP, el sistema implementa:
+1. **Audit Logs Inmutables**: Registro detallado de acciones críticas (IP, User-Agent, Acción) para análisis forense.
+2. **CSP Estricta**: Content Security Policy configurada en el middleware para mitigar ataques XSS y Clickjacking.
+3. **Rate Limiting**: Protección anti-fuerza bruta en el middleware para endpoints de API y Server Actions.
+4. **Validación Zod**: Sanitización y validación estricta de esquemas en todos los puntos de entrada de datos.
 
-### 1. Validación de Entrada (Input Validation)
-Todos los datos de entrada (formularios de login, registro, búsqueda) son **estrictamente validados y sanitizados** utilizando esquemas **Zod** antes de ser procesados.
--   *Prevención*: Inyección SQL (parcialmente cubierto por ORM), NoSQL Injection y datos malformados.
--   *Implementación*: `src/lib/validations.ts`.
+## 🧪 Estrategia de Calidad & Automatización
 
-### 2. Cabeceras de Seguridad HTTP (Security Headers)
-Se ha configurado un **Middleware** personalizado para inyectar cabeceras de seguridad en todas las respuestas:
--   **Content-Security-Policy (CSP)**: Restringe las fuentes de ejecución de scripts (solo dominios confiables como Stripe/Supabase), mitigando ataques **XSS**.
--   **X-Frame-Options: DENY**: Previene ataques de **Clickjacking**.
--   **X-Content-Type-Options: nosniff**: Evita que el navegador "adivine" tipos MIME (MIME Sniffing).
--   **Referrer-Policy**: Protege la privacidad del usuario al navegar fuera del sitio.
-
-### 3. Rate Limiting (Protección Anti-Brute Force)
-Implementación de un algoritmo de **Token Bucket** (en memoria para demo) en el Middleware para proteger endpoints críticos (`/api/*`, Server Actions) contra ataques de fuerza bruta y denegación de servicio (DoS).
--   *Límite*: 20 peticiones por minuto por IP.
-
-### 4. Autenticación y Autorización (IAM)
--   **Row Level Security (RLS)**: La seguridad se aplica a nivel del motor de base de datos (PostgreSQL). Incluso si una consulta SQL es inyectada, el atacante no puede ver datos que no le pertenecen.
--   **Server-Side Validation**: Las sesiones de pago de Stripe se crean exclusivamente en el servidor, validando los precios contra la base de datos para evitar la manipulación de precios en el cliente (Price Tampering).
--   **Gestión de Productos**: Formulario para crear nuevos productos directamente en Supabase.
--   **RLS Avanzado**: Políticas de seguridad que solo permiten `INSERT` si el usuario tiene `is_admin = true`.
-
-### 🔍 Búsqueda Avanzada
--   **Debounce**: Input optimizado que evita peticiones innecesarias mientras el usuario escribe (`useDebounce` hook).
--   **Filtro Potente**: Búsqueda insensible a mayúsculas/minúsculas (`ilike`) en nombre, artista y categoría.
--   **UX**: Sugerencias automáticas cuando no hay resultados.
-
-
-## 🌟 Funcionalidades Avanzadas (Nuevas)
-
-### 1. Progressive Web App (PWA) 📱
-StanStore es ahora instalable en dispositivos móviles y de escritorio.
-- **Offline First**: Gracias a `@ducanh2912/next-pwa`, la aplicación cachea recursos críticos para funcionar sin conexión.
-- **Install Prompt**: Un banner personalizado invita a los usuarios a instalar la app si su navegador lo soporta.
-- **Manifiesto**: Iconos y configuración de tema personalizados.
-
-### 2. Stock en Tiempo Real (Realtime) ⚡
-Suscripción en vivo a la base de datos de Supabase.
-- **Inventario Vivo**: Si alguien compra el último producto, el botón de "Añadir al Carrito" se deshabilita instantáneamente para todos los usuarios conectados sin recargar la página.
-- **Badges Reactivos**: Avisos visuales cuando quedan pocas unidades (ej: "¡Solo quedan 2!").
-
-### 3. Internacionalización (i18n) 🌍
-Soporte global con enrutamiento localizado.
-- **Idiomas**: Español (`/es`), Inglés (`/en`), Coreano (`/ko`).
-- **Detección Automática**: Middleware que redirige según la preferencia del navegador.
-- **SEO Internacional**: Etiquetas `hreflang` y metadatos localizados.
-
-### 4. CI/CD Pipeline 🤖
-Automatización robusta con GitHub Actions.
-- **Validación Automática**: En cada `push` a `main`, se ejecutan:
-    - Instalación limpia de dependencias.
-    - **Linting**: Verificación de estilo y calidad de código.
-    - **Tests Unitarios**: Ejecución de suite Vitest.
-    - **Escaneo de Secretos**: Detección de API Keys expuestas con Gitleaks.
-- **Despliegue Seguro**: Vercel solo despliega si todas las verificaciones pasan exitosamente.
+- **Unit Testing**: Suite de Vitest con una cobertura de ramas del **~86%** (mínimo requerido 70%).
+- **Integración**: Pruebas de flujo completo con Playwright que simulan desde la búsqueda hasta el checkout.
+- **Husky & Lint-staged**: Validación automática de linting y tests en el `pre-commit` para evitar código roto en el repositorio.
+- **CI/CD**: Pipeline de GitHub Actions que incluye auditoría de seguridad y escaneo de secretos antes de cada deployment.
 
 ## 📂 Estructura del Proyecto
 
+```text
+src/
+├── app/            # Rutas, Layouts e Internacionalización (next-intl)
+├── components/     # UI Atómica y Organismos complejos
+├── context/        # Estado global (Zustand) y Lógica de Negocio
+├── lib/            # Validaciones (Zod), Supabase y Utilidades
+├── middleware.ts   # Seguridad, Rate Limit y Localización
+└── scripts/        # Herramientas de IA y mantenimiento
+```
+
+## 🛠️ Instalación y Desarrollo
+
+1. **Dependencias**: `npm install`
+2. **Entorno**: Configurar `.env.local` con claves de Supabase y Stripe.
+3. **Desarrollo**: `npm run dev`
+4. **Pruebas**: `npm test` o `npm run test:coverage` para ver el reporte detallado.
+
 ---
-
-## 📸 Galería
-
-| Perfil de Usuario | Carrito de Compras | Pasarela de Pago |
-|:---:|:---:|:---:|
-| ![Perfil](./public/screenshots/profile.png) | ![Carrito](./public/screenshots/cart.png) | ![Stripe](./public/screenshots/stripe.png) |
-
----
-
-## 🛠️ Instalación Local
-
-Sigue estos pasos para desplegar el entorno de desarrollo:
-
-1.  **Clonar el repositorio**:
-    ```bash
-    git clone https://github.com/tu-usuario/StanStore.git
-    cd StanStore
-    ```
-
-2.  **Instalar dependencias**:
-    ```bash
-    npm install
-    ```
-
-3.  **Configurar Variables de Entorno**:
-    Crea un archivo `.env.local` en la raíz y añade tus claves:
-    ```bash
-    NEXT_PUBLIC_SUPABASE_URL=tu_url
-    NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
-    STRIPE_SECRET_KEY=sk_test_...
-    ```
-
-4.  **Ejecutar servidor de desarrollo**:
-    ```bash
-    npm run dev
-    ```
-
 ## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT - siéntete libre de usarlo para aprendizaje.
+Este proyecto es de código abierto bajo la [Licencia MIT](LICENSE).
