@@ -141,7 +141,7 @@ export default function SimilarProducts({ productId }: { productId: string }) {
     const [products, setProducts] = useState<SimilarProduct[]>([]);
     const [loading, setLoading] = useState(true);
     const locale = useLocale();
-    const t = useTranslations('Product');
+    const t = useTranslations('pdp');
     const { formatPrice } = useCurrency();
 
     useEffect(() => {
@@ -168,7 +168,7 @@ export default function SimilarProducts({ productId }: { productId: string }) {
 
     return (
         <Section>
-            <SectionTitle>{t('similarProducts')}</SectionTitle>
+            <SectionTitle>{t('related.title')}</SectionTitle>
             <ScrollContainer>
                 {loading ? (
                     <>

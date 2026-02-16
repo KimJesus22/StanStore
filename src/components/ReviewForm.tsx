@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-// import { useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import StarRating from './StarRating';
 // Import the server action directly. Next.js handles the rest.
@@ -15,7 +15,7 @@ interface ReviewFormProps {
 }
 
 export default function ReviewForm({ productId, userId, onReviewSubmitted }: ReviewFormProps) {
-    // const t = useTranslations('Product'); // Assuming we add translations later
+    const t = useTranslations('pdp.reviews');
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [submitting, setSubmitting] = useState(false);
@@ -23,11 +23,11 @@ export default function ReviewForm({ productId, userId, onReviewSubmitted }: Rev
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (rating === 0) {
-            toast.error('Por favor selecciona una calificación.');
+            toast.error(t('errorRating'));
             return;
         }
         if (!comment.trim()) {
-            toast.error('Por favor escribe un comentario.');
+            toast.error(t('errorComment'));
             return;
         }
 
@@ -36,7 +36,7 @@ export default function ReviewForm({ productId, userId, onReviewSubmitted }: Rev
             const result = await submitReview({ productId, rating, comment, userId });
 
             if (result.success) {
-                toast.success('¡Gracias por tu reseña!');
+                toast.success(t('success'));
                 setRating(0);
                 setComment('');
                 if (onReviewSubmitted) onReviewSubmitted();
@@ -53,21 +53,21 @@ export default function ReviewForm({ productId, userId, onReviewSubmitted }: Rev
 
     return (
         <form onSubmit={handleSubmit} style={{ marginTop: '2rem', padding: '1.5rem', border: '1px solid #eee', borderRadius: '12px' }}>
-            <h3 style={{ marginBottom: '1rem' }}>Escribe una reseña</h3>
+            <h3 style={{ marginBottom: '1rem' }}>{t('writeReview')}</h3>
 
             <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Calificación</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t('rating')}</label>
                 <StarRating rating={rating} setRating={setRating} interactive />
             </div>
 
             <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Comentario</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>{t('comment')}</label>
                 <textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     rows={4}
                     style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ccc' }}
-                    placeholder="¿Qué te pareció este producto?"
+                    placeholder={t('placeholder')}
                 />
             </div>
 
@@ -85,7 +85,7 @@ export default function ReviewForm({ productId, userId, onReviewSubmitted }: Rev
                     opacity: submitting ? 0.7 : 1
                 }}
             >
-                {submitting ? 'Enviando...' : 'Enviar Reseña'}
+                {submitting ? t('submitting') : t('submit')}
             </button>
         </form>
     );

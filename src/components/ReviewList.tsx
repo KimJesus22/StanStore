@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { supabase } from '@/lib/supabaseClient';
 import StarRating from './StarRating';
 import { formatDistanceToNow } from 'date-fns';
@@ -19,6 +20,12 @@ interface ReviewListProps {
 }
 
 export default function ReviewList({ productId }: ReviewListProps) {
+    const t = useTranslations('pdp.reviews');
+    // We can get the current locale from next-intl, but for date-fns we need the object
+    // Mapping string locale to date-fns locale object
+    // This is a simplified example. Ideally move this to a utility.
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -62,16 +69,16 @@ export default function ReviewList({ productId }: ReviewListProps) {
         };
     }, [productId]);
 
-    if (loading) return <p>Cargando reseñas...</p>;
+    if (loading) return <p>{t('loading')}</p>;
 
     if (reviews.length === 0) {
-        return <p style={{ color: '#888', marginTop: '1rem' }}>No hay reseñas aún. ¡Sé el primero en opinar!</p>;
+        return <p style={{ color: '#888', marginTop: '1rem' }}>{t('noReviews')}</p>;
     }
 
     return (
         <div style={{ marginTop: '2rem' }}>
             <h3 style={{ marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
-                Reseñas ({reviews.length})
+                {t('title')} ({reviews.length})
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 {reviews.map((review) => (

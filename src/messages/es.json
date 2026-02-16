@@ -41,5 +41,24 @@
         "title": "StanStore - Merch de K-Pop",
         "description": "La mejor tienda para álbumes de K-Pop, lightsticks y merch exclusivo.",
         "homeTitle": "Comprar Merch de K-Pop | StanStore"
+    },
+    "pdp": {
+        "reviews": {
+            "title": "Opiniones de los fans",
+            "writeReview": "Escribir opinión",
+            "placeholder": "Deja tu comentario aquí...",
+            "noReviews": "No hay opiniones aún",
+            "rating": "Calificación",
+            "comment": "Comentario",
+            "submit": "Enviar Reseña",
+            "submitting": "Enviando...",
+            "success": "¡Gracias por tu reseña!",
+            "errorRating": "Por favor selecciona una calificación.",
+            "errorComment": "Por favor escribe un comentario.",
+            "loading": "Cargando reseñas..."
+        },
+        "related": {
+            "title": "Quizás te guste..."
+        }
     }
 }

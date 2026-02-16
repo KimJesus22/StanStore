@@ -14,7 +14,9 @@
         "backHome": "홈으로 돌아가기",
         "outOfStock": "품절",
         "onlyLeft": "{count}개 남았습니다!",
-        "stockLimit": "{stock}개 이상 추가할 수 없습니다"
+        "stockLimit": "{stock}개 이상 추가할 수 없습니다",
+        "reviewsTitle": "MISSING_TRANSLATION: Opiniones de los fans",
+        "similarProducts": "MISSING_TRANSLATION: ✨ Quizás te guste..."
     },
     "Cart": {
         "title": "장바구니",
@@ -33,5 +35,30 @@
         "title": "StanStore - K-Pop 굿즈",
         "description": "K-Pop 앨범, 라이트스틱 및 독점 굿즈를 위한 최고의 상점.",
         "homeTitle": "K-Pop 굿즈 구매 | StanStore"
+    },
+    "CookieBanner": {
+        "message": "MISSING_TRANSLATION: Usamos cookies para mejorar tu experiencia y analizar nuestro tráfico. Al continuar, aceptas nuestra {link}.",
+        "privacyPolicy": "MISSING_TRANSLATION: Política de Privacidad",
+        "decline": "MISSING_TRANSLATION: Rechazar",
+        "accept": "MISSING_TRANSLATION: Aceptar Todas"
+    },
+    "pdp": {
+        "reviews": {
+            "title": "MISSING_TRANSLATION: Opiniones de los fans",
+            "writeReview": "MISSING_TRANSLATION: Escribir opinión",
+            "placeholder": "MISSING_TRANSLATION: Deja tu comentario aquí...",
+            "noReviews": "MISSING_TRANSLATION: No hay opiniones aún",
+            "rating": "MISSING_TRANSLATION: Calificación",
+            "comment": "MISSING_TRANSLATION: Comentario",
+            "submit": "MISSING_TRANSLATION: Enviar Reseña",
+            "submitting": "MISSING_TRANSLATION: Enviando...",
+            "success": "MISSING_TRANSLATION: ¡Gracias por tu reseña!",
+            "errorRating": "MISSING_TRANSLATION: Por favor selecciona una calificación.",
+            "errorComment": "MISSING_TRANSLATION: Por favor escribe un comentario.",
+            "loading": "MISSING_TRANSLATION: Cargando reseñas..."
+        },
+        "related": {
+            "title": "MISSING_TRANSLATION: Quizás te guste..."
+        }
     }
 }
