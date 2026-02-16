@@ -34,8 +34,41 @@
         "title": "New Arrivals",
         "subtitle": "Latest drops from your favorite artists",
         "loading": "Loading products...",
-        "noResults": "No products found for this category.",
-        "categoryAll": "All"
+        "loading": "Loading products...",
+        "categoryAll": "All",
+        "sort": {
+            "label": "Sort by:",
+            "newest": "Newest",
+            "price_asc": "Price: Low to High",
+            "price_desc": "Price: High to Low",
+            "alphabetical": "Alphabetical A-Z"
+        },
+        "filters": {
+            "title": "Filters",
+            "artist": "Artist",
+            "category": "Category",
+            "availability": "Availability",
+            "inStock": "In Stock Only",
+            "categories": {
+                "album": "Albums",
+                "lightstick": "Lightsticks",
+                "merch": "Merch & Accessories"
+            },
+            "price": "Price Range",
+            "min": "Min",
+            "max": "Max",
+            "min": "Min",
+            "max": "Max",
+            "reset": "Clear filters",
+            "viewResults": "View Results",
+            "mobileFilter": "Filter & Sort"
+        },
+        "noResults": {
+            "title": "Oops! No results found",
+            "message": "Try adjusting your filters or search for something else.",
+            "reset": "Clear all filters",
+            "popular": "Popular Products"
+        }
     },
     "Metadata": {
         "title": "StanStore - K-Pop Merch",
