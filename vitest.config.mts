@@ -51,6 +51,43 @@ export default defineConfig({
           setupFiles: ['.storybook/vitest.setup.ts']
         }
       }
-    ]
+    ],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'coverage/**',
+        'dist/**',
+        '**/[.]**',
+        'packages/*/test?(s)/**',
+        '**/*.d.ts',
+        '**/virtual:*',
+        '**/__x00__*',
+        '**/\x00*',
+        'cypress/**',
+        'test?(s)/**',
+        'test-?({,s})/**',
+        '**/*{.,-}{test,spec}.?(c|m)[jt]s?(x)',
+        '**/__tests__/**',
+        '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+        '**/vitest.{workspace,projects}.[jt]s?(x)',
+        '**/.{eslint,mocha,prettier}rc.{?(c|m)js,yml}',
+        'src/app/layout.tsx', // Next.js specific
+        'src/app/**/layout.tsx',
+        'src/app/**/page.tsx', // Pages are often hard to test with unit tests
+        'next.config.ts',
+        'postcss.config.js',
+        'tailwind.config.ts',
+        'src/i18n.ts',
+        'src/middleware.ts',
+        'src/navigation.ts',
+        'src/types.ts',
+        'src/theme.ts',
+        'src/styles/**',
+      ],
+      thresholds: {
+        branches: 70,
+      },
+    },
   }
 });

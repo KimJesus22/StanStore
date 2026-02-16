@@ -12,6 +12,14 @@ vi.mock('next-intl', () => ({
     useTranslations: () => (key: string) => key,
 }));
 
+vi.mock('@/hooks/useDarkMode', () => ({
+    useDarkMode: () => ({
+        theme: 'light',
+        toggleTheme: vi.fn(),
+        mounted: true,
+    }),
+}));
+
 // Mock Zustand store
 const mockCloseAuthModal = vi.fn();
 vi.mock('@/store/useAuthStore', () => ({
