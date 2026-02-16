@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import { Link } from '@/navigation';
 import { Facebook, Instagram, Twitter, Music } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+
 
 const FooterContainer = styled.footer`
   background-color: ${({ theme }) => theme.colors.secondaryBackground};
@@ -114,58 +114,58 @@ const Copyright = styled.div`
 `;
 
 export default function Footer() {
-    const t = useTranslations('Footer'); // Assuming translation keys exist, otherwise fallback or generic logic uses hardcoded for now based on user request "Stan Store"
-    const year = new Date().getFullYear();
+  // const t = useTranslations('Footer'); // Assuming translation keys exist, otherwise fallback or generic logic uses hardcoded for now based on user request "Stan Store"
+  const year = new Date().getFullYear();
 
-    return (
-        <FooterContainer>
-            <ContentGrid>
-                {/* Columna 1: Marca */}
-                <Column>
-                    <Brand>
-                        <Logo href="/">
-                            <Music size={24} color="#10CFBD" />
-                            StanStore
-                        </Logo>
-                        <Description>
-                            Tu tienda de confianza para merch de K-pop. Encuentra los mejores álbumes, lightsticks y accesorios de tus idols favoritos.
-                        </Description>
-                    </Brand>
-                </Column>
+  return (
+    <FooterContainer>
+      <ContentGrid>
+        {/* Columna 1: Marca */}
+        <Column>
+          <Brand>
+            <Logo href="/">
+              <Music size={24} color="#10CFBD" />
+              StanStore
+            </Logo>
+            <Description>
+              Tu tienda de confianza para merch de K-pop. Encuentra los mejores álbumes, lightsticks y accesorios de tus idols favoritos.
+            </Description>
+          </Brand>
+        </Column>
 
-                {/* Columna 2: Enlaces Rápidos */}
-                <Column>
-                    <ColumnTitle>Enlaces Rápidos</ColumnTitle>
-                    <FooterLink href="/">Inicio</FooterLink>
-                    <FooterLink href="/artists">Catálogo</FooterLink>
-                    <FooterLink href="/profile">Mi Cuenta</FooterLink>
-                    <FooterLink href="/track-order">Rastrear Pedido</FooterLink>
-                </Column>
+        {/* Columna 2: Enlaces Rápidos */}
+        <Column>
+          <ColumnTitle>Enlaces Rápidos</ColumnTitle>
+          <FooterLink href="/">Inicio</FooterLink>
+          <FooterLink href="/artists">Catálogo</FooterLink>
+          <FooterLink href="/profile">Mi Cuenta</FooterLink>
+          <FooterLink href="/track-order">Rastrear Pedido</FooterLink>
+        </Column>
 
-                {/* Columna 3: Legal y Social */}
-                <Column>
-                    <ColumnTitle>Legal</ColumnTitle>
-                    <FooterLink href="/terms">Términos y Condiciones</FooterLink>
-                    <FooterLink href="/privacy">Política de Privacidad</FooterLink>
+        {/* Columna 3: Legal y Social */}
+        <Column>
+          <ColumnTitle>Legal</ColumnTitle>
+          <FooterLink href="/terms">Términos y Condiciones</FooterLink>
+          <FooterLink href="/privacy">Política de Privacidad</FooterLink>
 
-                    <ColumnTitle style={{ marginTop: '1rem' }}>Síguenos</ColumnTitle>
-                    <SocialLinks>
-                        <SocialIcon href="https://facebook.com" target="_blank" aria-label="Facebook">
-                            <Facebook size={20} />
-                        </SocialIcon>
-                        <SocialIcon href="https://instagram.com" target="_blank" aria-label="Instagram">
-                            <Instagram size={20} />
-                        </SocialIcon>
-                        <SocialIcon href="https://twitter.com" target="_blank" aria-label="Twitter">
-                            <Twitter size={20} />
-                        </SocialIcon>
-                    </SocialLinks>
-                </Column>
-            </ContentGrid>
+          <ColumnTitle style={{ marginTop: '1rem' }}>Síguenos</ColumnTitle>
+          <SocialLinks>
+            <SocialIcon href="https://facebook.com" target="_blank" aria-label="Facebook">
+              <Facebook size={20} />
+            </SocialIcon>
+            <SocialIcon href="https://instagram.com" target="_blank" aria-label="Instagram">
+              <Instagram size={20} />
+            </SocialIcon>
+            <SocialIcon href="https://twitter.com" target="_blank" aria-label="Twitter">
+              <Twitter size={20} />
+            </SocialIcon>
+          </SocialLinks>
+        </Column>
+      </ContentGrid>
 
-            <Copyright>
-                &copy; {year} StanStore. Todos los derechos reservados.
-            </Copyright>
-        </FooterContainer>
-    );
+      <Copyright>
+        &copy; {year} StanStore. Todos los derechos reservados.
+      </Copyright>
+    </FooterContainer>
+  );
 }

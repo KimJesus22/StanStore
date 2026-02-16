@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import AuthModal from './AuthModal';
 import { supabase } from '@/lib/supabaseClient';
 import toast from 'react-hot-toast';
@@ -59,7 +59,7 @@ describe('AuthModal', () => {
 
     it('calls signInWithPassword on form submit with correct credentials', async () => {
         // Mock successful response
-        (supabase.auth.signInWithPassword as any).mockResolvedValue({
+        (supabase.auth.signInWithPassword as unknown as Mock).mockResolvedValue({
             data: { user: { id: '123' } },
             error: null,
         });
@@ -83,7 +83,7 @@ describe('AuthModal', () => {
     it('shows error toast on login failure', async () => {
         // Mock error response
         const errorMessage = 'Invalid login credentials';
-        (supabase.auth.signInWithPassword as any).mockResolvedValue({
+        (supabase.auth.signInWithPassword as unknown as Mock).mockResolvedValue({
             data: { user: null },
             error: new Error(errorMessage),
         });

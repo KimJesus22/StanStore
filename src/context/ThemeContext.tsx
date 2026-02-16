@@ -1,97 +1,32 @@
-'use client';
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
-import { themes } from '@/styles/themes';
-import { supabase } from '@/lib/supabaseClient';
-import { useAuthStore } from '@/store/useAuthStore';
-
-type ThemeName = keyof typeof themes;
+import { lightTheme, darkTheme } from '@/theme';
+import { useDarkMode } from '@/hooks/useDarkMode';
+import { GlobalStyles } from '@/styles/GlobalStyles';
 
 interface ThemeContextType {
-    currentTheme: ThemeName;
-    changeTheme: (theme: ThemeName) => Promise<void>;
+    theme: 'light' | 'dark';
+    toggleTheme: () => void;
+    mounted: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [currentTheme, setCurrentTheme] = useState<ThemeName>('Clancy');
-    const [mounted, setMounted] = useState(false);
-    const { user } = useAuthStore();
+    const { theme, toggleTheme, mounted } = useDarkMode();
 
-    useEffect(() => {
-        setMounted(true);
-        // Load from local storage initially
-        const savedTheme = localStorage.getItem('theme') as ThemeName;
-        if (savedTheme && themes[savedTheme]) {
-            setCurrentTheme(savedTheme);
-        }
-    }, []);
+    const themeObject = theme === 'light' ? lightTheme : darkTheme;
 
-    useEffect(() => {
-        // If user is logged in, try to fetch their preference from Supabase
-        const fetchProfileTheme = async () => {
-            if (!user) return;
+    if (!mounted) {
+        // Return an empty div to avoid hydration mismatch (as requested)
+        return <div style={{ visibility: 'hidden' }} />;
+    }
 
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('theme')
-                .eq('id', user.id)
-                .single();
-
-            if (data && data.theme && themes[data.theme as ThemeName]) {
-                setCurrentTheme(data.theme as ThemeName);
-                localStorage.setItem('theme', data.theme);
-            } else if (!data && !error) {
-                // If profile doesn't exist (edge case if trigger failed), create it
-                await supabase.from('profiles').insert({ id: user.id, theme: currentTheme });
-            }
-        };
-
-        if (user) {
-            fetchProfileTheme();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
-
-    const changeTheme = async (theme: ThemeName) => {
-        setCurrentTheme(theme);
-        localStorage.setItem('theme', theme);
-
-        if (user) {
-            // Persist to Supabase
-            const { error } = await supabase
-                .from('profiles')
-                .upsert({ id: user.id, theme: theme });
-
-            if (error) {
-                console.error('Error saving theme to Supabase:', error);
-            }
-        }
-    };
-
-    // Prevent hydration mismatch by rendering default theme initially
-    // but ALWAYS wrap in StyledThemeProvider so styled-components don't crash
     return (
-        <ThemeContext.Provider value={{ currentTheme, changeTheme }}>
-            <StyledThemeProvider theme={themes[currentTheme]}>
-                {/* To avoid hydration mismatch on content that depends on theme specific logic (not just CSS),
-                    we could use mounted check, but here we prioritize CSS stability.
-                    If necessary, suppressHydrationWarning or use a specific loader. 
-                */}
-                <div
-                    suppressHydrationWarning
-                    style={{
-                        visibility: mounted ? 'visible' : 'hidden',
-                        backgroundColor: themes[currentTheme].colors.background,
-                        color: themes[currentTheme].colors.text,
-                        minHeight: '100vh',
-                        transition: 'background-color 0.3s, color 0.3s',
-                    }}
-                >
-                    {children}
-                </div>
+        <ThemeContext.Provider value={{ theme, toggleTheme, mounted }}>
+            <StyledThemeProvider theme={themeObject}>
+                <GlobalStyles />
+                {children}
             </StyledThemeProvider>
         </ThemeContext.Provider>
     );

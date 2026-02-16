@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { getUserData } from '@/app/actions/privacy';
 import { useTheme } from '@/context/ThemeContext';
 import { useCurrency } from '@/context/CurrencyContext';
-import { themes } from '@/styles/themes';
+
 
 const Container = styled.div`
   max-width: 800px;
@@ -158,45 +158,7 @@ const ExportButton = styled(ButtonBase)`
   }
 `;
 
-const ThemeGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-`;
 
-const ThemeOption = styled.button<{ $isActive: boolean; $primary: string; $bg: string }>`
-  background: ${({ $bg }) => $bg};
-  border: 2px solid ${({ $isActive, $primary }) => ($isActive ? $primary : 'transparent')};
-  border-radius: 12px;
-  padding: 1rem;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-  }
-`;
-
-const ColorPreview = styled.div<{ $color: string }>`
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: ${({ $color }) => $color};
-  border: 1px solid rgba(0,0,0,0.1);
-`;
-
-const ThemeName = styled.span<{ $color: string }>`
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: ${({ $color }) => $color};
-`;
 
 interface Order {
   id: string;
@@ -209,7 +171,7 @@ interface Order {
 
 export default function ProfilePage() {
   const { user, isLoading, signOut, openAuthModal } = useAuthStore();
-  const { currentTheme, changeTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const { convertPrice } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
@@ -365,23 +327,14 @@ export default function ProfilePage() {
       </ProfileCard>
 
       <SectionTitle>
-        <Palette size={20} /> Personalización (Temas)
+        <Palette size={20} /> Personalización
       </SectionTitle>
 
-      <ThemeGrid>
-        {Object.entries(themes).map(([key, theme]) => (
-          <ThemeOption
-            key={key}
-            onClick={() => changeTheme(key as keyof typeof themes)}
-            $isActive={currentTheme === key}
-            $primary={theme.colors.primary}
-            $bg={theme.colors.secondaryBackground}
-          >
-            <ColorPreview $color={theme.colors.primary} />
-            <ThemeName $color={theme.colors.text}>{theme.name}</ThemeName>
-          </ThemeOption>
-        ))}
-      </ThemeGrid>
+      <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center' }}>
+        <ButtonBase onClick={toggleTheme}>
+          {theme === 'light' ? '🌙 Activar Modo Oscuro' : '☀️ Activar Modo Claro'}
+        </ButtonBase>
+      </div>
 
       <SectionTitle>
         <User size={20} /> Datos Personales (Encriptados)

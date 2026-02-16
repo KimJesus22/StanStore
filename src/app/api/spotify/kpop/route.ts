@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSpotifyToken, SpotifyArtist } from '@/lib/spotify';
+import { SpotifyArtist } from '@/lib/spotify';
 
 const KPOP_ARTIST_IDS = [
     '3Nrfpe0tUJi4K4DXYWgMUX', // BTS

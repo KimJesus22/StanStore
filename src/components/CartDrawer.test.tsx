@@ -78,7 +78,7 @@ describe('CartDrawer', () => {
             ...mockStoreState,
             items: [
                 { id: 1, name: 'Product A', price: 500, quantity: 2, image_url: '/img.jpg', artist: 'Artist A' },
-            ] as any,
+            ],
         };
 
         renderCart();
@@ -98,7 +98,7 @@ describe('CartDrawer', () => {
             ...mockStoreState,
             items: [
                 { id: 1, name: 'Product A', price: 500, quantity: 1, image_url: '/img.jpg', artist: 'Artist A' }
-            ] as any,
+            ],
         };
 
         renderCart();

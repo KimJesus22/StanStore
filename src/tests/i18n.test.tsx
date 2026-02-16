@@ -1,6 +1,6 @@
 
-import { render, screen, fireEvent, act } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach, Mock } from 'vitest';
 import { CurrencyProvider, useCurrency } from '@/context/CurrencyContext';
 import CurrencySwitcher from '@/components/CurrencySwitcher';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -16,7 +16,7 @@ vi.mock('@/navigation', () => ({
         push: vi.fn(),
     }),
     usePathname: () => '/',
-    Link: ({ children, href }: any) => <a href={href}>{children}</a>
+    Link: ({ children, href }: { children: React.ReactNode, href: string }) => <a href={href}>{children}</a>
 }));
 
 // Mock cookies-next
@@ -27,7 +27,7 @@ vi.mock('cookies-next', () => ({
 
 // Mock next-intl
 vi.mock('next-intl', () => ({
-    NextIntlClientProvider: ({ children, locale, messages }: any) => (
+    NextIntlClientProvider: ({ children, locale }: { children: React.ReactNode, locale: string }) => (
         <div data-locale={locale}>
             {children}
         </div>
@@ -73,23 +73,24 @@ const TestComponent = () => {
 describe('I18n & Currency Integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        (getCookie as any).mockReturnValue(undefined);
+        (getCookie as unknown as Mock).mockReturnValue(undefined);
     });
 
     const renderApp = (locale = 'es') => {
         return render(
-            // @ts-ignore
-            <CurrencyProvider>
-                <TestComponent />
-            </CurrencyProvider>
+            <div data-locale={locale}>
+                <CurrencyProvider>
+                    <TestComponent />
+                </CurrencyProvider>
+            </div>
         );
     };
 
     it('Test 1 (Independencia): Cambiar idioma no debe afectar la moneda', async () => {
         // Setup: Cookie returns MXN
-        (getCookie as any).mockReturnValue('MXN');
+        (getCookie as unknown as Mock).mockReturnValue('MXN');
 
-        const { rerender } = renderApp('es');
+        renderApp('es');
 
         // Verificar estado inicial
         expect(screen.getByTestId('currency-value')).toHaveTextContent('MXN');
@@ -105,7 +106,7 @@ describe('I18n & Currency Integration', () => {
     });
 
     it('Test 2 (Cambio de Moneda): Seleccionar moneda actualiza cookie y precios', () => {
-        (getCookie as any).mockReturnValue(undefined);
+        (getCookie as unknown as Mock).mockReturnValue(undefined);
 
         renderApp('es');
 
@@ -118,7 +119,7 @@ describe('I18n & Currency Integration', () => {
     });
 
     it('Test 2b (Cambio de Moneda a KRW)', () => {
-        (getCookie as any).mockReturnValue(undefined);
+        (getCookie as unknown as Mock).mockReturnValue(undefined);
         renderApp('es');
 
         const currencySelect = screen.getByLabelText('Seleccionar Moneda');

@@ -2,7 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
-import path from 'path';
+
 
 // Load env vars
 dotenv.config({ path: '.env.local' });

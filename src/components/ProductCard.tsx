@@ -12,12 +12,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 
 const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
-const CardLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-  display: block;
-  width: 100%;
-`;
+
 
 const Card = styled(motion.div)`
   display: flex;

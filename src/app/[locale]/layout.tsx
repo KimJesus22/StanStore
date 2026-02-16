@@ -20,7 +20,7 @@ const Footer = dynamicLoader(() => import('@/components/Footer'), {
   loading: () => <div style={{ padding: '2rem' }}><Skeleton $height="300px" /></div>
 });
 
-const CookieBanner = dynamicLoader(() => import('@/components/CookieBanner'), { ssr: false } as any);
+const CookieBanner = dynamicLoader(() => import('@/components/CookieBanner'), { ssr: false });
 const InstallPrompt = dynamicLoader(() => import('@/components/InstallPrompt'), { ssr: false });
 const GoogleAnalytics = dynamicLoader(() => import('@/components/GoogleAnalytics'), { ssr: false });
 
