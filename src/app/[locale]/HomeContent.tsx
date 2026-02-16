@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { mockProducts } from '@/data/mockData';
 import ProductCard from '@/components/ProductCard';
@@ -8,7 +8,7 @@ import ProductSkeleton from '@/components/ProductSkeleton';
 import FilterSidebar from '@/components/FilterSidebar';
 import SortSelector from '@/components/SortSelector';
 import { supabase } from '@/lib/supabaseClient';
-import { Product } from '@/types';
+import type { Product } from '@/types';
 import { useTranslations } from 'next-intl';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
@@ -74,16 +74,7 @@ const Grid = styled.div`
   }
 `;
 
-const NoResults = styled.div`
-  text-align: center;
-  padding: 4rem 0;
-  color: ${({ theme }) => theme.colors.text}80;
-  font-size: 1.1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-`;
+
 
 // Styled Components for Mobile
 const MobileFilterButton = styled.button`
@@ -177,8 +168,18 @@ export default function Home() {
 
     // URL State
     const currentSort = searchParams.get('sort') || 'newest';
-    const artistParams = searchParams.get('artist')?.split(',').filter(Boolean) || [];
-    const categoryParams = searchParams.get('category')?.split(',').filter(Boolean) || [];
+    const artistParamString = searchParams.get('artist');
+    const categoryParamString = searchParams.get('category');
+
+    // Memoize array params to prevent unnecessary re-renders/fetches
+    const artistParams = useMemo(() =>
+        artistParamString ? artistParamString.split(',').filter(Boolean) : [],
+        [artistParamString]);
+
+    const categoryParams = useMemo(() =>
+        categoryParamString ? categoryParamString.split(',').filter(Boolean) : [],
+        [categoryParamString]);
+
     const stockParam = searchParams.get('stock') === 'true';
     const minPriceParam = searchParams.get('min') || '';
     const maxPriceParam = searchParams.get('max') || '';
@@ -316,7 +317,7 @@ export default function Home() {
         } finally {
             setLoading(false);
         }
-    }, [currentSort, artistParams.join(','), categoryParams.join(','), stockParam, minPriceParam, maxPriceParam]);
+    }, [currentSort, artistParams, categoryParams, stockParam, minPriceParam, maxPriceParam]);
 
     useEffect(() => {
         fetchProducts();

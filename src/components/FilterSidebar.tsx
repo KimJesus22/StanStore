@@ -170,7 +170,7 @@ export default function FilterSidebar({
                         type="number"
                         placeholder={t('min')}
                         value={localMin}
-                        onChange={(e) => setLocalMin(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalMin(e.target.value)}
                         min="0"
                     />
                     <span>-</span>
@@ -178,7 +178,7 @@ export default function FilterSidebar({
                         type="number"
                         placeholder={t('max')}
                         value={localMax}
-                        onChange={(e) => setLocalMax(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalMax(e.target.value)}
                         min="0"
                     />
                 </PriceContainer>
@@ -193,6 +193,7 @@ export default function FilterSidebar({
                             checked={selectedCategories.includes(cat)}
                             onChange={() => onCategoryChange(cat)}
                         />
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {t(`categories.${cat}` as any)}
                     </CheckboxLabel>
                 ))}

@@ -25,7 +25,6 @@ export default function ReviewList({ productId }: ReviewListProps) {
     // Mapping string locale to date-fns locale object
     // This is a simplified example. Ideally move this to a utility.
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
 
