@@ -343,8 +343,8 @@ export default function Home() {
                 <Subtitle>{t('subtitle')}</Subtitle>
             </Header>
 
-            <MobileFilterButton onClick={() => setIsFilterOpen(true)}>
-                <span>⚡</span> {t('filters.mobileFilter')}
+            <MobileFilterButton onClick={() => setIsFilterOpen(true)} aria-label={t('filters.mobileFilter')}>
+                <span aria-hidden="true">⚡</span> {t('filters.mobileFilter')}
             </MobileFilterButton>
 
             {/* Mobile Drawer */}
@@ -352,7 +352,7 @@ export default function Home() {
             <DrawerContent $isOpen={isFilterOpen}>
                 <DrawerHeader>
                     <h3>{t('filters.title')}</h3>
-                    <CloseButton onClick={() => setIsFilterOpen(false)}>×</CloseButton>
+                    <CloseButton onClick={() => setIsFilterOpen(false)} aria-label={t('common.close') || 'Cerrar'}>×</CloseButton>
                 </DrawerHeader>
 
                 <FilterSidebar {...commonFilterProps} />

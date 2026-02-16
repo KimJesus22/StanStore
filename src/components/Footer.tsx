@@ -55,7 +55,8 @@ const Logo = styled(Link)`
 `;
 
 const Description = styled.p`
-  color: ${({ theme }) => theme.colors.text}99;
+  color: ${({ theme }) => theme.colors.text};
+  opacity: 0.9;
   line-height: 1.6;
   max-width: 300px;
 `;
@@ -68,7 +69,8 @@ const ColumnTitle = styled.h3`
 `;
 
 const FooterLink = styled(Link)`
-  color: ${({ theme }) => theme.colors.text}80;
+  color: ${({ theme }) => theme.colors.text};
+  opacity: 0.8;
   text-decoration: none;
   transition: color 0.2s;
   width: fit-content;
@@ -109,7 +111,8 @@ const Copyright = styled.div`
   padding-top: 2rem;
   border-top: 1px solid ${({ theme }) => theme.colors.border};
   text-align: center;
-  color: ${({ theme }) => theme.colors.text}60;
+  color: ${({ theme }) => theme.colors.text};
+  opacity: 0.7;
   font-size: 0.9rem;
 `;
 

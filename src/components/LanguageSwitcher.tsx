@@ -43,6 +43,7 @@ export default function LanguageSwitcher() {
       defaultValue={locale}
       onChange={onSelectChange}
       disabled={isPending}
+      aria-label="Seleccionar idioma"
     >
       <option value="es">🇲🇽 Español</option>
       <option value="en">🇺🇸 English</option>
