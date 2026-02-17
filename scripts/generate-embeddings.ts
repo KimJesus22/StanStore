@@ -28,25 +28,46 @@ async function main() {
     const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
     console.log('✅ Modelo cargado exitosamente');
 
-    // 3. Obtener todos los productos
-    const { data: products, error } = await supabase
+    // 3. Obtener productos para verificar estado
+    // Seleccionamos timestamps para filtrar incrementalmente
+    const { data: allProducts, error } = await supabase
         .from('products')
-        .select('id, name, description, artist, category');
+        .select('id, name, description, artist, category, updated_at, last_embedding_at');
 
     if (error) {
         console.error('❌ Error al obtener productos:', error.message);
         process.exit(1);
     }
 
-    if (!products || products.length === 0) {
+    if (!allProducts || allProducts.length === 0) {
         console.log('⚠️ No hay productos en la base de datos');
         process.exit(0);
     }
 
-    console.log(`\n📦 Encontrados ${products.length} productos\n`);
+    // Filtrar productos que necesitan actualización:
+    // 1. last_embedding_at es NULL (nunca procesado)
+    // 2. updated_at > last_embedding_at (modificado después del último embedding)
+    const productsToProcess = allProducts.filter(p => {
+        if (!p.last_embedding_at) return true; // Nuevo o nunca procesado
+        if (!p.updated_at) return false; // Si no tiene updated_at, asumimos que no ha cambiado (o falló algo)
+        return new Date(p.updated_at) > new Date(p.last_embedding_at); // Modificado recientemente
+    });
 
-    // 4. Generar y guardar embeddings
-    for (const product of products) {
+    if (productsToProcess.length === 0) {
+        console.log('✨ Todo está actualizado. No se requieren nuevos embeddings.');
+        process.exit(0);
+    }
+
+    console.log(`\n📦 Encontrados ${allProducts.length} productos total.`);
+    console.log(`🚀 ${productsToProcess.length} requieren actualización de embeddings.\n`);
+
+    const BATCH_SIZE = 50;
+    let updatesBatch: { id: string; embedding: number[]; last_embedding_at: string }[] = [];
+    let successCount = 0;
+    let errorCount = 0;
+
+    // 4. Generar y guardar embeddings solo para los pendientes
+    for (const product of productsToProcess) {
         // Crear texto enriquecido para el embedding
         const textForEmbedding = [
             product.name,
@@ -55,29 +76,60 @@ async function main() {
             product.description || '',
         ].join(' | ');
 
-        console.log(`🔄 Procesando: ${product.name} (${product.artist})`);
+        console.log(`🔄 Generando vector: ${product.name} (${product.artist})`);
 
-        // Generar embedding
-        const output = await extractor(textForEmbedding, {
-            pooling: 'mean',
-            normalize: true,
-        });
-        const embedding = Array.from(output.data as Float32Array);
+        try {
+            // Generar embedding
+            const output = await extractor(textForEmbedding, {
+                pooling: 'mean',
+                normalize: true,
+            });
+            const embedding = Array.from(output.data as Float32Array);
 
-        // Guardar en Supabase
-        const { error: updateError } = await supabase
-            .from('products')
-            .update({ embedding: embedding })
-            .eq('id', product.id);
+            // Agregar al lote
+            updatesBatch.push({
+                id: product.id,
+                embedding: embedding,
+                last_embedding_at: new Date().toISOString(),
+            });
 
-        if (updateError) {
-            console.error(`   ❌ Error: ${updateError.message}`);
-        } else {
-            console.log(`   ✅ Embedding guardado (${embedding.length} dimensiones)`);
+            // Si el lote está lleno, procesar
+            if (updatesBatch.length >= BATCH_SIZE) {
+                await processBatch(supabase, updatesBatch);
+                successCount += updatesBatch.length;
+                updatesBatch = []; // Limpiar lote
+            }
+        } catch (e) {
+            console.error(`Error generando vector para ID ${product.id}:`, e);
+            errorCount++;
         }
     }
 
-    console.log('\n🎉 ¡Todos los embeddings generados y guardados!');
+    // Procesar remanentes
+    if (updatesBatch.length > 0) {
+        await processBatch(supabase, updatesBatch);
+        successCount += updatesBatch.length;
+    }
+
+    console.log(`\n🎉 Proceso finalizado. Exito: ${successCount}, Errores: ${errorCount}`);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function processBatch(supabase: any, batch: any[]) {
+    console.log(`💾 Guardando lote de ${batch.length} productos...`);
+
+    // Upsert masivo (requiere que 'id' sea Primary Key)
+    const { error } = await supabase
+        .from('products')
+        .upsert(batch, { onConflict: 'id' }); // Solo actualiza embeddings y timestamp
+
+    if (error) {
+        console.error('❌ Error guardando lote:', error.message);
+        // Opcional: Podríamos intentar guardar uno a uno si falla el lote, 
+        // pero para scripts de mantenimiento es aceptable loguear el fallo.
+    } else {
+        console.log('✅ Lote guardado.');
+    }
 }
 
 main().catch(console.error);
