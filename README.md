@@ -9,48 +9,45 @@
 
 ## 🚀 Tecnologías (Tech Stack)
 
--   **Frontend**: [Next.js 16 (App Router)](https://nextjs.org/) - Rendimiento extremo con Server Actions y SSR.
--   **IA & Búsqueda**: [@xenova/transformers](https://huggingface.co/docs/transformers.js) - Generación de embeddings locales para búsqueda semántica avanzada.
--   **Base de Datos**: [Supabase](https://supabase.com/) (PostgreSQL) - Gestión de datos con Row Level Security (RLS).
--   **Pagos**: [Stripe](https://stripe.com/) - Procesamiento seguro y cumplimiento PCI.
--   **Estilos & UI**: Styled Components + [Framer Motion](https://www.framer.com/motion/) para una experiencia de usuario "premium".
--   **Calidad**: [Vitest](https://vitest.dev/) para unit testing y [Playwright](https://playwright.dev/) para flujos de integración E2E.
+-   **Frontend**: [Next.js 16 (App Router)](https://nextjs.org/) - Rendimiento extremo con Server Actions, SSR e **ISR**.
+-   **IA & Búsqueda**: [@xenova/transformers](https://huggingface.co/docs/transformers.js) - Generación de embeddings locales (384D) con **pgvector** e índices HNSW.
+-   **Base de Datos**: [Supabase](https://supabase.com/) (PostgreSQL) - Gestión de datos con RLS y búsqueda vectorial.
+-   **Pagos**: [Stripe](https://stripe.com/) - Procesamiento con validación estricta de versiones de API en webhooks.
+-   **Estilos & UI**: Styled Components + [Framer Motion](https://www.framer.com/motion/).
+-   **Calidad**: [Vitest](https://vitest.dev/) con entorno **Happy-DOM** y [Playwright](https://playwright.dev/).
 
 ## 🧠 Inteligencia Artificial (Búsqueda Semántica)
 
 A diferencia de las búsquedas tradicionales por texto exacto, StanStore utiliza **Embeddings**:
-- **Tecnología**: Implementado con modelos de HuggingFace ejecutándose vía `transformers.js`.
-- **Funcionamiento**: Los productos se vectorizan para permitir búsquedas por "intención" o "concepto".
-- **Mantenimiento**: Scripts automatizados en `scripts/generate-embeddings.ts` para mantener el índice actualizado.
+- **Tecnología**: Módulos locales `transformers.js` (Xenova/all-MiniLM-L6-v2) - **Costo $0**.
+- **Infraestructura**: Almacenamiento en columnas `vector(384)` con índices **HNSW** para búsquedas de alta velocidad.
+- **Mantenimiento**: Scripts incrementales en `scripts/generate-embeddings.ts` que procesan únicamente productos nuevos o editados mediante batch upserts.
 
 ## ⚡ Performance & UX (Optimización LCP/CLS)
 
-Hemos optimizado cada milisegundo para mejorar la conversión:
-- **Priorización de Carga**: Uso de `priority={true}` en imágenes LCP y `sizes` dinámicos para reducir el consumo de datos en móviles.
-- **Componentes Diferidos**: Reproductores pesados (Spotify, YouTube) y secciones secundarias se cargan bajo demanda (Next Dynamic) para no bloquear el hilo principal.
-- **Web Vitals**: Monitorización en tiempo real mediante `WebVitals.tsx` con alertas visuales en consola para métricas críticas (LCP, CLS, INP).
+- **ISR (Incremental Static Regeneration)**: Las páginas de catálogo y productos populares se pre-renderizan cada hora (`revalidate = 3600`), asegurando carga instantánea y SEO óptimo.
+- **Priorización de Carga**: Uso de `priority={true}` en imágenes LCP y `sizes` dinámicos.
+- **Componentes Diferidos**: Carga bajo demanda de reproductores externos (Spotify, YouTube).
 
 ## 🛡️ Ingeniería de Seguridad (Security Hardening)
 
-Siguiendo el top 10 de OWASP, el sistema implementa:
-1. **Audit Logs Inmutables**: Registro detallado de acciones críticas (IP, User-Agent, Acción) para análisis forense.
-2. **CSP Estricta**: Content Security Policy configurada en el middleware para mitigar ataques XSS y Clickjacking.
-3. **Rate Limiting**: Protección anti-fuerza bruta en el middleware para endpoints de API y Server Actions.
-4. **Validación Zod**: Sanitización y validación estricta de esquemas en todos los puntos de entrada de datos.
+1. **Audit Logs Inmutables**: Registro detallado de acciones críticas incluyendo latencia y metadatos.
+2. **Cifrado de Alta Seguridad**: Implementación de AES-256-CBC con **rotación de claves** y versionado de secretos.
+3. **Validación de Integraciones**: El endpoint de Stripe valida que la versión del evento coincida con la configuración de la app (`STRIPE_API_VERSION`), alertando sobre discrepancias.
+4. **Protección de Secretos**: Tests automatizados (`env.security.test.ts`) que bloquean el build si se detectan fugas de claves administrativas (`SERVICE_ROLE_KEY`) hacia el cliente.
 
 ### Modelo de Seguridad Supabase (RLS vs Bypass)
 
-Para evitar fugas de datos, hemos estandarizado el acceso a la base de datos:
-
-*   **Cliente/Servidor (`lib/supabase/*`)**: Usan `ANON_KEY`. **Respetan RLS**. Esto significa que las consultas *siempre* están limitadas por las políticas `auth.uid() = user_id`. Si un usuario intenta acceder a datos de otro, la base de datos devuelve 0 filas.
-*   **Admin (`lib/supabase/admin.ts`)**: Usa `SERVICE_ROLE_KEY`. **Ignora RLS**. Exclusivo para tareas de sistema (Webhooks de Stripe, Cron Jobs) donde no hay sesión de usuario activa. *Nunca importar en componentes de cliente.*
+*   **Cliente/Servidor (`lib/supabase/{client,server}.ts`)**: Respetan RLS.
+*   **Admin (`lib/supabase/admin.ts`)**: Usa `SERVICE_ROLE_KEY`. Bypass RLS.
 
 ## 🧪 Estrategia de Calidad & Automatización
 
-- **Unit Testing**: Suite de Vitest con una cobertura de ramas del **~86%** (mínimo requerido 70%).
-- **Integración**: Pruebas de flujo completo con Playwright que simulan desde la búsqueda hasta el checkout.
-- **Husky & Lint-staged**: Validación automática de linting y tests en el `pre-commit` para evitar código roto en el repositorio.
-- **CI/CD**: Pipeline de GitHub Actions que incluye auditoría de seguridad y escaneo de secretos antes de cada deployment.
+- **Unit Testing**: Suite de Vitest optimizada con **Happy-DOM** para mayor compatibilidad de módulos ESM.
+- **Integración**: Pruebas de flujo completo con Playwright.
+- **Seguridad**: Escaneo de variables de entorno en tiempo de build (`npm run build`).
+- **Husky**: Pre-commit hooks para linting y tests locales.
+
 
 ## 📂 Estructura del Proyecto
 
