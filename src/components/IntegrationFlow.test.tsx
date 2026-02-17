@@ -79,10 +79,21 @@ vi.mock('next-intl', () => ({
             'addedToCart': 'Added to cart',
             'stockLimit': 'Stock limit reached',
             'back': 'Back',
+            'outOfStock': 'Out of Stock',
         };
         return translations[key] || key;
     },
     useLocale: () => 'en',
+    useFormatter: () => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        number: (val: number, options?: any) => {
+            if (options?.style === 'currency') return `$${val}`;
+            return String(val);
+        },
+        dateTime: (date: Date) => date.toLocaleDateString(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        list: (list: any[]) => list.join(', '),
+    }),
 }));
 
 // Mock Currency Context

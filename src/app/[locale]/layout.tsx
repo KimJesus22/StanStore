@@ -79,7 +79,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider messages={messages} timeZone="America/Mexico_City">
           <Providers>
             <StyledComponentsRegistry>
               <DynamicGoogleAnalytics gaId="G-XXXXXXXXXX" />

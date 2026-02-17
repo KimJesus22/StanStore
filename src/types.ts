@@ -13,6 +13,8 @@ export interface Product {
     spotify_album_id?: string;
     theme_color?: string;
     youtube_video_id?: string;
+    release_date?: string; // ISO Date string
+    related_artists?: string[];
 }
 
 export interface ShippingInfo {

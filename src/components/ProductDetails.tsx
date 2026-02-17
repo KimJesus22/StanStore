@@ -9,7 +9,7 @@ import { Minus, Plus, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { Link } from '@/navigation';
 import toast from 'react-hot-toast';
 import { Product } from '@/types';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations, useLocale, useFormatter } from 'next-intl';
 import { supabase } from '@/lib/supabaseClient';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
@@ -40,7 +40,8 @@ const SimilarProducts = dynamic(() => import('./SimilarProducts'), {
 });
 
 import { verifyPurchase } from '@/app/actions/reviews';
-import { useCurrency } from '@/context/CurrencyContext';
+// import { useCurrency } from '@/context/CurrencyContext'; // Replaced by PriceTag
+import PriceTag from './ui/PriceTag';
 
 const BLUR_DATA_URL = "data:image/png;base664,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
@@ -264,6 +265,7 @@ const FanButton = styled.button<{ $isActive: boolean, $themeColor?: string }>`
 
 export default function ProductDetails({ product }: { product: Product }) {
   const t = useTranslations('Product');
+  const format = useFormatter();
   const locale = useLocale();
   const { addToCart, isAdding } = useCart();
   const openCart = useCartStore((state) => state.openCart); // Keep using store for UI state (open drawer)
@@ -273,7 +275,7 @@ export default function ProductDetails({ product }: { product: Product }) {
     : locale === 'en'
       ? (product.description_en || product.description)
       : product.description;
-  const { formatPrice } = useCurrency();
+  // const { formatPrice } = useCurrency(); // Removed
   const [quantity, setQuantity] = useState(1);
   const [currentStock, setCurrentStock] = useState(product?.stock || 0);
   const [canReview, setCanReview] = useState(false);
@@ -422,7 +424,30 @@ export default function ProductDetails({ product }: { product: Product }) {
           </StockBadge>
         )}
 
-        <Price>{formatPrice(product.price)}</Price>
+        <Price>
+          {/* Usando PriceTag con useFormatter */}
+          <PriceTag amount={product.price} currency="USD" />
+        </Price>
+
+        {/* Ejemplo de formateo de fecha */}
+        {product.release_date && (
+          <div style={{ marginBottom: '1rem', color: '#666' }}>
+            <strong>Lanzamiento: </strong>
+            {format.dateTime(new Date(product.release_date), {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </div>
+        )}
+
+        {/* Ejemplo de formateo de lista */}
+        {product.related_artists && product.related_artists.length > 0 && (
+          <div style={{ marginBottom: '1rem', color: '#666' }}>
+            <strong>Artistas relacionados: </strong>
+            {format.list(product.related_artists, { type: 'conjunction' })}
+          </div>
+        )}
 
         <Description>
           {description || "Sin descripción disponible para este producto."}

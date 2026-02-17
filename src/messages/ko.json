@@ -3,7 +3,25 @@
         "home": "홈",
         "search": "검색",
         "profile": "프로필",
-        "cart": "장바구니"
+        "cart": "장바구니",
+        "login": "로그인",
+        "logout": "로그아웃"
+    },
+    "Auth": {
+        "loginButton": "입장",
+        "login": "로그인",
+        "register": "회원가입",
+        "logout": "로그아웃",
+        "error": "오류가 발생했습니다",
+        "welcome": "환영합니다!"
+    },
+    "Validations": {
+        "required": "필수 항목입니다",
+        "email": "유효하지 않은 이메일 주소입니다",
+        "passwordMin": "비밀번호는 최소 {min}자 이상이어야 합니다",
+        "passwordUppercase": "대문자를 최소 하나 포함해야 합니다",
+        "passwordNumber": "숫자를 최소 하나 포함해야 합니다",
+        "searchMax": "검색어가 너무 깁니다"
     },
     "Product": {
         "addToCart": "장바구니 담기",
@@ -29,7 +47,25 @@
         "subtitle": "좋아하는 아티스트의 최신 상품",
         "loading": "상품 불러오는 중...",
         "noResults": "이 카테고리의 상품이 없습니다.",
-        "categoryAll": "전체"
+        "categoryAll": "전체",
+        "filters": {
+            "title": "필터 (Filters)",
+            "artist": "아티스트 (Artist)",
+            "category": "카테고리 (Category)",
+            "availability": "가용성 (Availability)",
+            "inStock": "재고 있음 (In Stock Only)",
+            "categories": {
+                "album": "앨범 (Albums)",
+                "lightstick": "라이트스틱 (Lightsticks)",
+                "merch": "굿즈 (Merch)"
+            },
+            "price": "가격 범위 (Price Range)",
+            "min": "최소 (Min)",
+            "max": "최대 (Max)",
+            "reset": "필터 초기화 (Clear)",
+            "viewResults": "결과 보기 (View)",
+            "mobileFilter": "필터 및 정렬 (Filter & Sort)"
+        }
     },
     "Metadata": {
         "title": "StanStore - K-Pop 굿즈",

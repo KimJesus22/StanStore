@@ -45,6 +45,10 @@ const nextConfig: NextConfig = {
       fileName: true,
     },
   },
+  env: {
+    // Mock for build time if missing
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || 'sk_test_mock_key_for_build',
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports

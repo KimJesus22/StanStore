@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { supabase } from '@/lib/supabaseClient';
 import { X, Mail, Lock, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 
 const Overlay = styled.div`
   position: fixed;
@@ -172,6 +173,7 @@ export default function AuthModal() {
   const [loading, setLoading] = useState(false);
 
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const t = useTranslations('Validations');
 
   if (!isAuthModalOpen) return null;
 
@@ -182,8 +184,8 @@ export default function AuthModal() {
 
     try {
       // 1. Zod Validation
-      const { LoginSchema, RegisterSchema } = await import('@/lib/validations');
-      const schema = isSignUp ? RegisterSchema : LoginSchema;
+      const { createLoginSchema, createRegisterSchema } = await import('@/lib/validations');
+      const schema = isSignUp ? createRegisterSchema(t) : createLoginSchema(t);
 
       const result = schema.safeParse({ email, password });
 

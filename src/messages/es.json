@@ -3,7 +3,25 @@
         "home": "Inicio",
         "search": "Buscar",
         "profile": "Perfil",
-        "cart": "Carrito"
+        "cart": "Carrito",
+        "login": "Iniciar Sesión",
+        "logout": "Cerrar Sesión"
+    },
+    "Auth": {
+        "loginButton": "Entrar",
+        "login": "Iniciar Sesión",
+        "register": "Registrarse",
+        "logout": "Cerrar Sesión",
+        "error": "Ha ocurrido un error",
+        "welcome": "¡Bienvenido de nuevo!"
+    },
+    "Validations": {
+        "required": "Este campo es requerido",
+        "email": "El correo electrónico no es válido",
+        "passwordMin": "La contraseña debe tener al menos {min} caracteres",
+        "passwordUppercase": "Debe contener al menos una mayúscula",
+        "passwordNumber": "Debe contener al menos un número",
+        "searchMax": "La búsqueda es demasiado larga"
     },
     "Product": {
         "addToCart": "Añadir al Carrito",
@@ -34,7 +52,6 @@
         "title": "Novedades",
         "subtitle": "Lo último de tus artistas favoritos",
         "loading": "Cargando productos...",
-        "loading": "Cargando productos...",
         "categoryAll": "Todos",
         "sort": {
             "label": "Ordenar por:",
@@ -55,8 +72,6 @@
                 "merch": "Ropa y Accesorios"
             },
             "price": "Rango de Precio",
-            "min": "Mín",
-            "max": "Máx",
             "min": "Mín",
             "max": "Máx",
             "reset": "Limpiar filtros",

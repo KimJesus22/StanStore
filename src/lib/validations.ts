@@ -1,28 +1,26 @@
 import { z } from 'zod';
 
-export const LoginSchema = z.object({
-    email: z.string().email('El correo electrónico no es válido'),
-    password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+// Helper type for the translation function
+type Translator = (key: string, values?: Record<string, string | number>) => string;
+
+export const createLoginSchema = (t: Translator) => z.object({
+    email: z.string().email(t('email')),
+    password: z.string().min(6, t('passwordMin', { min: 6 })),
 });
 
-export const RegisterSchema = z.object({
-    email: z.string().email('El correo electrónico no es válido'),
+export const createRegisterSchema = (t: Translator) => z.object({
+    email: z.string().email(t('email')),
     password: z.string()
-        .min(8, 'La contraseña debe tener al menos 8 caracteres')
-        .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
-        .regex(/[0-9]/, 'Debe contener al menos un número'),
+        .min(8, t('passwordMin', { min: 8 }))
+        .regex(/[A-Z]/, t('passwordUppercase'))
+        .regex(/[0-9]/, t('passwordNumber')),
 });
 
-export const SearchSchema = z.object({
-    query: z.string().trim().max(100, 'La búsqueda es demasiado larga').optional(),
+export const createSearchSchema = (t: Translator) => z.object({
+    query: z.string().trim().max(100, t('searchMax')).optional(),
 });
 
-export const ProductSchema = z.object({
-    name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
-    price: z.number().min(0.01, 'El precio debe ser mayor a 0'),
-    category: z.string().min(2, 'La categoría es requerida'),
-    artist: z.string().min(1, 'El artista es requerido'),
-    description: z.string().min(10, 'La descripción debe ser más detallada'),
-    image_url: z.string().min(1, 'La imagen es requerida'),
-    spotify_album_id: z.string().optional(),
-});
+// Mantener versiones estáticas por compatibilidad si es necesario,
+// o forzar la actualización en los componentes consumidores.
+// Por ahora, eliminamos las estáticas para forzar el uso de i18n.
+

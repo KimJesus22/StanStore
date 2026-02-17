@@ -3,7 +3,25 @@
         "home": "Home",
         "search": "Search",
         "profile": "Profile",
-        "cart": "Cart"
+        "cart": "Cart",
+        "login": "Login",
+        "logout": "Logout"
+    },
+    "Auth": {
+        "loginButton": "Enter",
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "error": "An error occurred",
+        "welcome": "Welcome back!"
+    },
+    "Validations": {
+        "required": "This field is required",
+        "email": "Invalid email address",
+        "passwordMin": "Password must be at least {min} characters",
+        "passwordUppercase": "Must contain at least one uppercase letter",
+        "passwordNumber": "Must contain at least one number",
+        "searchMax": "Search query is too long"
     },
     "Product": {
         "addToCart": "Add to Cart",
@@ -34,7 +52,6 @@
         "title": "New Arrivals",
         "subtitle": "Latest drops from your favorite artists",
         "loading": "Loading products...",
-        "loading": "Loading products...",
         "categoryAll": "All",
         "sort": {
             "label": "Sort by:",
@@ -55,8 +72,6 @@
                 "merch": "Merch & Accessories"
             },
             "price": "Price Range",
-            "min": "Min",
-            "max": "Max",
             "min": "Min",
             "max": "Max",
             "reset": "Clear filters",
