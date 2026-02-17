@@ -1,7 +1,7 @@
-
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import Stripe from 'stripe'; // Keep for types
+import { stripe } from '@/lib/stripe'; // Centralized client
 import { supabase } from '@/lib/supabaseClient';
 import { logAuditAction } from '@/app/actions/audit';
 
@@ -13,10 +13,8 @@ import { logAuditAction } from '@/app/actions/audit';
  *     x-hidden: true
  */
 export async function POST(req: Request) {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        apiVersion: '2025-01-27.acacia' as any,
-    });
+    // Shared 'stripe' instance is used here. 
+    // It's already initialized with the correct API version and Secret Key.
 
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -31,6 +29,15 @@ export async function POST(req: Request) {
     } catch (err) {
         console.error('Webhook signature verification failed.', err);
         return new NextResponse(`Webhook Error: ${err instanceof Error ? err.message : 'Unknown Error'}`, { status: 400 });
+    }
+
+    // Version Mismatch Check
+    if (event.api_version && event.api_version !== process.env.STRIPE_API_VERSION) {
+        console.warn(`⚠️ Stripe Version Mismatch: Webhook (${event.api_version}) !== App (${process.env.STRIPE_API_VERSION}). Check Stripe Dashboard.`);
+        await logAuditAction('STRIPE_VERSION_MISMATCH', {
+            webhookVersion: event.api_version,
+            appVersion: process.env.STRIPE_API_VERSION
+        });
     }
 
     if (event.type === 'checkout.session.completed') {

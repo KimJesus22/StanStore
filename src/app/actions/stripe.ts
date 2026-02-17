@@ -1,6 +1,6 @@
 'use server';
 
-import Stripe from 'stripe';
+import { stripe } from '@/lib/stripe';
 import { supabase } from '@/lib/supabaseClient';
 import { logAuditAction } from '@/app/actions/audit';
 import { ShippingInfo } from '@/types';
@@ -12,16 +12,7 @@ export async function createCheckoutSession(
     shippingInfo?: ShippingInfo
 ) {
     try {
-        const stripeKey = process.env.STRIPE_SECRET_KEY;
-        if (!stripeKey) {
-            console.error('Stripe Secret Key missing');
-            return { error: 'Configuration Error: Stripe key missing' };
-        }
-
-        const stripe = new Stripe(stripeKey, {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            apiVersion: '2025-01-27.acacia' as any, // Bypass TS check for latest version
-        });
+        // Stripe instance comes from lib/stripe with version checks
 
         // 1. Validate items and fetch real prices from DB
         const lineItems = [];
