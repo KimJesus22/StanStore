@@ -29,6 +29,11 @@ vi.mock('@/context/CurrencyContext', () => ({
     }),
 }));
 
+const mockUseCart = vi.fn();
+vi.mock('@/hooks/useCart', () => ({
+    useCart: () => mockUseCart(),
+}));
+
 // Mock Zustand store - default to empty
 const mockRemoveFromCart = vi.fn();
 const mockCloseCart = vi.fn();
@@ -60,11 +65,17 @@ describe('CartDrawer', () => {
         vi.clearAllMocks();
         // Reset store default
         mockStoreState = {
-            items: [],
             isCartOpen: true,
             closeCart: mockCloseCart,
-            removeFromCart: mockRemoveFromCart,
+            removeFromCart: mockRemoveFromCart, // Still used for remove? No, useCart handles it now likely? Check component.
+            items: [], // Store might still keep items if used for persistent count or sync, but drawer uses hook.
         };
+
+        // Default useCart mock
+        mockUseCart.mockReturnValue({
+            data: [],
+            isLoading: false,
+        });
     });
 
     it('shows empty state when cart is empty', () => {
@@ -75,12 +86,14 @@ describe('CartDrawer', () => {
 
     it('renders items and calculates total correctly', () => {
         // Setup store with items
-        mockStoreState = {
-            ...mockStoreState,
-            items: [
-                { id: 1, name: 'Product A', price: 500, quantity: 2, image_url: '/img.jpg', artist: 'Artist A' },
-            ],
-        };
+        const items = [
+            { id: '1', name: 'Product A', price: 500, quantity: 2, image_url: '/img.jpg', artist: 'Artist A' },
+        ];
+
+        mockUseCart.mockReturnValue({
+            data: items,
+            isLoading: false
+        });
 
         renderCart();
 
@@ -95,12 +108,14 @@ describe('CartDrawer', () => {
     });
 
     it('navigates to checkout when button is clicked', () => {
-        mockStoreState = {
-            ...mockStoreState,
-            items: [
-                { id: 1, name: 'Product A', price: 500, quantity: 1, image_url: '/img.jpg', artist: 'Artist A' }
-            ],
-        };
+        const items = [
+            { id: '1', name: 'Product A', price: 500, quantity: 1, image_url: '/img.jpg', artist: 'Artist A' }
+        ];
+
+        mockUseCart.mockReturnValue({
+            data: items,
+            isLoading: false
+        });
 
         renderCart();
 

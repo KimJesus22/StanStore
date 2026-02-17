@@ -1,3 +1,4 @@
+import Providers from '@/components/Providers';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -79,23 +80,25 @@ export default async function LocaleLayout({
     <html lang={locale}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <StyledComponentsRegistry>
-            <DynamicGoogleAnalytics gaId="G-XXXXXXXXXX" />
-            <Toaster position="bottom-center" />
-            <ThemeProvider>
-              <AuthProvider>
-                <CurrencyProvider>
-                  <Navbar />
-                  <WebVitals />
-                  <CartDrawer />
-                  <DynamicInstallPrompt />
-                  {children}
-                  <Footer />
-                </CurrencyProvider>
-              </AuthProvider>
-              <DynamicCookieBanner />
-            </ThemeProvider>
-          </StyledComponentsRegistry>
+          <Providers>
+            <StyledComponentsRegistry>
+              <DynamicGoogleAnalytics gaId="G-XXXXXXXXXX" />
+              <Toaster position="bottom-center" />
+              <ThemeProvider>
+                <AuthProvider>
+                  <CurrencyProvider>
+                    <Navbar />
+                    <WebVitals />
+                    <CartDrawer />
+                    <DynamicInstallPrompt />
+                    {children}
+                    <Footer />
+                  </CurrencyProvider>
+                </AuthProvider>
+                <DynamicCookieBanner />
+              </ThemeProvider>
+            </StyledComponentsRegistry>
+          </Providers>
         </NextIntlClientProvider>
       </body>
     </html>

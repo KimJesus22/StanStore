@@ -11,6 +11,20 @@ import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '../theme'; // Relative path since file is in src/components
 import { Product } from '../types';
 
+const mockAddToCart = vi.fn();
+// Default mock implementation
+const mockUseCartFn = vi.fn(() => ({
+    addToCart: mockAddToCart,
+    addToCartAsync: mockAddToCart,
+    isAdding: false,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: [] as any[], // Default empty
+}));
+
+vi.mock('@/hooks/useCart', () => ({
+    useCart: () => mockUseCartFn(),
+}));
+
 // --- Mocks ---
 
 // Mock Next.js Navigation
@@ -27,7 +41,7 @@ vi.mock('next/navigation', () => ({
         const hrefStr = typeof href === 'object' && href.pathname && href.params
             ? href.pathname.replace('[id]', href.params.id)
             : href;
-         
+
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return <a href={hrefStr} {...(props as any)}>{children}</a>;
@@ -41,7 +55,7 @@ vi.mock('@/navigation', () => ({
         const hrefStr = typeof href === 'object' && href.pathname && href.params
             ? href.pathname.replace('[id]', href.params.id)
             : href;
-         
+
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return <a href={hrefStr} {...(props as any)}>{children}</a>;
@@ -149,6 +163,12 @@ describe('Integration Flow: User Journey', () => {
         vi.clearAllMocks();
         useCartStore.getState().clearCart();
         useCartStore.getState().closeCart();
+        mockUseCartFn.mockReturnValue({
+            addToCart: mockAddToCart,
+            addToCartAsync: mockAddToCart,
+            isAdding: false,
+            data: [],
+        });
     });
 
     it('Search -> Select Product -> Add to Cart -> Verify Cart', async () => {
@@ -205,8 +225,17 @@ describe('Integration Flow: User Journey', () => {
         // We assume CartDrawer is present in Layout. We render it now.
         // We manually open it or assume it opened automatically (useCartStore logic says yes)
 
+        // Ensure we simulate cart having items now
+        mockUseCartFn.mockReturnValue({
+            addToCart: mockAddToCart,
+            addToCartAsync: mockAddToCart,
+            isAdding: false,
+            data: [{ ...mockProduct, quantity: 1 }],
+        });
+
         // Ensure cart is open in store (ProductDetails calls addToCart which calls openCart)
-        expect(useCartStore.getState().items).toHaveLength(1);
+        // expect(useCartStore.getState().items).toHaveLength(1); // Removed as items are now in React Query
+        expect(mockAddToCart).toHaveBeenCalled();
         expect(useCartStore.getState().isCartOpen).toBe(true);
 
         renderWithTheme(<CartDrawer />);

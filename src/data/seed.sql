@@ -1,4 +1,7 @@
--- 1. Asegurar que la columna 'stock' existe
+-- 1. Habilitar extensión pg_net (necesaria para webhooks/edge functions)
+CREATE EXTENSION IF NOT EXISTS "pg_net" WITH SCHEMA extensions;
+
+-- 2. Asegurar que la columna 'stock' existe
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'products' AND column_name = 'stock') THEN
@@ -139,6 +142,66 @@ VALUES
         'El quinto mini álbum de ENHYPEN. Una continuación de su serie BLOOD, explorando temas de amor y sacrificio con un sonido fresco.',
         55,
         'XBwYJiEOmPo'
+    ),
+    (
+        'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b66',
+        'THE ALBUM',
+        28.00,
+        '/images/the-album-blackpink.jpg',
+        'album',
+        'BLACKPINK',
+        true,
+        'El primer álbum de estudio completo de BLACKPINK. Incluye éxitos como "Lovesick Girls", "How You Like That" y colaboraciones con Selena Gomez y Cardi B.',
+        80,
+        'dyRsYk0LyA8'
+    ),
+    (
+        'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b67',
+        'THE WORLD EP.FIN : WILL',
+        30.00,
+        '/images/the-world-ep-fin-will.jpg',
+        'album',
+        'ATEEZ',
+        true,
+        'El segundo álbum de estudio de ATEEZ, concluyendo la serie THE WORLD. Muestra su energía explosiva y versatilidad musical.',
+        40,
+        'Amq-qlqbjYA'
+    ),
+    (
+        'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b68',
+        'KILL MY DOUBT',
+        25.00,
+        '/images/kill-my-doubt.jpg',
+        'album',
+        'ITZY',
+        false,
+        'El séptimo mini álbum de ITZY. Con el tema principal "CAKE", el álbum muestra la confianza y carisma característicos del grupo.',
+        35,
+        '2L2x1p_O1s8'
+    ),
+    (
+        'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b69',
+        'SKZOO Plush (Wolf Chan)',
+        40.00,
+        '/images/skzoo-wolf-chan.jpg',
+        'merch',
+        'Stray Kids',
+        false,
+        'Peluche oficial de SKZOO, personaje Wolf Chan (Bang Chan). Suave, adorable y perfecto para cualquier colección de STAY.',
+        15,
+        'TQTlCHxyCv8'
+    ),
+    (
+        'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b70',
+        'I''VE MINE',
+        27.00,
+        '/images/ive-mine.jpg',
+        'album',
+        'IVE',
+        true,
+        'El primer EP de IVE. Explora la identidad y confianza con tres canciones principales: "Either Way", "Off The Record" y "Baddie".',
+        50,
+        'N0UT6010aZk'
     )
 ON CONFLICT (id) DO UPDATE SET 
     stock = EXCLUDED.stock,

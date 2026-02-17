@@ -2,7 +2,8 @@
 
 import styled from 'styled-components';
 import { useCartStore } from '@/store/useCartStore';
-import { X, Trash2, ShoppingBag } from 'lucide-react';
+import { useCart } from '@/hooks/useCart';
+import { X, Trash2, ShoppingBag, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -231,7 +232,12 @@ const TermsCheckbox = styled.div`
 export default function CartDrawer() {
   const t = useTranslations('Cart');
   const locale = useLocale();
-  const { isCartOpen, closeCart, items, removeFromCart } = useCartStore();
+  const { isCartOpen, closeCart, removeFromCart } = useCartStore(); // items removed, using server state
+  const { data: serverItems, isLoading } = useCart();
+
+  // Fallback to empty array if undefined
+  const items = serverItems || [];
+
   const { formatPrice } = useCurrency();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -282,7 +288,12 @@ export default function CartDrawer() {
               </CloseButton>
             </Header>
 
-            {items.length === 0 ? (
+            {isLoading ? (
+              <EmptyState>
+                <Loader2 className="animate-spin" size={48} style={{ opacity: 0.2 }} />
+                <p>Cargando carrito...</p>
+              </EmptyState>
+            ) : items.length === 0 ? (
               <EmptyState>
                 <ShoppingBag size={48} style={{ opacity: 0.2 }} />
                 <p>{t('empty')}</p>

@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useCartStore } from '@/store/useCartStore';
+import { useCart } from '@/hooks/useCart';
 import { Minus, Plus, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { Link } from '@/navigation';
 import toast from 'react-hot-toast';
@@ -264,7 +265,8 @@ const FanButton = styled.button<{ $isActive: boolean, $themeColor?: string }>`
 export default function ProductDetails({ product }: { product: Product }) {
   const t = useTranslations('Product');
   const locale = useLocale();
-  const addToCart = useCartStore((state) => state.addToCart);
+  const { addToCart, isAdding } = useCart();
+  const openCart = useCartStore((state) => state.openCart); // Keep using store for UI state (open drawer)
 
   const description = locale === 'ko'
     ? (product.description_ko || product.description)
@@ -340,8 +342,9 @@ export default function ProductDetails({ product }: { product: Product }) {
     }
 
     for (let i = 0; i < quantity; i++) {
-      addToCart(product);
+      addToCart({ productId: product.id, quantity: 1 });
     }
+    openCart(); // Open drawer after adding
 
     toast.success(t('addedToCart', { quantity, count: quantity }), {
       style: {
@@ -446,7 +449,7 @@ export default function ProductDetails({ product }: { product: Product }) {
 
           <AddToCartButton
             onClick={handleAddToCart}
-            disabled={isOutOfStock}
+            disabled={isOutOfStock || isAdding}
           >
             <ShoppingBag size={20} />
             {isOutOfStock ? t('outOfStock') : t('addToCart')}
