@@ -10,6 +10,11 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 export default defineConfig({
   plugins: [react()],
   test: {
+    server: {
+      deps: {
+        inline: ['html-encoding-sniffer']
+      }
+    },
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
