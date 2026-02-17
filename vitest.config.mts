@@ -10,12 +10,7 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 export default defineConfig({
   plugins: [react()],
   test: {
-    server: {
-      deps: {
-        inline: ['html-encoding-sniffer']
-      }
-    },
-    environment: 'jsdom',
+    environment: 'happy-dom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
     alias: {
@@ -25,7 +20,7 @@ export default defineConfig({
       {
         test: {
           name: 'unit',
-          environment: 'jsdom',
+          environment: 'happy-dom',
           globals: true,
           include: ['src/**/*.test.{ts,tsx}'],
           setupFiles: ['./vitest.setup.ts'],

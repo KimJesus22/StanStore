@@ -3,8 +3,34 @@ import { supabase } from '@/lib/supabaseClient';
 import ProductDetails from '@/components/ProductDetails';
 import { mockProducts } from '@/data/mockData';
 
+import { locales } from '@/navigation';
+
+export const revalidate = 3600; // Revalidar cada hora
+export const dynamicParams = true; // Permitir productos nuevos bajo demanda
+
+export async function generateStaticParams() {
+  // Obtener los 100 productos más recientes para pre-renderizar
+  const { data: products } = await supabase
+    .from('products')
+    .select('id')
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if (!products) return [];
+
+  // Generar params para cada locale y cada producto
+  const params = [];
+  for (const locale of locales) {
+    for (const product of products) {
+      params.push({ locale, id: product.id });
+    }
+  }
+
+  return params;
+}
+
 type Props = {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string; locale: string }>
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
