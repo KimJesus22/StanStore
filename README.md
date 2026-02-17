@@ -38,6 +38,13 @@ Siguiendo el top 10 de OWASP, el sistema implementa:
 3. **Rate Limiting**: Protección anti-fuerza bruta en el middleware para endpoints de API y Server Actions.
 4. **Validación Zod**: Sanitización y validación estricta de esquemas en todos los puntos de entrada de datos.
 
+### Modelo de Seguridad Supabase (RLS vs Bypass)
+
+Para evitar fugas de datos, hemos estandarizado el acceso a la base de datos:
+
+*   **Cliente/Servidor (`lib/supabase/*`)**: Usan `ANON_KEY`. **Respetan RLS**. Esto significa que las consultas *siempre* están limitadas por las políticas `auth.uid() = user_id`. Si un usuario intenta acceder a datos de otro, la base de datos devuelve 0 filas.
+*   **Admin (`lib/supabase/admin.ts`)**: Usa `SERVICE_ROLE_KEY`. **Ignora RLS**. Exclusivo para tareas de sistema (Webhooks de Stripe, Cron Jobs) donde no hay sesión de usuario activa. *Nunca importar en componentes de cliente.*
+
 ## 🧪 Estrategia de Calidad & Automatización
 
 - **Unit Testing**: Suite de Vitest con una cobertura de ramas del **~86%** (mínimo requerido 70%).
