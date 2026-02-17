@@ -1,0 +1,34 @@
+
+> stanstore@0.1.0 build
+> next build --webpack
+
+▲ Next.js 16.1.6 (webpack)
+- Environments: .env.local
+- Experiments (use with caution):
+  · clientTraceMetadata
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+[@sentry/nextjs] Could not find `onRequestError` hook in instrumentation file. This indicates outdated configuration of the Sentry SDK. Use `Sentry.captureRequestError` to instrument the `onRequestError` hook: https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#errors-from-nested-react-server-components
+ ✓ (pwa) Compiling for server...
+ ✓ (pwa) Compiling for server...
+ ✓ (pwa) Compiling for client (static)...
+ ○ (pwa) Service worker: C:\Users\gomez\Documents\StanStore\public\sw.js
+ ○ (pwa)   URL: /sw.js
+ ○ (pwa)   Scope: /
+[@sentry/nextjs] DEPRECATION WARNING: It is recommended renaming your `sentry.client.config.ts` file, or moving its content to `instrumentation-client.ts`. When using Turbopack `sentry.client.config.ts` will no longer work. Read more about the `instrumentation-client.ts` file: https://nextjs.org/docs/app/api-reference/file-conventions/instrumentation-client
+✓ Compiled successfully in 14.5s
+  Running TypeScript ...
+Failed to compile.
+
+./src/components/ProductCard.tsx:212:13
+Type error: Type 'string' is not assignable to type '"/" | "/artists" | "/profile" | "/track-order" | "/terms" | "/admin" | "/search" | "/privacy" | ({ pathname: "/"; } & Omit<UrlObject, "pathname">) | ({ pathname: "/artists"; } & Omit<...>) | ... 5 more ... | ({ ...; } & Omit<...>)'.
+
+[0m [90m 210 |[39m       transition[33m=[39m{{ duration[33m:[39m [35m0.4[39m[33m,[39m delay[33m:[39m index [33m*[39m [35m0.1[39m }}
+ [90m 211 |[39m     [33m>[39m
+[31m[1m>[22m[39m[90m 212 |[39m       [33m<[39m[33mLink[39m href[33m=[39m{isOutOfStock [33m?[39m [32m'#'[39m [33m:[39m productUrl} style[33m=[39m{{ textDecoration[33m:[39m [32m'none'[39m[33m,[39m color[33m:[39m [32m'inherit'[39m[33m,[39m flex[33m:[39m [35m1[39m[33m,[39m pointerEvents[33m:[39m isOutOfStock [33m?[39m [32m'none'[39m [33m:[39m [32m'auto'[39m }}[33m>[39m
+ [90m     |[39m             [31m[1m^[22m[39m
+ [90m 213 |[39m         [33m<[39m[33mImageContainer[39m[33m>[39m
+ [90m 214 |[39m           {isOutOfStock [33m&&[39m [33m<[39m[33mOutOfStockOverlay[39m[33m>[39m[33mAgotado[39m[33m<[39m[33m/[39m[33mOutOfStockOverlay[39m[33m>[39m}
+ [90m 215 |[39m           [33m<[39m[33mImage[39m[0m
+Next.js build worker exited with code: 1 and signal: null

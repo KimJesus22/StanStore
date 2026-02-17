@@ -19,6 +19,12 @@ const AdminContent = dynamic(() => import('./AdminContent'), {
   loading: () => <p>Cargando gestión de productos...</p>,
   ssr: false
 });
+
+const IpBanManager = dynamic(() => import('@/components/admin/IpBanManager'), {
+  loading: () => <div style={{ height: 200, background: '#f5f5f5', borderRadius: 8, marginTop: '2rem' }} />,
+  ssr: false
+});
+
 // import { useTranslations } from 'next-intl';
 
 const Container = styled.div`
@@ -61,7 +67,7 @@ const StatValue = styled.div`
   font-size: 2rem;
   font-weight: 700;
   color: #10CFBD;
-`;
+  `;
 
 const StatLabel = styled.div`
   color: #666;
@@ -134,6 +140,9 @@ export default function AdminDashboard() {
         <SalesChart data={salesData} />
         <CategoryChart data={categoryData} />
       </Grid>
+
+      {/* Gestión de Baneos de IP */}
+      <IpBanManager />
 
       {/* Formulario para crear productos */}
       <AdminContent />
