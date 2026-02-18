@@ -1,9 +1,14 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
+import { registerZodErrorMap } from '@/lib/zod-error-map';
 
 export default function Providers({ children }: { children: ReactNode }) {
+    useEffect(() => {
+        registerZodErrorMap();
+    }, []);
+
     const [queryClient] = useState(
         () =>
             new QueryClient({
