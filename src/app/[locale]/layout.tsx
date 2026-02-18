@@ -15,6 +15,9 @@ import type { Viewport } from 'next';
 import dynamicLoader from 'next/dynamic';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { WebVitals } from '@/components/WebVitals';
+import SkipLink from '@/components/ui/SkipLink';
+import RouteAnnouncer from '@/components/RouteAnnouncer';
+import AxeReporter from '@/components/AxeReporter';
 
 // Lazy loading de componentes "Below the Fold" o interactivos no críticos
 const Footer = dynamicLoader(() => import('@/components/Footer'), {
@@ -87,11 +90,16 @@ export default async function LocaleLayout({
               <ThemeProvider>
                 <AuthProvider>
                   <CurrencyProvider>
+                    <SkipLink />
+                    <RouteAnnouncer />
+                    <AxeReporter />
                     <Navbar />
                     <WebVitals />
                     <CartDrawer />
                     <DynamicInstallPrompt />
-                    {children}
+                    <main id="content">
+                      {children}
+                    </main>
                     <Footer />
                   </CurrencyProvider>
                 </AuthProvider>

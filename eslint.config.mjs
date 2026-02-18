@@ -8,6 +8,12 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([...nextVitals, ...nextTs, {
   rules: {
     "react-hooks/set-state-in-effect": "off",
+    "jsx-a11y/alt-text": "error",
+    "jsx-a11y/aria-role": "error",
+    "jsx-a11y/aria-props": "error",
+    "jsx-a11y/click-events-have-key-events": "error",
+    "jsx-a11y/no-static-element-interactions": "error",
+    "jsx-a11y/anchor-is-valid": "error",
   },
 }, // Override default ignores of eslint-config-next.
 globalIgnores([

@@ -8,7 +8,8 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
-import Image from 'next/image';
+// import Image from 'next/image'; // Replaced by ProductImage
+import ProductImage from '@/components/ui/ProductImage';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useRouter } from 'next/navigation';
 
@@ -311,9 +312,9 @@ export default function CartDrawer() {
                       transition={{ duration: 0.2 }}
                     >
                       <ItemImage>
-                        <Image
+                        <ProductImage
                           src={item.image_url}
-                          alt={item.name}
+                          product={item}
                           fill
                           sizes="80px"
                           placeholder="blur"

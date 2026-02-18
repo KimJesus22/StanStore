@@ -8,6 +8,7 @@ export const themes = {
             accent: '#F57F17', // Darkened Yellow for contrast
             secondaryBackground: '#F5F5F5',
             border: '#E0E0E0',
+            textMuted: '#616161', // 4.5:1 check
         },
     },
     ScaledAndIcy: {
@@ -20,6 +21,7 @@ export const themes = {
             accent: '#C2185B', // Darkened Pink for contrast
             secondaryBackground: '#FFFFFF',
             border: '#E0E0E0',
+            textMuted: '#585858',
         },
     },
     Minimalist: {
@@ -32,6 +34,7 @@ export const themes = {
             accent: '#D84315', // Darkened Peach for contrast
             secondaryBackground: '#FAFAFA',
             border: '#EEEEEE',
+            textMuted: '#666666',
         },
     },
 };

@@ -7,7 +7,8 @@ import { Link } from '@/navigation';
 import { ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+// import Image from 'next/image'; // Replaced by ProductImage
+import ProductImage from '@/components/ui/ProductImage';
 import { useCurrency } from '@/context/CurrencyContext';
 
 const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
@@ -212,10 +213,9 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
       {isOutOfStock ? (
         <div style={{ textDecoration: 'none', color: 'inherit', flex: 1, cursor: 'not-allowed' }}>
           <ImageContainer>
-            <OutOfStockOverlay>Agotado</OutOfStockOverlay>
-            <Image
+            <ProductImage
               src={product.image_url}
-              alt={product.name}
+              product={product}
               fill
               sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
               priority={false}
@@ -233,9 +233,9 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
           style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}
         >
           <ImageContainer>
-            <Image
+            <ProductImage
               src={product.image_url}
-              alt={product.name}
+              product={product}
               fill
               sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
               priority={false}

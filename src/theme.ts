@@ -9,6 +9,7 @@ export const lightTheme: DefaultTheme = {
         secondaryBackground: '#F5F5F5', // Acts as cardBg
         accent: '#F57F17',
         border: '#E0E0E0',
+        textMuted: '#616161', // High contrast gray
     },
 };
 
@@ -21,5 +22,6 @@ export const darkTheme: DefaultTheme = {
         secondaryBackground: '#1E1E1E', // Dark card background
         accent: '#FFB74D', // Lighter orange for dark mode
         border: '#333333',
+        textMuted: '#B0B0B0', // Light gray for dark bg
     },
 };

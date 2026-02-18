@@ -11,7 +11,8 @@ import toast from 'react-hot-toast';
 import { Product } from '@/types';
 import { useTranslations, useLocale, useFormatter } from 'next-intl';
 import { supabase } from '@/lib/supabaseClient';
-import Image from 'next/image';
+// import Image from 'next/image'; // Replaced by ProductImage
+import ProductImage from '@/components/ui/ProductImage';
 import dynamic from 'next/dynamic';
 import { Skeleton } from './ui/Skeleton';
 
@@ -386,9 +387,9 @@ export default function ProductDetails({ product }: { product: Product }) {
       />
 
       <ImageWrapper>
-        <Image
+        <ProductImage
           src={product.image_url}
-          alt={product.name}
+          product={product}
           fill
           priority
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"

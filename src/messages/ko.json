@@ -96,5 +96,8 @@
         "related": {
             "title": "MISSING_TRANSLATION: Quizás te guste..."
         }
+    },
+    "RouteAnnouncer": {
+        "navigatedTo": "페이지 이동: {title}"
     }
 }

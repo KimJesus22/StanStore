@@ -108,5 +108,8 @@
         "related": {
             "title": "You might also like..."
         }
+    },
+    "RouteAnnouncer": {
+        "navigatedTo": "Navigated to: {title}"
     }
 }
