@@ -10,11 +10,12 @@
 ## 🚀 Tecnologías (Tech Stack)
 
 -   **Frontend**: [Next.js 16 (App Router)](https://nextjs.org/) - Rendimiento extremo con Server Actions, SSR e **ISR**.
+-   **Internacionalización**: [next-intl](https://next-intl-docs.vercel.app/) - Soporte nativo para ES, EN, KO con rutas localizadas y formateo dinámico.
 -   **IA & Búsqueda**: [@xenova/transformers](https://huggingface.co/docs/transformers.js) - Generación de embeddings locales (384D) con **pgvector** e índices HNSW.
 -   **Base de Datos**: [Supabase](https://supabase.com/) (PostgreSQL) - Gestión de datos con RLS y búsqueda vectorial.
 -   **Pagos**: [Stripe](https://stripe.com/) - Procesamiento con validación estricta de versiones de API en webhooks.
 -   **Estilos & UI**: Styled Components + [Framer Motion](https://www.framer.com/motion/).
--   **Calidad**: [Vitest](https://vitest.dev/) con entorno **Happy-DOM** y [Playwright](https://playwright.dev/).
+-   **Calidad & A11y**: [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/) y [Axe Core](https://www.deque.com/axe/) para auditorías de accesibilidad.
 
 ## 🧠 Inteligencia Artificial (Búsqueda Semántica)
 
@@ -28,6 +29,23 @@ A diferencia de las búsquedas tradicionales por texto exacto, StanStore utiliza
 - **ISR (Incremental Static Regeneration)**: Las páginas de catálogo y productos populares se pre-renderizan cada hora (`revalidate = 3600`), asegurando carga instantánea y SEO óptimo.
 - **Priorización de Carga**: Uso de `priority={true}` en imágenes LCP y `sizes` dinámicos.
 - **Componentes Diferidos**: Carga bajo demanda de reproductores externos (Spotify, YouTube).
+
+## 🌍 Internacionalización (i18n)
+
+Implementada con un enfoque "Type-Safe" y optimizada para SEO:
+- **Idiomas Soportados**: 🇪🇸 Español, 🇺🇸 Inglés, 🇰🇷 Coreano.
+- **Rutas Localizadas**: Estructura `/[locale]/ruta` con detección automática de preferencia de idioma.
+- **Formateo Dinámico**: Uso de `useFormatter` para mostrar monedas (`PriceTag`), fechas y listas gramaticalmente correctas según el locale.
+- **Validaciones i18n**: Esquemas de **Zod** dinámicos que inyectan mensajes de error traducidos en tiempo real.
+
+## ♿ Accesibilidad (A11y - WCAG 2.1 AA)
+
+Diseñada para ser inclusiva y navegable por todos:
+- **Navegación por Teclado**: Componente **Skip Link** para saltar al contenido y anillos de foco de alto contraste (`:focus-visible`) globales.
+- **Lectores de Pantalla**: **Route Announcer** para anunciar cambios de página en navegación SPA y etiquetas ARIA optimizadas.
+- **Contraste de Color**: Auditoría de paleta (Ratio 4.5:1) con variables `textMuted` ajustadas para modo claro y oscuro.
+- **Imágenes**: Componente `ProductImage` inteligente que exige `alt` o genera fallbacks automáticos basados en metadatos del producto.
+- **QA Automatizado**: Integración de `eslint-plugin-jsx-a11y` y diagnósticos en consola con **Axe Core** en entorno de desarrollo.
 
 ## 🛡️ Ingeniería de Seguridad (Security Hardening)
 
