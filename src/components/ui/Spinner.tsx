@@ -1,3 +1,5 @@
+'use client';
+
 import { Loader2 } from 'lucide-react';
 import styled, { keyframes } from 'styled-components';
 
@@ -24,15 +26,15 @@ const SpinnerWrapper = styled.div<{ $size?: number; $color?: string }>`
 `;
 
 interface SpinnerProps {
-    size?: number;
-    color?: string;
-    className?: string;
+  size?: number;
+  color?: string;
+  className?: string;
 }
 
 export default function Spinner({ size = 24, color, className }: SpinnerProps) {
-    return (
-        <SpinnerWrapper $size={size} $color={color} className={className}>
-            <Loader2 />
-        </SpinnerWrapper>
-    );
+  return (
+    <SpinnerWrapper $size={size} $color={color} className={className}>
+      <Loader2 />
+    </SpinnerWrapper>
+  );
 }

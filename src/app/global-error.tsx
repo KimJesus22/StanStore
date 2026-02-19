@@ -1,8 +1,8 @@
 'use client';
 
+import React, { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
 import Error from "next/error";
-import { useEffect } from "react";
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -60,31 +60,31 @@ const Illustration = styled.div`
 `;
 
 export default function GlobalError({
-    error,
-    reset,
+  error,
+  reset,
 }: {
-    error: Error & { digest?: string };
-    reset: () => void;
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
-    useEffect(() => {
-        Sentry.captureException(error);
-    }, [error]);
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
 
-    return (
-        <html>
-            <body>
-                <Container>
-                    <Illustration>💔</Illustration>
-                    <Title>¡Oops! Algo salió mal</Title>
-                    <Message>
-                        Lo sentimos, ha ocurrido un error inesperado al cargar la página.
-                        Nuestro equipo de fans ya está investigando.
-                    </Message>
-                    <RetryButton onClick={() => reset()}>
-                        Intentar de nuevo
-                    </RetryButton>
-                </Container>
-            </body>
-        </html>
-    );
+  return (
+    <html>
+      <body>
+        <Container>
+          <Illustration>💔</Illustration>
+          <Title>¡Oops! Algo salió mal</Title>
+          <Message>
+            Lo sentimos, ha ocurrido un error inesperado al cargar la página.
+            Nuestro equipo de fans ya está investigando.
+          </Message>
+          <RetryButton onClick={() => reset()}>
+            Intentar de nuevo
+          </RetryButton>
+        </Container>
+      </body>
+    </html>
+  );
 }
