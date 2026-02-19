@@ -5,9 +5,7 @@ import styled from 'styled-components';
 import { Link } from '@/navigation';
 import type { Artist } from '../services/artistService';
 
-const CardLink = styled(Link)`
-    display: block;
-    text-decoration: none;
+const CardWrapper = styled.div`
     border-radius: 16px;
     overflow: hidden;
     background: ${({ theme }) => theme.colors.secondaryBackground};
@@ -97,26 +95,28 @@ export default function ArtistCard({ artist }: ArtistCardProps) {
     const productLabel = artist.products_count === 1 ? 'producto' : 'productos';
 
     return (
-        <CardLink href={href}>
-            <ImageWrapper>
-                {artist.image_url ? (
-                    <StyledImage
-                        src={artist.image_url}
-                        alt={artist.name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    />
-                ) : (
-                    <Placeholder>🎵</Placeholder>
-                )}
-            </ImageWrapper>
-            <CardBody>
-                <ArtistName>{artist.name}</ArtistName>
-                <Footer>
-                    <Badge>{artist.products_count} {productLabel}</Badge>
-                    {artist.genre && <GenreTag>{artist.genre}</GenreTag>}
-                </Footer>
-            </CardBody>
-        </CardLink>
+        <Link href={href} style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+            <CardWrapper>
+                <ImageWrapper>
+                    {artist.image_url ? (
+                        <StyledImage
+                            src={artist.image_url}
+                            alt={artist.name}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        />
+                    ) : (
+                        <Placeholder>🎵</Placeholder>
+                    )}
+                </ImageWrapper>
+                <CardBody>
+                    <ArtistName>{artist.name}</ArtistName>
+                    <Footer>
+                        <Badge>{artist.products_count} {productLabel}</Badge>
+                        {artist.genre && <GenreTag>{artist.genre}</GenreTag>}
+                    </Footer>
+                </CardBody>
+            </CardWrapper>
+        </Link>
     );
 }
