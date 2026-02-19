@@ -28,7 +28,7 @@ export const withAuth: MiddlewareFactory = (next: NextMiddleware) => {
                             request.cookies.set(name, value);
                         });
                         cookiesToSet.forEach(({ name, value, options }) => {
-                            response.cookies.set(name, value, options);
+                            (response as NextResponse).cookies.set(name, value, options);
                         });
                     },
                 },
