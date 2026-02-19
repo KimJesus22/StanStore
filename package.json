@@ -17,6 +17,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "analyze": "cross-env ANALYZE=true next build --webpack",
+    "update-types": "npx supabase gen types typescript --project-id \"mi-id\" > src/types/database.types.ts",
     "prepare": "husky"
   },
   "lint-staged": {
