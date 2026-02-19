@@ -11,7 +11,8 @@ function getPurify() {
     if (!_purify) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { JSDOM } = require('jsdom') as typeof import('jsdom');
-        _purify = createDOMPurify(new JSDOM('').window as unknown as Window);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        _purify = createDOMPurify(new JSDOM('').window as unknown as any);
     }
     return _purify;
 }
