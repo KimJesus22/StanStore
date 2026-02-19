@@ -1,74 +1,48 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
-import matter from 'gray-matter';
-import { remark } from 'remark';
-import html from 'remark-html';
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { MarkdownStyles } from '@/components/MarkdownStyles';
 
-async function getTermsContent(locale: string) {
-    const termsDirectory = path.join(process.cwd(), 'src/content/terms');
+// Define the shape of the props
+interface PageProps {
+    params: Promise<{ locale: string }>;
+}
 
-    // Intentar cargar el archivo del idioma solicitado
-    let fullPath = path.join(termsDirectory, `terms.${locale}.md`);
-    let isFallback = false;
-
-    if (!fs.existsSync(fullPath)) {
-        // Fallback a español si no existe
-        fullPath = path.join(termsDirectory, 'terms.es.md');
-        isFallback = true;
-    }
-
-    if (!fs.existsSync(fullPath)) {
-        // Si ni siquiera existe el de español, retornar error o contenido dummy
-        return {
-            title: 'Error',
-            date: '',
-            contentHtml: '<p>Terms and conditions not found.</p>',
-            isFallback: false
-        };
-    }
-
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-    const matterResult = matter(fileContents);
-
-    const processedContent = await remark()
-        .use(html)
-        .process(matterResult.content);
-
-    const contentHtml = processedContent.toString();
+export async function generateMetadata({ params }: PageProps) {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'Metadata' });
 
     return {
-        title: matterResult.data.title,
-        date: matterResult.data.date,
-        contentHtml,
-        isFallback,
+        title: t('termsTitle'),
+        description: t('termsDescription')
     };
 }
 
-export default async function TermsPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function TermsPage({ params }: PageProps) {
     const { locale } = await params;
-    const { title, date, contentHtml, isFallback } = await getTermsContent(locale);
+
+    // Habilitar renderizado estático
+    setRequestLocale(locale);
+
+    // Determinar la ruta del archivo markdown
+    // Nota: Asegúrate de que los archivos existan en src/content/terms/
+    const filePath = path.join(process.cwd(), 'src', 'content', 'terms', `${locale}.md`);
+
+    let content = '';
+
+    try {
+        content = await fs.readFile(filePath, 'utf8');
+    } catch (error) {
+        console.error(`Error reading terms file for locale ${locale}:`, error);
+        notFound();
+    }
 
     return (
-        <div style={{ maxWidth: '800px', margin: '4rem auto', padding: '0 1.5rem', fontFamily: 'sans-serif' }}>
-            {isFallback && (
-                <div style={{
-                    backgroundColor: '#fff3cd',
-                    color: '#856404',
-                    padding: '0.75rem 1.25rem',
-                    marginBottom: '1rem',
-                    borderRadius: '0.25rem',
-                    border: '1px solid #ffeeba',
-                    fontSize: '0.9rem'
-                }}>
-                    Document only available in Spanish for now.
-                </div>
-            )}
-
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 700, marginBottom: '2rem' }}>{title}</h1>
-
-            {date && <p style={{ marginBottom: '1rem', color: '#666' }}>Last updated: {date}</p>}
-
-            <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
-        </div>
+        <MarkdownStyles>
+            <ReactMarkdown>{content}</ReactMarkdown>
+        </MarkdownStyles>
     );
 }

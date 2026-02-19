@@ -4,12 +4,15 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import { useCartStore } from '@/features/cart';
 import { useCurrency } from '@/context/CurrencyContext';
-import { useLocale } from 'next-intl';
-import { ShippingInfo } from '@/types';
+import { useTranslations, useLocale } from 'next-intl';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { ArrowLeft, Loader2, Info } from 'lucide-react';
 import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createCheckoutSchema, CheckoutSchema } from '@/schemas/checkout';
+import TermsSummaryAlert from './TermsSummaryAlert';
 
 const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
@@ -55,7 +58,7 @@ const BackLink = styled(Link)`
     }
 `;
 
-const FormSection = styled.div``;
+const FormSection = styled.form``;
 
 const SectionTitle = styled.h2`
     font-size: 1.35rem;
@@ -109,10 +112,10 @@ const FloatingLabel = styled.label<{ $hasValue: boolean }>`
     z-index: 1;
 `;
 
-const Input = styled.input`
+const Input = styled.input<{ $error?: boolean }>`
     width: 100%;
     padding: 1.15rem 14px 0.55rem;
-    border: 1px solid #ddd;
+    border: 1px solid ${({ $error }) => ($error ? '#e53935' : '#ddd')};
     border-radius: 8px;
     font-size: 0.95rem;
     color: #111;
@@ -133,10 +136,10 @@ const Input = styled.input`
     }
 `;
 
-const Select = styled.select`
+const Select = styled.select<{ $error?: boolean }>`
     width: 100%;
     padding: 1.15rem 14px 0.55rem;
-    border: 1px solid #ddd;
+    border: 1px solid ${({ $error }) => ($error ? '#e53935' : '#ddd')};
     border-radius: 8px;
     font-size: 0.95rem;
     color: #111;
@@ -153,6 +156,14 @@ const Select = styled.select`
     &:focus {
         border-color: #111;
     }
+`;
+
+const ErrorMessage = styled.span`
+    display: block;
+    color: #e53935;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    margin-left: 0.5rem;
 `;
 
 const CheckboxRow = styled.label`
@@ -312,14 +323,17 @@ const ShippingMethodBox = styled.div`
     font-size: 0.9rem;
 `;
 
-const TermsCheckbox = styled.label`
+const TermsCheckbox = styled.div`
+    margin-top: 1rem;
+`;
+
+const TermsLabel = styled.label<{ $error?: boolean }>`
     display: flex;
     align-items: flex-start;
     gap: 0.6rem;
     font-size: 0.85rem;
-    color: #555;
+    color: ${({ $error }) => ($error ? '#e53935' : '#555')};
     cursor: pointer;
-    margin-top: 1rem;
 
     input {
         margin-top: 2px;
@@ -332,6 +346,7 @@ const TermsCheckbox = styled.label`
     a {
         text-decoration: underline;
         color: inherit;
+        font-weight: 600;
     }
 `;
 
@@ -341,57 +356,45 @@ export default function CheckoutForm() {
     const { items } = useCartStore();
     const { formatPrice } = useCurrency();
     const locale = useLocale();
+    const t = useTranslations('Validations');
+    const tCheckout = useTranslations('Cart');
 
     const [loading, setLoading] = useState(false);
-    const [acceptedTerms, setAcceptedTerms] = useState(false);
-    const [shipping, setShipping] = useState<ShippingInfo>({
-        country: 'México',
-        firstName: '',
-        lastName: '',
-        address: '',
-        apartment: '',
-        postalCode: '',
-        city: '',
-        state: '',
-        phone: '',
+
+    // Initialize React Hook Form
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors, isValid }
+    } = useForm<CheckoutSchema>({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resolver: zodResolver(createCheckoutSchema(t)) as any,
+        defaultValues: {
+            country: 'México',
+            firstName: '',
+            lastName: '',
+            address: '',
+            apartment: '',
+            postalCode: '',
+            city: '',
+            state: '',
+            phone: '',
+            acceptTerms: false
+        },
+        mode: 'onTouched'
     });
+
+    // Watch fields for floating labels
+    const watchedFields = watch();
 
     const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-    const updateField = (field: keyof ShippingInfo, value: string) => {
-        setShipping(prev => ({ ...prev, [field]: value }));
-    };
-
-    const validateForm = (): boolean => {
-        if (!shipping.firstName.trim() || !shipping.lastName.trim()) {
-            toast.error('Nombre y apellidos son requeridos');
-            return false;
-        }
-        if (!shipping.address.trim()) {
-            toast.error('La dirección es requerida');
-            return false;
-        }
-        if (!shipping.postalCode.trim() || !shipping.city.trim() || !shipping.state) {
-            toast.error('Código postal, ciudad y estado son requeridos');
-            return false;
-        }
-        if (!shipping.phone.trim()) {
-            toast.error('El teléfono es requerido');
-            return false;
-        }
-        if (!acceptedTerms) {
-            toast.error('Debes aceptar los términos y condiciones');
-            return false;
-        }
-        return true;
-    };
-
-    const handleSubmit = async () => {
+    const onSubmit = async (data: CheckoutSchema) => {
         if (items.length === 0) {
             toast.error('Tu carrito está vacío');
             return;
         }
-        if (!validateForm()) return;
 
         setLoading(true);
         try {
@@ -400,13 +403,24 @@ export default function CheckoutForm() {
             const legalMetadata = {
                 agreedAt: new Date().toISOString(),
                 userAgent: navigator.userAgent,
+                acceptedTerms: String(data.acceptTerms)
             };
 
             const { url, error } = await createCheckoutSession(
                 items.map(item => ({ id: item.id, quantity: item.quantity })),
                 legalMetadata,
                 locale,
-                shipping
+                {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    address: data.address,
+                    apartment: data.apartment || '',
+                    postalCode: data.postalCode,
+                    city: data.city,
+                    state: data.state,
+                    country: data.country,
+                    phone: data.phone,
+                }
             );
 
             if (error) {
@@ -438,10 +452,12 @@ export default function CheckoutForm() {
 
     return (
         <PageWrapper>
-            <FormSection>
+            <FormSection onSubmit={handleSubmit(onSubmit)}>
                 <BackLink href={`/${locale}`}>
                     <ArrowLeft size={16} /> Volver a la tienda
                 </BackLink>
+
+                <TermsSummaryAlert />
 
                 <SectionTitle>Entrega</SectionTitle>
 
@@ -455,13 +471,14 @@ export default function CheckoutForm() {
                     <InputWrapper>
                         <Select
                             id="country"
-                            value={shipping.country}
-                            onChange={e => updateField('country', e.target.value)}
+                            {...register('country')}
+                            $error={!!errors.country}
                         >
                             <option value="México">México</option>
                         </Select>
                         <FloatingLabel htmlFor="country" $hasValue={true}>País / Región</FloatingLabel>
                     </InputWrapper>
+                    {errors.country && <ErrorMessage>{errors.country.message}</ErrorMessage>}
                 </FormGroup>
 
                 {/* Nombre + Apellidos */}
@@ -469,18 +486,20 @@ export default function CheckoutForm() {
                     <InputWrapper>
                         <Input
                             id="firstName"
-                            value={shipping.firstName}
-                            onChange={e => updateField('firstName', e.target.value)}
+                            {...register('firstName')}
+                            $error={!!errors.firstName}
                         />
-                        <FloatingLabel htmlFor="firstName" $hasValue={!!shipping.firstName}>Nombre</FloatingLabel>
+                        <FloatingLabel htmlFor="firstName" $hasValue={!!watchedFields.firstName}>Nombre</FloatingLabel>
+                        {errors.firstName && <ErrorMessage>{errors.firstName.message}</ErrorMessage>}
                     </InputWrapper>
                     <InputWrapper>
                         <Input
                             id="lastName"
-                            value={shipping.lastName}
-                            onChange={e => updateField('lastName', e.target.value)}
+                            {...register('lastName')}
+                            $error={!!errors.lastName}
                         />
-                        <FloatingLabel htmlFor="lastName" $hasValue={!!shipping.lastName}>Apellidos</FloatingLabel>
+                        <FloatingLabel htmlFor="lastName" $hasValue={!!watchedFields.lastName}>Apellidos</FloatingLabel>
+                        {errors.lastName && <ErrorMessage>{errors.lastName.message}</ErrorMessage>}
                     </InputWrapper>
                 </Row>
 
@@ -489,11 +508,12 @@ export default function CheckoutForm() {
                     <InputWrapper>
                         <Input
                             id="address"
-                            value={shipping.address}
-                            onChange={e => updateField('address', e.target.value)}
+                            {...register('address')}
+                            $error={!!errors.address}
                         />
-                        <FloatingLabel htmlFor="address" $hasValue={!!shipping.address}>Dirección</FloatingLabel>
+                        <FloatingLabel htmlFor="address" $hasValue={!!watchedFields.address}>Dirección</FloatingLabel>
                     </InputWrapper>
+                    {errors.address && <ErrorMessage>{errors.address.message}</ErrorMessage>}
                 </FormGroup>
 
                 {/* Apartamento */}
@@ -501,10 +521,9 @@ export default function CheckoutForm() {
                     <InputWrapper>
                         <Input
                             id="apartment"
-                            value={shipping.apartment || ''}
-                            onChange={e => updateField('apartment', e.target.value)}
+                            {...register('apartment')}
                         />
-                        <FloatingLabel htmlFor="apartment" $hasValue={!!shipping.apartment}>Casa, apartamento, etc. (opcional)</FloatingLabel>
+                        <FloatingLabel htmlFor="apartment" $hasValue={!!watchedFields.apartment}>Casa, apartamento, etc. (opcional)</FloatingLabel>
                     </InputWrapper>
                 </FormGroup>
 
@@ -513,31 +532,34 @@ export default function CheckoutForm() {
                     <InputWrapper>
                         <Input
                             id="postalCode"
-                            value={shipping.postalCode}
-                            onChange={e => updateField('postalCode', e.target.value)}
+                            {...register('postalCode')}
+                            $error={!!errors.postalCode}
                         />
-                        <FloatingLabel htmlFor="postalCode" $hasValue={!!shipping.postalCode}>Código postal</FloatingLabel>
+                        <FloatingLabel htmlFor="postalCode" $hasValue={!!watchedFields.postalCode}>Código postal</FloatingLabel>
+                        {errors.postalCode && <ErrorMessage>{errors.postalCode.message}</ErrorMessage>}
                     </InputWrapper>
                     <InputWrapper>
                         <Input
                             id="city"
-                            value={shipping.city}
-                            onChange={e => updateField('city', e.target.value)}
+                            {...register('city')}
+                            $error={!!errors.city}
                         />
-                        <FloatingLabel htmlFor="city" $hasValue={!!shipping.city}>Ciudad</FloatingLabel>
+                        <FloatingLabel htmlFor="city" $hasValue={!!watchedFields.city}>Ciudad</FloatingLabel>
+                        {errors.city && <ErrorMessage>{errors.city.message}</ErrorMessage>}
                     </InputWrapper>
                     <InputWrapper>
                         <Select
                             id="state"
-                            value={shipping.state}
-                            onChange={e => updateField('state', e.target.value)}
+                            {...register('state')}
+                            $error={!!errors.state}
                         >
                             <option value="">Seleccionar</option>
                             {MEXICO_STATES.map(state => (
                                 <option key={state} value={state}>{state}</option>
                             ))}
                         </Select>
-                        <FloatingLabel htmlFor="state" $hasValue={!!shipping.state}>Estado</FloatingLabel>
+                        <FloatingLabel htmlFor="state" $hasValue={!!watchedFields.state}>Estado</FloatingLabel>
+                        {errors.state && <ErrorMessage>{errors.state.message}</ErrorMessage>}
                     </InputWrapper>
                 </Row>
 
@@ -547,11 +569,12 @@ export default function CheckoutForm() {
                         <Input
                             id="phone"
                             type="tel"
-                            value={shipping.phone}
-                            onChange={e => updateField('phone', e.target.value)}
+                            {...register('phone')}
+                            $error={!!errors.phone}
                         />
-                        <FloatingLabel htmlFor="phone" $hasValue={!!shipping.phone}>Teléfono</FloatingLabel>
+                        <FloatingLabel htmlFor="phone" $hasValue={!!watchedFields.phone}>Teléfono</FloatingLabel>
                     </InputWrapper>
+                    {errors.phone && <ErrorMessage>{errors.phone.message}</ErrorMessage>}
                 </FormGroup>
 
                 <CheckboxRow>
@@ -567,14 +590,16 @@ export default function CheckoutForm() {
 
                 {/* Términos */}
                 <TermsCheckbox>
-                    <input
-                        type="checkbox"
-                        checked={acceptedTerms}
-                        onChange={e => setAcceptedTerms(e.target.checked)}
-                    />
-                    <span>
-                        Acepto los <a href={`/${locale}/terms`} target="_blank" rel="noopener noreferrer">Términos y Condiciones</a> y reconozco que esta acción constituye una <strong>Firma Digital</strong> válida.
-                    </span>
+                    <TermsLabel $error={!!errors.acceptTerms}>
+                        <input
+                            type="checkbox"
+                            {...register('acceptTerms')}
+                        />
+                        <span>
+                            He leído y acepto la <Link href={`/${locale}/terms`} target="_blank" rel="noopener noreferrer">Política de Reembolso</Link> y los <Link href={`/${locale}/terms`} target="_blank" rel="noopener noreferrer">Términos del Group Order</Link>.
+                        </span>
+                    </TermsLabel>
+                    {errors.acceptTerms && <ErrorMessage>{errors.acceptTerms.message}</ErrorMessage>}
                 </TermsCheckbox>
             </FormSection>
 
@@ -612,8 +637,8 @@ export default function CheckoutForm() {
                 </TotalRow>
 
                 <PayButton
-                    onClick={handleSubmit}
-                    disabled={loading || !acceptedTerms}
+                    onClick={handleSubmit(onSubmit)}
+                    disabled={loading}
                 >
                     {loading ? (
                         <>

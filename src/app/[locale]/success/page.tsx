@@ -170,9 +170,17 @@ function SuccessContent() {
       )}
 
       <Button href="/">Volver a la tienda</Button>
+
+      <div style={{ padding: '0 1rem', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <NextPurchaseCoupon />
+        <ShareToUnlock />
+      </div>
     </>
   );
 }
+
+import NextPurchaseCoupon from '@/components/gamification/NextPurchaseCoupon';
+import ShareToUnlock from '@/components/gamification/ShareToUnlock';
 
 export default function SuccessPage() {
   return (

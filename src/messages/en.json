@@ -31,7 +31,23 @@
         "passwordUppercase": "Must contain at least one uppercase letter",
         "passwordNumber": "Must contain at least one number",
         "passwordsMatch": "Passwords do not match",
-        "searchMax": "Search query cannot exceed {max} characters"
+        "searchMax": "Search query cannot exceed {max} characters",
+        "acceptTerms": "You must accept the terms and conditions to participate in the group order",
+        "phoneMin": "Phone number must be at least 10 digits"
+    },
+    "TermsAlert": {
+        "title": "Important Information",
+        "point1": "This is a Group Order (Pre-order).",
+        "point2": "No cancellations after the order close date.",
+        "point3": "International shipping and customs will be charged separately when the items arrive."
+    },
+    "Gamification": {
+        "shareTitle": "Help us reach the goal!",
+        "shareText": "I just joined the Group Order! Join here:",
+        "couponTitle": "Thank you for your support!",
+        "couponText": "Here is a 5% OFF coupon for your next Group Order:",
+        "copy": "Copy",
+        "copied": "Copied!"
     },
     "Product": {
         "addToCart": "Add to Cart",
@@ -99,7 +115,9 @@
     "Metadata": {
         "title": "StanStore - K-Pop Merch",
         "description": "The best store for K-Pop albums, lightsticks, and exclusive merch.",
-        "homeTitle": "Buy K-Pop Merch | StanStore"
+        "homeTitle": "Buy K-Pop Merch | StanStore",
+        "termsTitle": "Terms and Conditions | StanStore",
+        "termsDescription": "Read our Terms and Conditions regarding purchases, shipping, and returns."
     },
     "pdp": {
         "reviews": {
