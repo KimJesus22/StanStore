@@ -153,7 +153,7 @@ export default function Footer() {
 
           <ColumnTitle style={{ marginTop: '1rem' }}>Síguenos</ColumnTitle>
           <SocialLinks>
-            <SocialIcon href="https://facebook.com" target="_blank" aria-label="Facebook">
+            <SocialIcon href="https://www.facebook.com/profile.php?id=61588123330439" target="_blank" aria-label="Facebook">
               <Facebook size={20} />
             </SocialIcon>
             <SocialIcon href="https://instagram.com" target="_blank" aria-label="Instagram">

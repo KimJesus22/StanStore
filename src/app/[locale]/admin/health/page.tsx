@@ -6,8 +6,6 @@ import { motion } from 'framer-motion';
 import { Activity, Zap, Clock, AlertOctagon, HeartPulse } from 'lucide-react';
 import { checkSystemHealth, HealthMetrics } from '@/app/actions/health';
 
-export const dynamic = 'force-dynamic';
-
 // --- Styled Components ---
 
 const blinkRed = keyframes`
