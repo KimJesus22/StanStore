@@ -31,10 +31,6 @@ const ImageWrapper = styled.div`
     background: ${({ theme }) => theme.colors.border};
 `;
 
-const StyledImage = styled(Image)`
-    object-fit: cover;
-    transition: transform 0.35s ease;
-`;
 
 const Placeholder = styled.div`
     width: 100%;
@@ -99,11 +95,12 @@ export default function ArtistCard({ artist }: ArtistCardProps) {
             <CardWrapper>
                 <ImageWrapper>
                     {artist.image_url ? (
-                        <StyledImage
+                        <Image
                             src={artist.image_url}
                             alt={artist.name}
                             fill
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            style={{ objectFit: 'cover', transition: 'transform 0.35s ease' }}
                         />
                     ) : (
                         <Placeholder>🎵</Placeholder>

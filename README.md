@@ -7,7 +7,7 @@
 
 **StanStore** es una plataforma de comercio electrónico de vanguardia para mercancía exclusiva. Diseñada con un enfoque de **defensa en profundidad**, combina una arquitectura de micro-interacciones fluida con rigurosos estándares de ciberseguridad y capacidades modernas de Inteligencia Artificial.
 
-## 🚀 Tecnologías (Tech Stack)
+## 🚀 Tecnologías
 
 -   **Frontend**: [Next.js 16 (App Router)](https://nextjs.org/) - Rendimiento extremo con Server Actions, SSR e **ISR**.
 -   **Internacionalización**: [next-intl](https://next-intl-docs.vercel.app/) - Soporte nativo para ES, EN, KO con rutas localizadas y formateo dinámico.
@@ -24,7 +24,7 @@ A diferencia de las búsquedas tradicionales por texto exacto, StanStore utiliza
 - **Infraestructura**: Almacenamiento en columnas `vector(384)` con índices **HNSW** para búsquedas de alta velocidad.
 - **Mantenimiento**: Scripts incrementales en `scripts/generate-embeddings.ts` que procesan únicamente productos nuevos o editados mediante batch upserts.
 
-## ⚡ Performance & UX (Optimización LCP/CLS)
+## ⚡ Rendimiento y Experiencia de Usuario (Optimización LCP/CLS)
 
 - **ISR (Incremental Static Regeneration)**: Las páginas de catálogo y productos populares se pre-renderizan cada hora (`revalidate = 3600`), asegurando carga instantánea y SEO óptimo.
 - **Priorización de Carga**: Uso de `priority={true}` en imágenes LCP y `sizes` dinámicos.
@@ -32,7 +32,7 @@ A diferencia de las búsquedas tradicionales por texto exacto, StanStore utiliza
 
 ## 🌍 Internacionalización (i18n)
 
-Implementada con un enfoque "Type-Safe" y optimizada para SEO:
+Implementada con un enfoque de tipado seguro y optimizada para SEO:
 - **Idiomas Soportados**: 🇪🇸 Español, 🇺🇸 Inglés, 🇰🇷 Coreano.
 - **Rutas Localizadas**: Estructura `/[locale]/ruta` con detección automática de preferencia de idioma.
 - **Formateo Dinámico**: Uso de `useFormatter` para mostrar monedas (`PriceTag`), fechas y listas gramaticalmente correctas según el locale.
@@ -44,13 +44,13 @@ Implementada con un enfoque "Type-Safe" y optimizada para SEO:
 ## ♿ Accesibilidad (A11y - WCAG 2.1 AA)
 
 Diseñada para ser inclusiva y navegable por todos:
-- **Navegación por Teclado**: Componente **Skip Link** para saltar al contenido y anillos de foco de alto contraste (`:focus-visible`) globales.
-- **Lectores de Pantalla**: **Route Announcer** para anunciar cambios de página en navegación SPA y etiquetas ARIA optimizadas.
+- **Navegación por Teclado**: Componente **Enlace de Salto** para saltar al contenido y anillos de foco de alto contraste (`:focus-visible`) globales.
+- **Lectores de Pantalla**: **Anunciador de Rutas** para anunciar cambios de página en navegación SPA y etiquetas ARIA optimizadas.
 - **Contraste de Color**: Auditoría de paleta (Ratio 4.5:1) con variables `textMuted` ajustadas para modo claro y oscuro.
 - **Imágenes**: Componente `ProductImage` inteligente que exige `alt` o genera fallbacks automáticos basados en metadatos del producto.
 - **QA Automatizado**: Integración de `eslint-plugin-jsx-a11y` y diagnósticos en consola con **Axe Core** en entorno de desarrollo.
 
-## 🛡️ Ingeniería de Seguridad (Security Hardening)
+## 🛡️ Ingeniería de Seguridad (Fortalecimiento del Sistema)
 
 1. **Audit Logs Inmutables**: Registro detallado de acciones críticas incluyendo latencia y metadatos.
 2. **Cifrado de Alta Seguridad**: Implementación de AES-256-CBC con **rotación de claves** y versionado de secretos.
@@ -60,7 +60,7 @@ Diseñada para ser inclusiva y navegable por todos:
 ### Modelo de Seguridad Supabase (RLS vs Bypass)
 
 *   **Cliente/Servidor (`lib/supabase/{client,server}.ts`)**: Respetan RLS.
-*   **Admin (`lib/supabase/admin.ts`)**: Usa `SERVICE_ROLE_KEY`. Bypass RLS.
+*   **Admin (`lib/supabase/admin.ts`)**: Usa `SERVICE_ROLE_KEY`. Omite RLS.
 
 ## 🧪 Estrategia de Calidad & Automatización
 
@@ -70,9 +70,9 @@ Diseñada para ser inclusiva y navegable por todos:
 - **Husky**: Pre-commit hooks con `lint-staged` para linting (`eslint --fix`) y tests locales.
 - **Generación de Tipos**: Script `npm run update-types` para sincronizar tipos TypeScript desde el esquema de Supabase (`supabase gen types`).
 
-## 🏗️ Arquitectura Feature-Based
+## 🏗️ Arquitectura Basada en Módulos
 
-El proyecto ha sido migrado a una arquitectura modular basada en **features**, donde cada dominio de negocio es un módulo autocontenido:
+El proyecto ha sido migrado a una arquitectura modular basada en **módulos de dominio**, donde cada dominio de negocio es un módulo autocontenido:
 
 ```text
 src/features/
@@ -82,13 +82,13 @@ src/features/
 └── checkout/     # Flujo de pago y órdenes
 ```
 
-- **Public API (`index.ts`)**: Cada feature exporta únicamente lo necesario a través de su `index.ts`, ocultando la implementación interna.
-- **Boundary Enforcement**: Regla ESLint `no-restricted-imports` con patrón `@/features/*/*` que prohíbe importaciones profundas entre features.
+- **API Pública (`index.ts`)**: Cada módulo exporta únicamente lo necesario a través de su `index.ts`, ocultando la implementación interna.
+- **Aplicación de Límites**: Regla ESLint `no-restricted-imports` con patrón `@/features/*/*` que prohíbe importaciones profundas entre módulos.
 - **Alias de Ruta**: `@/features/*`, `@/ui/*`, `@/lib/*` configurados en `tsconfig.json` para imports limpios.
 
-## 🔗 Middleware Pipeline (Chain Pattern)
+## 🔗 Cadena de Middlewares (Patrón Cadena)
 
-El middleware de Next.js ha sido refactorizado en una **cadena composable** de responsabilidades:
+El middleware de Next.js ha sido refactorizado en una **cadena componible** de responsabilidades:
 
 ```text
 Request → withSecurityHeaders → withRateLimit → withAuth → withI18n → Response
@@ -102,18 +102,18 @@ Request → withSecurityHeaders → withRateLimit → withAuth → withI18n → 
 | `withI18n` | Detección de locale, cookie `NEXT_LOCALE`, reescritura de rutas |
 
 - **Matcher**: `/((?!api|_next|_vercel|.*\\..*).*)` — Excluye API, assets estáticos y archivos internos de Next.js.
-- **Utilidad `chain.ts`**: Implementa el patrón Stack Handler con tipo `CustomMiddleware` para encadenar middlewares de forma declarativa.
+- **Utilidad `chain.ts`**: Implementa el patrón de manejador en pila con tipo `CustomMiddleware` para encadenar middlewares de forma declarativa.
 
 ## 🔒 Sistema de Tipos Estricto
 
-Tipado end-to-end desde la base de datos hasta la UI:
+Tipado extremo a extremo desde la base de datos hasta la interfaz:
 
 - **Tipos de Dominio** (`src/types/domain.ts`): `Product`, `OrderItem`, `User`, `Order` con status y métodos de pago tipados.
-- **Enums con `as const`** (`src/types/enums.ts`): `OrderStatus` y `PaymentMethod` para tree-shaking óptimo.
-- **`ActionResponse<T>`** (`src/types/api.ts`): Tipo discriminado (union) para respuestas consistentes de Server Actions.
+- **Enums con `as const`** (`src/types/enums.ts`): `OrderStatus` y `PaymentMethod` para eliminación óptima de código muerto.
+- **`ActionResponse<T>`** (`src/types/api.ts`): Tipo discriminado (unión) para respuestas consistentes de Server Actions.
 - **Tipos de UI** (`src/types/ui.ts`): `ProductListProps`, `ClassNameProps`, `ChildrenProps` centralizados.
 - **Validación Isomórfica**: Esquemas Zod (`src/schemas/auth.ts`) compartidos entre cliente (`react-hook-form` + `zodResolver`) y servidor (Server Actions con `safeParse`).
-- **Error Map Global**: `src/lib/zod-error-map.ts` con traducción automática de errores de validación.
+- **Mapa de Errores Global**: `src/lib/zod-error-map.ts` con traducción automática de errores de validación.
 
 ## 🤖 DevOps & Automatización GitHub
 
@@ -136,12 +136,12 @@ src/
 │       ├── components/
 │       ├── hooks/
 │       ├── services/
-│       └── index.ts  # Public API
+│       └── index.ts  # API Pública
 ├── lib/              # Supabase clients, utilidades y helpers
-├── middlewares/      # Middleware chain (Security, Auth, i18n, RateLimit)
+├── middlewares/      # Cadena de middlewares (Seguridad, Auth, i18n, Límite de tasa)
 ├── schemas/          # Esquemas Zod (validación isomórfica)
 ├── types/            # Tipos de dominio, API, UI y enums
-├── middleware.ts     # Punto de entrada del middleware pipeline
+├── middleware.ts     # Punto de entrada de la cadena de middlewares
 └── scripts/          # Herramientas de IA y mantenimiento
 ```
 

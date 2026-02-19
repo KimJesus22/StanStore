@@ -123,6 +123,10 @@ interface ProductCardProps {
    * Si es true, muestra un estado de carga (skeleton).
    */
   isLoading?: boolean;
+  /**
+   * Si es true, precarga la imagen (usar en las primeras tarjetas visibles para mejorar LCP).
+   */
+  priority?: boolean;
 }
 
 const SkeletonCard = styled.div`
@@ -157,7 +161,7 @@ const OutOfStockOverlay = styled.div`
   border-radius: 12px;
 `;
 
-export default function ProductCard({ product, index = 0, isLoading = false }: ProductCardProps) {
+export default function ProductCard({ product, index = 0, isLoading = false, priority = false }: ProductCardProps) {
   const addToCart = useCartStore((state) => state.addToCart);
   const { formatPrice } = useCurrency();
 
@@ -218,7 +222,7 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
               product={product}
               fill
               sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
-              priority={false}
+              priority={priority}
               placeholder="blur"
               blurDataURL={BLUR_DATA_URL}
               style={{ objectFit: 'contain', filter: 'grayscale(100%)' }}
@@ -238,7 +242,7 @@ export default function ProductCard({ product, index = 0, isLoading = false }: P
               product={product}
               fill
               sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
-              priority={false}
+              priority={priority}
               placeholder="blur"
               blurDataURL={BLUR_DATA_URL}
               style={{ objectFit: 'contain' }}

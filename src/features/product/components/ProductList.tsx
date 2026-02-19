@@ -41,7 +41,7 @@ export default function ProductList({ products, loading, onReset }: ProductListP
     return (
         <Grid>
             {products.map((product, index) => (
-                <ProductCard key={product.id} product={product} index={index} />
+                <ProductCard key={product.id} product={product} index={index} priority={index < 4} />
             ))}
         </Grid>
     );

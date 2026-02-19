@@ -1,4 +1,6 @@
-import ArtistsContent from './ArtistsContent';
+import nextDynamic from 'next/dynamic';
+
+const ArtistsContent = nextDynamic(() => import('./ArtistsContent'), { ssr: false });
 
 export const dynamic = 'force-dynamic';
 
