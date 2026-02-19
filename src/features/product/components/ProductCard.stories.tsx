@@ -29,10 +29,9 @@ const theme = {
         secondaryBackground: "#f5f5f5",
         text: "#000000",
         primary: "#0070f3",
-        secondary: "#ff4081",
-        border: "#eaeaea",
         accent: "#0070f3",
-        muted: "#888888",
+        border: "#eaeaea",
+        textMuted: "#888888",
     },
 };
 
