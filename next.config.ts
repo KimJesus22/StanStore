@@ -17,6 +17,7 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  transpilePackages: ['styled-components'],
   turbopack: {},
   images: {
     // loader: 'custom',
