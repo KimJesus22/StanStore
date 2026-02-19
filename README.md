@@ -37,6 +37,9 @@ Implementada con un enfoque "Type-Safe" y optimizada para SEO:
 - **Rutas Localizadas**: Estructura `/[locale]/ruta` con detección automática de preferencia de idioma.
 - **Formateo Dinámico**: Uso de `useFormatter` para mostrar monedas (`PriceTag`), fechas y listas gramaticalmente correctas según el locale.
 - **Validaciones i18n**: Esquemas de **Zod** dinámicos que inyectan mensajes de error traducidos en tiempo real.
+- **Contenido Dinámico (JSONB)**: El servicio `getArtists` localiza campos JSONB (`bio`) con fallback automático a español.
+- **Páginas Estáticas en Markdown**: Páginas legales (`/terms`) renderizadas desde archivos `.md` por locale (`terms.es.md`, `terms.en.md`) con `gray-matter` + `remark`. Si el idioma no existe, se carga el español con un aviso visual.
+- **Cookie `NEXT_LOCALE`**: Gestionada automáticamente por el middleware `next-intl` para persistir la preferencia de idioma.
 
 ## ♿ Accesibilidad (A11y - WCAG 2.1 AA)
 
@@ -64,19 +67,82 @@ Diseñada para ser inclusiva y navegable por todos:
 - **Unit Testing**: Suite de Vitest optimizada con **Happy-DOM** para mayor compatibilidad de módulos ESM.
 - **Integración**: Pruebas de flujo completo con Playwright.
 - **Seguridad**: Escaneo de variables de entorno en tiempo de build (`npm run build`).
-- **Husky**: Pre-commit hooks para linting y tests locales.
+- **Husky**: Pre-commit hooks con `lint-staged` para linting (`eslint --fix`) y tests locales.
+- **Generación de Tipos**: Script `npm run update-types` para sincronizar tipos TypeScript desde el esquema de Supabase (`supabase gen types`).
+
+## 🏗️ Arquitectura Feature-Based
+
+El proyecto ha sido migrado a una arquitectura modular basada en **features**, donde cada dominio de negocio es un módulo autocontenido:
+
+```text
+src/features/
+├── auth/         # Autenticación (login, registro, sesión)
+├── product/      # Catálogo, servicios de artistas, búsqueda
+├── cart/         # Carrito de compras (store Zustand)
+└── checkout/     # Flujo de pago y órdenes
+```
+
+- **Public API (`index.ts`)**: Cada feature exporta únicamente lo necesario a través de su `index.ts`, ocultando la implementación interna.
+- **Boundary Enforcement**: Regla ESLint `no-restricted-imports` con patrón `@/features/*/*` que prohíbe importaciones profundas entre features.
+- **Alias de Ruta**: `@/features/*`, `@/ui/*`, `@/lib/*` configurados en `tsconfig.json` para imports limpios.
+
+## 🔗 Middleware Pipeline (Chain Pattern)
+
+El middleware de Next.js ha sido refactorizado en una **cadena composable** de responsabilidades:
+
+```text
+Request → withSecurityHeaders → withRateLimit → withAuth → withI18n → Response
+```
+
+| Middleware | Responsabilidad |
+|---|---|
+| `withSecurityHeaders` | CSP, HSTS, X-Frame-Options |
+| `withRateLimit` | Límite de peticiones por IP |
+| `withAuth` | Validación de sesión Supabase y protección de rutas |
+| `withI18n` | Detección de locale, cookie `NEXT_LOCALE`, reescritura de rutas |
+
+- **Matcher**: `/((?!api|_next|_vercel|.*\\..*).*)` — Excluye API, assets estáticos y archivos internos de Next.js.
+- **Utilidad `chain.ts`**: Implementa el patrón Stack Handler con tipo `CustomMiddleware` para encadenar middlewares de forma declarativa.
+
+## 🔒 Sistema de Tipos Estricto
+
+Tipado end-to-end desde la base de datos hasta la UI:
+
+- **Tipos de Dominio** (`src/types/domain.ts`): `Product`, `OrderItem`, `User`, `Order` con status y métodos de pago tipados.
+- **Enums con `as const`** (`src/types/enums.ts`): `OrderStatus` y `PaymentMethod` para tree-shaking óptimo.
+- **`ActionResponse<T>`** (`src/types/api.ts`): Tipo discriminado (union) para respuestas consistentes de Server Actions.
+- **Tipos de UI** (`src/types/ui.ts`): `ProductListProps`, `ClassNameProps`, `ChildrenProps` centralizados.
+- **Validación Isomórfica**: Esquemas Zod (`src/schemas/auth.ts`) compartidos entre cliente (`react-hook-form` + `zodResolver`) y servidor (Server Actions con `safeParse`).
+- **Error Map Global**: `src/lib/zod-error-map.ts` con traducción automática de errores de validación.
+
+## 🤖 DevOps & Automatización GitHub
+
+- **Dependabot** (`.github/dependabot.yml`): Actualización semanal de `npm` (lunes 09:00) y mensual de `github-actions`. Límite de 10 PRs abiertos.
+- **Auto-Merge** (`.github/workflows/dependabot-automerge.yml`): Merge automático de PRs de Dependabot para actualizaciones patch/minor que pasen CI.
+- **CodeQL** (`.github/workflows/codeql.yml`): Análisis estático de seguridad en push, PR y cron semanal.
+- **Secret Scanning & Push Protection**: Activado en el repositorio para bloquear pushes con secretos expuestos.
 
 
 ## 📂 Estructura del Proyecto
 
 ```text
 src/
-├── app/            # Rutas, Layouts e Internacionalización (next-intl)
-├── components/     # UI Atómica y Organismos complejos
-├── context/        # Estado global (Zustand) y Lógica de Negocio
-├── lib/            # Validaciones (Zod), Supabase y Utilidades
-├── middleware.ts   # Seguridad, Rate Limit y Localización
-└── scripts/        # Herramientas de IA y mantenimiento
+├── app/              # Rutas, Layouts e Internacionalización (next-intl)
+├── components/       # UI Atómica y Organismos complejos
+├── content/          # Contenido estático en Markdown (terms, privacy)
+├── context/          # Estado global (Zustand) y Lógica de Negocio
+├── features/         # Módulos de dominio (auth, product, cart, checkout)
+│   └── [feature]/
+│       ├── components/
+│       ├── hooks/
+│       ├── services/
+│       └── index.ts  # Public API
+├── lib/              # Supabase clients, utilidades y helpers
+├── middlewares/      # Middleware chain (Security, Auth, i18n, RateLimit)
+├── schemas/          # Esquemas Zod (validación isomórfica)
+├── types/            # Tipos de dominio, API, UI y enums
+├── middleware.ts     # Punto de entrada del middleware pipeline
+└── scripts/          # Herramientas de IA y mantenimiento
 ```
 
 ## 🛠️ Instalación y Desarrollo
