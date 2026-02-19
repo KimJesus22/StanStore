@@ -134,5 +134,24 @@
         "statusProcessing": "Processing",
         "statusShipped": "Shipped",
         "statusDelivered": "Delivered"
+    },
+    "Navigation": {
+        "home": "Home",
+        "products": "Products",
+        "artists": "Artists",
+        "search": "Search"
+    },
+    "Filters": {
+        "price": "Price",
+        "category": "Category",
+        "artist": "Artist",
+        "availability": "Availability",
+        "reset": "Clear filters",
+        "apply": "Apply"
+    },
+    "Errors": {
+        "generic": "An error occurred",
+        "notFound": "Page not found",
+        "unauthorized": "You don't have permission to view this page"
     }
 }

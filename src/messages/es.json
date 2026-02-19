@@ -134,5 +134,24 @@
         "statusProcessing": "En Preparación",
         "statusShipped": "Enviado",
         "statusDelivered": "Entregado"
+    },
+    "Navigation": {
+        "home": "Inicio",
+        "products": "Productos",
+        "artists": "Artistas",
+        "search": "Buscar"
+    },
+    "Filters": {
+        "price": "Precio",
+        "category": "Categoría",
+        "artist": "Artista",
+        "availability": "Disponibilidad",
+        "reset": "Limpiar filtros",
+        "apply": "Aplicar"
+    },
+    "Errors": {
+        "generic": "Ha ocurrido un error",
+        "notFound": "Página no encontrada",
+        "unauthorized": "No tienes permiso para ver esta página"
     }
 }
