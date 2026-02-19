@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { motion } from 'framer-motion';
 import { Activity, Zap, Clock, AlertOctagon, HeartPulse } from 'lucide-react';
 import { checkSystemHealth, HealthMetrics } from '@/app/actions/health';
+
+export const dynamic = 'force-dynamic';
 
 // --- Styled Components ---
 

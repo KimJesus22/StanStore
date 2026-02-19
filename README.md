@@ -24,6 +24,21 @@ A diferencia de las búsquedas tradicionales por texto exacto, StanStore utiliza
 - **Infraestructura**: Almacenamiento en columnas `vector(384)` con índices **HNSW** para búsquedas de alta velocidad.
 - **Mantenimiento**: Scripts incrementales en `scripts/generate-embeddings.ts` que procesan únicamente productos nuevos o editados mediante batch upserts.
 
+## 🛒 Checkout & Gamificación (Nuevas Características)
+
+### Refactorización del Checkout
+- **Validación Robusta**: Implementación de `react-hook-form` con esquemas **Zod** para validación en tiempo real y feedback inmediato.
+- **Cumplimiento Legal**: Checkbox obligatorio para aceptación de Términos y Política de Reembolso, con alerta visual de puntos clave (`TermsSummaryAlert`) sobre envíos internacionales.
+- **Optimización de Renderizado**: Carga dinámica (`lazy loading`) del formulario de checkout para reducir el Time-to-Interactive (TTI).
+
+### Gamificación y Social Sharing
+Potenciando la retención y el alcance orgánico en la página de éxito (`/success`):
+1. **Cupón de Recompensa**: Componente `NextPurchaseCoupon` que incentiva la recompra inmediata con un código de descuento (`STANFAN5`).
+2. **Difusión Social**: Componente `ShareToUnlock` con integración nativa para:
+    - **X (Twitter)**: Intentos de tweet precargados.
+    - **WhatsApp**: Mensajes directos pre-rellenados.
+    - **Clipboard**: Copiado rápido del enlace de la tienda.
+
 ## ⚡ Rendimiento y Experiencia de Usuario (Optimización LCP/CLS)
 
 - **ISR (Incremental Static Regeneration)**: Las páginas de catálogo y productos populares se pre-renderizan cada hora (`revalidate = 3600`), asegurando carga instantánea y SEO óptimo.
@@ -79,7 +94,9 @@ src/features/
 ├── auth/         # Autenticación (login, registro, sesión)
 ├── product/      # Catálogo, servicios de artistas, búsqueda
 ├── cart/         # Carrito de compras (store Zustand)
-└── checkout/     # Flujo de pago y órdenes
+├── checkout/     # Flujo de pago y órdenes (Zod schemas, validations)
+└── components/
+    └── gamification/ # ShareToUnlock, NextPurchaseCoupon
 ```
 
 - **API Pública (`index.ts`)**: Cada módulo exporta únicamente lo necesario a través de su `index.ts`, ocultando la implementación interna.

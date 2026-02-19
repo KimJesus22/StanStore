@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import ProofGrid from './ProofGrid';
 
-export const revalidate = 3600; // ISR: regenerate every hour
+export const dynamic = 'force-dynamic';
 
 export default async function ProofPage() {
     const supabase = await createClient();

@@ -3,10 +3,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase Client
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
-);
+// Initialize Supabase Client moved inside function
+// const supabase = createClient(...)
 
 export interface HealthMetrics {
     latency: number; // ms
@@ -21,6 +19,10 @@ export async function checkSystemHealth(): Promise<HealthMetrics> {
     let error = null;
 
     try {
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+            process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
+        );
         // Measure Supabase Latency: Simple lightweight query
         await supabase.from('products').select('count', { count: 'exact', head: true }).single();
     } catch (e) {

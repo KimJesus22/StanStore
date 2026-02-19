@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { initMercadoPago, Payment } from '@mercadopago/sdk-react';
+import type { IPaymentFormData } from '@mercadopago/sdk-react/esm/bricks/payment/type';
 import styled from 'styled-components';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useCartStore } from '@/features/cart';
@@ -47,11 +48,6 @@ const BrickContainer = styled.div`
 `;
 
 /* ─── Types ─── */
-
-interface MPFormData {
-    selectedPaymentMethod: string;
-    formData: Record<string, unknown>;
-}
 
 interface PaymentCheckoutProps {
     /** Called with the MP form data when the user submits the brick */
@@ -119,7 +115,8 @@ export default function PaymentCheckout({ onPaymentSuccess }: PaymentCheckoutPro
     }, []);
 
     const onSubmit = useCallback(
-        async ({ selectedPaymentMethod, formData }: MPFormData) => {
+        async (param: IPaymentFormData) => {
+            const { selectedPaymentMethod, formData } = param;
             setIsSubmitting(true);
             try {
                 console.log('Payment method selected:', selectedPaymentMethod);

@@ -4,9 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 
 // We need SERVICE_ROLE key to select/admin, but ANON key is enough to INSERT with our RLS policy.
 // However, creating a client inside action is standard.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Client creation moved inside action to avoid build-time side effects
+// const supabase = createClient(supabaseUrl, supabaseKey);
 
 export interface SecurityReport {
     title: string;
@@ -18,6 +17,10 @@ export interface SecurityReport {
 
 export async function submitSecurityReport(report: SecurityReport) {
     try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
         const { error } = await supabase
             .from('security_reports')
             .insert([report]);

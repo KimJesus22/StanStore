@@ -7,6 +7,8 @@ import { Shield, Lock, AlertTriangle, CheckCircle, Send } from 'lucide-react';
 import { submitSecurityReport, SecurityReport } from '@/app/actions/security';
 import toast from 'react-hot-toast';
 
+export const dynamic = 'force-dynamic';
+
 const Container = styled.div`
   max-width: 900px;
   margin: 0 auto;
