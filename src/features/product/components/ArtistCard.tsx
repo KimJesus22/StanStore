@@ -93,7 +93,7 @@ interface ArtistCardProps {
 }
 
 export default function ArtistCard({ artist }: ArtistCardProps) {
-    const href = `/?artist=${encodeURIComponent(artist.name)}`;
+    const href = { pathname: '/' as const, query: { artist: artist.name } };
     const productLabel = artist.products_count === 1 ? 'producto' : 'productos';
 
     return (
