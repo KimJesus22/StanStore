@@ -49,6 +49,7 @@
     "node_modules",
     "scripts",
     "supabase",
-    "src/schemas/generate-json-schema.ts"
+    "src/schemas/generate-json-schema.ts",
+    "src/schemas/test-auth.ts"
   ]
 }
