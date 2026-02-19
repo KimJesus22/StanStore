@@ -243,7 +243,7 @@ export default function AuthModal() {
 
         <Title>{isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión'}</Title>
 
-        <Form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit} noValidate>
           <InputGroup>
             <IconWrapper><Mail size={18} /></IconWrapper>
             <Input
@@ -252,7 +252,6 @@ export default function AuthModal() {
               aria-label="Correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               style={{ borderColor: errors.email ? '#ef4444' : '#e0e0e0' }}
             />
             {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
@@ -266,8 +265,6 @@ export default function AuthModal() {
               aria-label="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              minLength={6}
-              required
               style={{ borderColor: errors.password ? '#ef4444' : '#e0e0e0' }}
             />
             {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}

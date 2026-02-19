@@ -44,8 +44,8 @@ async function getTermsContent(locale: string) {
     };
 }
 
-export default async function TermsPage({ params }: { params: { locale: string } }) {
-    const { locale } = params;
+export default async function TermsPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const { title, date, contentHtml, isFallback } = await getTermsContent(locale);
 
     return (

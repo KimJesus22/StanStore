@@ -52,7 +52,7 @@ export default function ReviewForm({ productId, userId, onReviewSubmitted }: Rev
     };
 
     return (
-        <form onSubmit={handleSubmit} style={{ marginTop: '2rem', padding: '1.5rem', border: '1px solid #eee', borderRadius: '12px' }}>
+        <form onSubmit={handleSubmit} noValidate style={{ marginTop: '2rem', padding: '1.5rem', border: '1px solid #eee', borderRadius: '12px' }}>
             <h3 style={{ marginBottom: '1rem' }}>{t('writeReview')}</h3>
 
             <div style={{ marginBottom: '1rem' }}>
