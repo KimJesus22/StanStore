@@ -20,10 +20,22 @@ CREATE TABLE IF NOT EXISTS public.artists (
 -- 2. Row Level Security
 ALTER TABLE public.artists ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "Lectura pública de artistas"
-    ON public.artists FOR SELECT
-    TO anon, authenticated
-    USING (true);
+-- CREATE POLICY no soporta IF NOT EXISTS — usamos DO para hacerlo idempotente
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE schemaname = 'public'
+          AND tablename  = 'artists'
+          AND policyname = 'Lectura pública de artistas'
+    ) THEN
+        CREATE POLICY "Lectura pública de artistas"
+            ON public.artists FOR SELECT
+            TO anon, authenticated
+            USING (true);
+    END IF;
+END
+$$;
 
 -- 3. Índices para filtrado y ordenación eficientes
 CREATE INDEX IF NOT EXISTS idx_artists_genre      ON public.artists (genre);
