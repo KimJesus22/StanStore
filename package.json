@@ -88,7 +88,7 @@
     "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
-    "eslint-plugin-storybook": "^10.2.8",
+    "eslint-plugin-storybook": "^10.2.10",
     "happy-dom": "^20.6.2",
     "husky": "^9.1.7",
     "jsdom": "^28.1.0",
