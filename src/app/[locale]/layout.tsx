@@ -60,7 +60,6 @@ export const viewport: Viewport = {
   themeColor: "#10CFBD",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
 };
 
 export function generateStaticParams() {

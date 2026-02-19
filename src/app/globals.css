@@ -1,5 +1,3 @@
-/* swagger-ui importado aquí para que webpack no lo evalúe en el server bundle */
-@import 'swagger-ui-react/swagger-ui.css';
 
 * {
   box-sizing: border-box;
