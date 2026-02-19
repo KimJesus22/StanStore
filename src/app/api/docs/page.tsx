@@ -1,11 +1,13 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { AdminGuard } from '@/hooks/useAdmin';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 import 'swagger-ui-react/swagger-ui.css';
 
 // SwaggerUI debe cargarse dinámicamente porque usa window
-const SwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false });
+const SwaggerUI = nextDynamic(() => import('swagger-ui-react'), { ssr: false });
 
 export default function ApiDocs() {
     return (
