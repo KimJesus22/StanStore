@@ -38,6 +38,9 @@ export interface Database {
                     name: string
                     bio: Json | null // JSONB: { "es": "...", "en": "..." }
                     image_url: string | null
+                    genre: string | null
+                    popularity_score: number | null
+                    debut_date: string | null
                     created_at: string
                 }
                 Insert: {
@@ -45,6 +48,9 @@ export interface Database {
                     name: string
                     bio?: Json | null
                     image_url?: string | null
+                    genre?: string | null
+                    popularity_score?: number | null
+                    debut_date?: string | null
                     created_at?: string
                 }
                 Update: {
@@ -52,6 +58,9 @@ export interface Database {
                     name?: string
                     bio?: Json | null
                     image_url?: string | null
+                    genre?: string | null
+                    popularity_score?: number | null
+                    debut_date?: string | null
                     created_at?: string
                 }
             }

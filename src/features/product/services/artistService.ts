@@ -1,32 +1,64 @@
 import { supabase } from '@/lib/supabaseClient';
-import { Database } from '@/types/database.types';
-
-type ArtistRow = Database['public']['Tables']['artists']['Row'];
 
 export interface Artist {
     id: string;
     name: string;
-    bio: string; // Localized bio
+    bio: string;
     image_url: string | null;
+    products_count: number;
+    genre: string | null;
+    popularity_score: number | null;
+    debut_date: string | null;
 }
 
-export async function getArtists(locale: string = 'es'): Promise<Artist[]> {
+type OrderByField = 'name' | 'popularity_score' | 'debut_date';
+
+interface GetArtistsOptions {
+    genre?: string;
+    orderBy?: OrderByField;
+}
+
+export async function getArtists(
+    locale: string = 'es',
+    options: GetArtistsOptions = {}
+): Promise<Artist[]> {
+    const { genre, orderBy = 'name' } = options;
+
     try {
-        const { data, error } = await supabase
+        let query = supabase
             .from('artists')
-            .select('*')
-            .order('name');
+            .select(`
+                id,
+                name,
+                bio,
+                image_url,
+                genre,
+                popularity_score,
+                debut_date,
+                products(count)
+            `)
+            .order(orderBy, { ascending: orderBy === 'name' });
+
+        if (genre) {
+            query = query.eq('genre', genre);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
             console.error('Error fetching artists:', error);
             return [];
         }
 
-        return data.map((artist: ArtistRow) => ({
+        return (data ?? []).map((artist) => ({
             id: artist.id,
             name: artist.name,
             image_url: artist.image_url,
-            bio: getLocalizedContent(artist.bio as Record<string, string> | null, locale),
+            bio: getLocalizedBio(artist.bio as Record<string, string> | null, locale),
+            products_count: (artist.products as Array<{ count: number }>)?.[0]?.count ?? 0,
+            genre: artist.genre ?? null,
+            popularity_score: artist.popularity_score ?? null,
+            debut_date: artist.debut_date ?? null,
         }));
 
     } catch (err) {
@@ -35,9 +67,8 @@ export async function getArtists(locale: string = 'es'): Promise<Artist[]> {
     }
 }
 
-function getLocalizedContent(content: Record<string, string> | null, locale: string): string {
+function getLocalizedBio(content: Record<string, string> | null, locale: string): string {
     if (!content || typeof content !== 'object') return '';
-    // Opción A: JSONB mapping en frontend
-    // Intenta obtener el idioma solicitado, si no, fallback a 'es'
+    // Fallback: locale solicitado → español → cadena vacía
     return content[locale] || content['es'] || '';
 }
