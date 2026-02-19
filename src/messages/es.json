@@ -111,5 +111,19 @@
     },
     "RouteAnnouncer": {
         "navigatedTo": "Navegado a: {title}"
+    },
+    "TrackOrder": {
+        "title": "Rastrear Pedido",
+        "subtitle": "Ingresa tu número de pedido para ver el estado de tu envío.",
+        "placeholder": "Ej: ORD-2025-XXXXX",
+        "search": "Buscar",
+        "searching": "Buscando...",
+        "notFound": "No se encontró ningún pedido con el ID: {orderId}",
+        "help": "Si acabas de realizar tu compra, espera unos minutos e intenta de nuevo. Si el problema persiste, contáctanos.",
+        "statusExample": "Estados de envío:",
+        "statusConfirmed": "Pedido Confirmado",
+        "statusProcessing": "En Preparación",
+        "statusShipped": "Enviado",
+        "statusDelivered": "Entregado"
     }
 }

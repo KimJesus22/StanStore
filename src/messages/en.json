@@ -111,5 +111,19 @@
     },
     "RouteAnnouncer": {
         "navigatedTo": "Navigated to: {title}"
+    },
+    "TrackOrder": {
+        "title": "Track Order",
+        "subtitle": "Enter your order number to check the status of your shipment.",
+        "placeholder": "e.g. ORD-2025-XXXXX",
+        "search": "Search",
+        "searching": "Searching...",
+        "notFound": "No order found with ID: {orderId}",
+        "help": "If you just placed your order, wait a few minutes and try again. If the issue persists, contact us.",
+        "statusExample": "Shipping statuses:",
+        "statusConfirmed": "Order Confirmed",
+        "statusProcessing": "Processing",
+        "statusShipped": "Shipped",
+        "statusDelivered": "Delivered"
     }
 }

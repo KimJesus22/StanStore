@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Music, Users, TrendingUp, ExternalLink } from 'lucide-react';
 import ArtistSkeleton from '@/components/ui/ArtistSkeleton';
+import { useLocale } from 'next-intl';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -166,23 +167,33 @@ function formatFollowers(n: number): string {
 }
 
 export default function ArtistsPage() {
+  const locale = useLocale();
   const [artists, setArtists] = useState<Artist[]>([]);
   const [loading, setLoading] = useState(true);
+  const [debugError, setDebugError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/spotify/kpop')
-      .then(r => r.json())
+      .then(async (r) => {
+        if (!r.ok) {
+          const body = await r.text();
+          throw new Error(`API respondió ${r.status}: ${body}`);
+        }
+        return r.json();
+      })
       .then((data: { artists?: Artist[] }) => {
         console.log('Artists Data:', data);
-        if (data && Array.isArray(data.artists)) {
+        if (data && Array.isArray(data.artists) && data.artists.length > 0) {
           setArtists(data.artists);
         } else {
-          console.warn('Invalid artists data structure:', data);
+          console.warn('Invalid or empty artists data:', data);
+          setDebugError(`Data recibida pero sin artistas. Keys: ${JSON.stringify(Object.keys(data || {}))}`);
           setArtists([]);
         }
       })
       .catch(err => {
         console.error('Error loading artists:', err);
+        setDebugError(err.message || 'Error desconocido');
         setArtists([]);
       })
       .finally(() => setLoading(false));
@@ -247,8 +258,17 @@ export default function ArtistsPage() {
         </Grid>
       ) : (
         <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
-          <h2>No artists found</h2>
-          <p>Try refreshing the page or checking your connection.</p>
+          <h2 style={{ color: '#e74c3c', marginBottom: '1rem' }}>
+            Debug: No artists found for locale: {locale}
+          </h2>
+          {debugError && (
+            <p style={{ background: '#fff3cd', border: '1px solid #ffc107', padding: '1rem', borderRadius: '8px', color: '#856404', maxWidth: '600px', margin: '0 auto', fontSize: '0.9rem', wordBreak: 'break-word' }}>
+              <strong>Error:</strong> {debugError}
+            </p>
+          )}
+          <p style={{ marginTop: '1rem' }}>
+            Verifica que <code>SPOTIFY_CLIENT_ID</code> y <code>SPOTIFY_CLIENT_SECRET</code> estén configurados en las variables de entorno.
+          </p>
         </div>
       )}
     </PageContainer>
