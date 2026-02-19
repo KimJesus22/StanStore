@@ -1,11 +1,15 @@
 'use client';
 
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCartStore } from '@/features/cart';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useTranslations, useLocale } from 'next-intl';
 import toast from 'react-hot-toast';
+import { useReferralStore } from '@/features/referral';
+import { useAuth } from '@/features/auth';
+import { supabase } from '@/lib/supabaseClient';
+import { POINTS_REQUIRED, POINTS_DISCOUNT_MXN } from '@/features/cart';
 import Image from 'next/image';
 import { ArrowLeft, Loader2, Info } from 'lucide-react';
 import Link from 'next/link';
@@ -350,6 +354,80 @@ const TermsLabel = styled.label<{ $error?: boolean }>`
     }
 `;
 
+const PointsRedeemCard = styled.div<{ $active: boolean }>`
+    background: ${({ $active }) => ($active ? 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' : '#fafafa')};
+    border: 2px solid ${({ $active }) => ($active ? '#22c55e' : '#e5e7eb')};
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+        border-color: ${({ $active }) => ($active ? '#16a34a' : '#d1d5db')};
+    }
+`;
+
+const PointsToggle = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+`;
+
+const PointsInfo = styled.div`
+    flex: 1;
+`;
+
+const PointsTitle = styled.div`
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #111;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+`;
+
+const PointsSubtext = styled.div`
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.25rem;
+`;
+
+const ToggleSwitch = styled.button<{ $active: boolean }>`
+    width: 48px;
+    height: 28px;
+    border-radius: 14px;
+    border: none;
+    background: ${({ $active }) => ($active ? '#22c55e' : '#d1d5db')};
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: ${({ $active }) => ($active ? '23px' : '3px')};
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        transition: left 0.2s;
+    }
+`;
+
+const DiscountRow = styled.div`
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    color: #22c55e;
+    font-weight: 600;
+`;
+
 /* ─── Component ─── */
 
 export default function CheckoutForm() {
@@ -357,9 +435,43 @@ export default function CheckoutForm() {
     const { formatPrice } = useCurrency();
     const locale = useLocale();
     const t = useTranslations('Validations');
-    const tCheckout = useTranslations('Cart');
+    const tCheckout = useTranslations('Cart'); // eslint-disable-line @typescript-eslint/no-unused-vars
 
     const [loading, setLoading] = useState(false);
+    const referrerId = useReferralStore((s) => s.referrerId);
+    const clearReferrer = useReferralStore((s) => s.clearReferrer);
+    const { user } = useAuth();
+
+    // Points redemption state
+    const [userPoints, setUserPoints] = useState<number>(0);
+    const [usePoints, setUsePoints] = useState(false);
+    const [loadingPoints, setLoadingPoints] = useState(true);
+
+    // Fetch user's loyalty points
+    useEffect(() => {
+        async function fetchPoints() {
+            if (!user) {
+                setLoadingPoints(false);
+                return;
+            }
+            try {
+                const { data, error } = await supabase
+                    .from('user_rewards')
+                    .select('loyalty_points')
+                    .eq('id', user.id)
+                    .single();
+
+                if (!error && data) {
+                    setUserPoints(data.loyalty_points);
+                }
+            } catch (err) {
+                console.error('Error fetching points:', err);
+            } finally {
+                setLoadingPoints(false);
+            }
+        }
+        fetchPoints();
+    }, [user]);
 
     // Initialize React Hook Form
     const {
@@ -389,6 +501,8 @@ export default function CheckoutForm() {
     const watchedFields = watch();
 
     const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const discount = usePoints ? POINTS_DISCOUNT_MXN : 0;
+    const finalTotal = Math.max(0, total - discount);
 
     const onSubmit = async (data: CheckoutSchema) => {
         if (items.length === 0) {
@@ -420,7 +534,10 @@ export default function CheckoutForm() {
                     state: data.state,
                     country: data.country,
                     phone: data.phone,
-                }
+                },
+                referrerId || undefined,
+                usePoints,
+                user?.id
             );
 
             if (error) {
@@ -429,6 +546,7 @@ export default function CheckoutForm() {
             }
 
             if (url) {
+                clearReferrer();
                 window.location.href = url;
             }
         } catch (error) {
@@ -632,8 +750,44 @@ export default function CheckoutForm() {
                 ))}
 
                 <TotalRow>
-                    <span>Total</span>
+                    <span>Subtotal</span>
                     <span>{formatPrice(total)}</span>
+                </TotalRow>
+
+                {/* Points Redemption */}
+                {!loadingPoints && user && userPoints >= POINTS_REQUIRED && (
+                    <PointsRedeemCard
+                        $active={usePoints}
+                        onClick={() => setUsePoints(!usePoints)}
+                    >
+                        <PointsToggle>
+                            <PointsInfo>
+                                <PointsTitle>
+                                    🎁 Canjear Puntos
+                                </PointsTitle>
+                                <PointsSubtext>
+                                    Tienes {userPoints.toLocaleString()} pts — Canjea {POINTS_REQUIRED} por ${POINTS_DISCOUNT_MXN} MXN de descuento
+                                </PointsSubtext>
+                            </PointsInfo>
+                            <ToggleSwitch
+                                $active={usePoints}
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setUsePoints(!usePoints); }}
+                            />
+                        </PointsToggle>
+                    </PointsRedeemCard>
+                )}
+
+                {usePoints && (
+                    <DiscountRow>
+                        <span>Descuento Lealtad (-{POINTS_REQUIRED} pts)</span>
+                        <span>-{formatPrice(POINTS_DISCOUNT_MXN)}</span>
+                    </DiscountRow>
+                )}
+
+                <TotalRow style={{ borderTop: '2px solid #111', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                    <span style={{ fontWeight: 800 }}>Total</span>
+                    <span style={{ fontWeight: 800 }}>{formatPrice(finalTotal)}</span>
                 </TotalRow>
 
                 <PayButton
@@ -645,7 +799,7 @@ export default function CheckoutForm() {
                             <Loader2 size={18} className="animate-spin" /> Procesando...
                         </>
                     ) : (
-                        `Pagar ${formatPrice(total)}`
+                        `Pagar ${formatPrice(finalTotal)}`
                     )}
                 </PayButton>
             </SummaryPanel>

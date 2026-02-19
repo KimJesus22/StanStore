@@ -5,11 +5,18 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth';
 import { supabase } from '@/lib/supabaseClient';
 import styled from 'styled-components';
-import { User, LogOut, Package, Calendar, Download, Palette } from 'lucide-react';
+import { User, LogOut, Package, Calendar, Download, Palette, Trophy } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { getUserData } from '@/app/actions/privacy';
 import { useTheme } from '@/context/ThemeContext';
 import { useCurrency } from '@/context/CurrencyContext';
+
+ 
+const LoyaltyCard = dynamic(() => import('@/features/loyalty/components/LoyaltyCard'), {
+  ssr: false,
+  loading: () => <div style={{ background: '#fff', borderRadius: '20px', padding: '3rem', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginBottom: '2rem', textAlign: 'center', color: '#888' }}>Cargando programa de lealtad...</div>,
+});
 
 
 const Container = styled.div`
@@ -325,6 +332,12 @@ export default function ProfilePage() {
           </LogoutButton>
         </ActionButtons>
       </ProfileCard>
+
+      {/* Loyalty Program */}
+      <SectionTitle>
+        <Trophy color="#FFD700" size={20} /> Programa de Lealtad
+      </SectionTitle>
+      <LoyaltyCard userId={user.id} />
 
       <SectionTitle>
         <Palette size={20} /> Personalización

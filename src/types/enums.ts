@@ -20,3 +20,11 @@ export const PaymentMethod = {
 } as const;
 
 export type PaymentMethod = typeof PaymentMethod[keyof typeof PaymentMethod];
+
+export const LoyaltyTier = {
+    BRONZE: 'BRONZE',
+    SILVER: 'SILVER',
+    GOLD: 'GOLD',
+} as const;
+
+export type LoyaltyTier = typeof LoyaltyTier[keyof typeof LoyaltyTier];

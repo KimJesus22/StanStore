@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import { useCartStore } from '@/features/cart';
 import { useCart } from '@/features/cart';
 import { Minus, Plus, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { useReferralStore, ShareButton } from '@/features/referral';
 import { Link } from '@/navigation';
 import toast from 'react-hot-toast';
 import { Product } from '@/types';
@@ -281,6 +283,16 @@ export default function ProductDetails({ product }: { product: Product }) {
   const [canReview, setCanReview] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [isFanMode, setIsFanMode] = useState(false);
+  const searchParams = useSearchParams();
+  const setReferrer = useReferralStore((s) => s.setReferrer);
+
+  // Capture ?ref= param from URL
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) {
+      setReferrer(ref);
+    }
+  }, [searchParams, setReferrer]);
 
   useEffect(() => {
     const checkUserEligibility = async () => {
@@ -480,6 +492,12 @@ export default function ProductDetails({ product }: { product: Product }) {
             {isOutOfStock ? t('outOfStock') : t('addToCart')}
           </AddToCartButton>
         </Controls>
+
+        <ShareButton
+          productId={product.id}
+          productName={product.name}
+          userId={userId}
+        />
 
         {product.spotify_album_id && (
           <SpotifyPlayer albumId={product.spotify_album_id} />
