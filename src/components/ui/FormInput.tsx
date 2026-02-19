@@ -7,16 +7,16 @@ import { UseFormRegisterReturn, FieldError } from 'react-hook-form';
 import { useZodErrorTranslation } from '@/hooks/useZodErrorTranslation';
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    /** Texto del label visible */
-    label: string;
-    /** Nombre del campo (usado para htmlFor, id, aria-describedby) */
-    name: string;
-    /** Resultado de register('fieldName') de React Hook Form */
-    register: UseFormRegisterReturn;
-    /** Objeto de error del campo (formState.errors.fieldName) */
-    error?: FieldError;
-    /** Icono opcional a la izquierda del input */
-    icon?: React.ReactNode;
+  /** Texto del label visible */
+  label: string;
+  /** Nombre del campo (usado para htmlFor, id, aria-describedby) */
+  name: string;
+  /** Resultado de register('fieldName') de React Hook Form */
+  register: UseFormRegisterReturn;
+  /** Objeto de error del campo (formState.errors.fieldName) */
+  error?: FieldError;
+  /** Icono opcional a la izquierda del input */
+  icon?: React.ReactNode;
 }
 
 const Wrapper = styled.div`
@@ -41,7 +41,7 @@ const IconWrapper = styled.div`
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: ${({ theme }) => theme.colors.text}60;
+  color: ${({ theme }) => theme.colors.text}70;
   pointer-events: none;
   display: flex;
   align-items: center;
@@ -65,7 +65,7 @@ const StyledInput = styled.input<{ $hasError: boolean; $hasIcon: boolean }>`
   }
 
   &::placeholder {
-    color: ${({ theme }) => theme.colors.text}50;
+    color: ${({ theme }) => theme.colors.text}70;
   }
 `;
 
@@ -99,38 +99,38 @@ const ErrorMessage = styled.span`
  * />
  */
 export default function FormInput({
-    label,
-    name,
-    register,
-    error,
-    icon,
-    ...inputProps
+  label,
+  name,
+  register,
+  error,
+  icon,
+  ...inputProps
 }: FormInputProps) {
-    const translateError = useZodErrorTranslation();
-    const errorMessage = translateError(error);
-    const errorId = `${name}-error`;
+  const translateError = useZodErrorTranslation();
+  const errorMessage = translateError(error);
+  const errorId = `${name}-error`;
 
-    return (
-        <Wrapper>
-            <Label htmlFor={name}>{label}</Label>
-            <InputContainer>
-                {icon && <IconWrapper>{icon}</IconWrapper>}
-                <StyledInput
-                    id={name}
-                    $hasError={!!error}
-                    $hasIcon={!!icon}
-                    aria-invalid={!!error}
-                    aria-describedby={error ? errorId : undefined}
-                    {...register}
-                    {...inputProps}
-                />
-            </InputContainer>
-            {error && errorMessage && (
-                <ErrorMessage id={errorId} role="alert">
-                    <AlertCircle size={14} />
-                    {errorMessage}
-                </ErrorMessage>
-            )}
-        </Wrapper>
-    );
+  return (
+    <Wrapper>
+      <Label htmlFor={name}>{label}</Label>
+      <InputContainer>
+        {icon && <IconWrapper>{icon}</IconWrapper>}
+        <StyledInput
+          id={name}
+          $hasError={!!error}
+          $hasIcon={!!icon}
+          aria-invalid={!!error}
+          aria-describedby={error ? errorId : undefined}
+          {...register}
+          {...inputProps}
+        />
+      </InputContainer>
+      {error && errorMessage && (
+        <ErrorMessage id={errorId} role="alert">
+          <AlertCircle size={14} />
+          {errorMessage}
+        </ErrorMessage>
+      )}
+    </Wrapper>
+  );
 }
