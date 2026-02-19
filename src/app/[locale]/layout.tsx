@@ -103,7 +103,7 @@ export default async function LocaleLayout({
                     <WebVitals />
                     <CartDrawer />
                     <DynamicInstallPrompt />
-                    <main id="content">
+                    <main id="content" aria-label="Contenido principal">
                       {children}
                     </main>
                     <Footer />

@@ -34,7 +34,7 @@ const RightSection = styled.div`
 
 export default function Navbar() {
   return (
-    <Nav>
+    <Nav aria-label="Navegación principal">
       <HeaderLogo />
       <RightSection>
         <HeaderSearch />

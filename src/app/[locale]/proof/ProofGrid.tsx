@@ -23,7 +23,7 @@ interface ProofGridProps {
 
 /* ─── Styled Components ─── */
 
-const Page = styled.main`
+const Page = styled.div`
     max-width: 1200px;
     margin: 0 auto;
     padding: 3rem 1.5rem 5rem;
