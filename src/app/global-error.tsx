@@ -1,63 +1,7 @@
 'use client';
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
-import Error from "next/error";
-import styled from 'styled-components';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background-color: #f8f9fa;
-  color: #333;
-  font-family: 'Inter', sans-serif;
-  padding: 2rem;
-  text-align: center;
-`;
-
-const Title = styled.h2`
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 1rem;
-  color: #ff4081; /* K-Pop vibrant pink */
-`;
-
-const Message = styled.p`
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-  color: #666;
-  max-width: 600px;
-`;
-
-const RetryButton = styled.button`
-  background: linear-gradient(135deg, #10CFBD 0%, #0ebac5 100%);
-  color: white;
-  border: none;
-  padding: 0.8rem 2rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 15px rgba(16, 207, 189, 0.4);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(16, 207, 189, 0.6);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-const Illustration = styled.div`
-  font-size: 4rem;
-  margin-bottom: 1rem;
-`;
 
 export default function GlobalError({
   error,
@@ -73,17 +17,53 @@ export default function GlobalError({
   return (
     <html>
       <body>
-        <Container>
-          <Illustration>💔</Illustration>
-          <Title>¡Oops! Algo salió mal</Title>
-          <Message>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          backgroundColor: '#f8f9fa',
+          color: '#333',
+          fontFamily: "'Inter', sans-serif",
+          padding: '2rem',
+          textAlign: 'center',
+        }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>💔</div>
+          <h2 style={{
+            fontSize: '2.5rem',
+            fontWeight: 800,
+            marginBottom: '1rem',
+            color: '#ff4081',
+          }}>
+            ¡Oops! Algo salió mal
+          </h2>
+          <p style={{
+            fontSize: '1.2rem',
+            marginBottom: '2rem',
+            color: '#666',
+            maxWidth: '600px',
+          }}>
             Lo sentimos, ha ocurrido un error inesperado al cargar la página.
-            Nuestro equipo de fans ya está investigando.
-          </Message>
-          <RetryButton onClick={() => reset()}>
+            Nuestro equipo de desarrolladores ya está investigando.
+          </p>
+          <button
+            onClick={() => reset()}
+            style={{
+              background: 'linear-gradient(135deg, #10CFBD 0%, #0ebac5 100%)',
+              color: 'white',
+              border: 'none',
+              padding: '0.8rem 2rem',
+              fontSize: '1.1rem',
+              fontWeight: 600,
+              borderRadius: '50px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(16, 207, 189, 0.4)',
+            }}
+          >
             Intentar de nuevo
-          </RetryButton>
-        </Container>
+          </button>
+        </div>
       </body>
     </html>
   );
