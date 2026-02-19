@@ -8,7 +8,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useTranslations } from 'next-intl';
 import { AnimatePresence, motion } from 'framer-motion';
-import Spinner from '@/components/Spinner';
+import Spinner from '@/components/ui/Spinner';
 
 const SearchContainer = styled.div<{ $isOpen: boolean }>`
   position: relative;

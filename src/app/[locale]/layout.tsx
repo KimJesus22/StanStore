@@ -4,8 +4,8 @@ import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server
 import { notFound } from 'next/navigation';
 import StyledComponentsRegistry from '@/lib/registry';
 import Navbar from '@/components/Navbar';
-import CartDrawer from '@/components/CartDrawer';
-import AuthProvider from '@/components/AuthProvider';
+import { CartDrawer } from '@/features/cart';
+import { AuthProvider } from '@/features/auth';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 import { Toaster } from 'react-hot-toast';

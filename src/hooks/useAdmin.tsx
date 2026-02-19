@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAuth } from '@/features/auth';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 
 export function useAdmin() {
-    const { user, isLoading: isAuthLoading } = useAuthStore();
+    const { user, isLoading: isAuthLoading } = useAuth();
     const [isAdmin, setIsAdmin] = useState(false);
     const [checking, setChecking] = useState(true);
 

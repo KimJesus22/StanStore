@@ -14,6 +14,21 @@ const eslintConfig = defineConfig([...nextVitals, ...nextTs, {
     "jsx-a11y/click-events-have-key-events": "error",
     "jsx-a11y/no-static-element-interactions": "error",
     "jsx-a11y/anchor-is-valid": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        patterns: [
+          {
+            group: ["@/features/*/*"],
+            message: "Por favor usa el Public API del feature (ej: @/features/auth) en lugar de importar archivos internos directamente."
+          },
+          {
+            group: ["@/store/*"],
+            message: "Stores deprecados. Usa hooks dentro de @/features."
+          }
+        ]
+      }
+    ]
   },
 }, // Override default ignores of eslint-config-next.
 globalIgnores([
@@ -27,6 +42,7 @@ globalIgnores([
   "public/swe-worker-*.js",
   "public/workbox-*.js",
   "storybook-static/**",
+  "scripts/**"
 ]), ...storybook.configs["flat/recommended"]]);
 
 export default eslintConfig;

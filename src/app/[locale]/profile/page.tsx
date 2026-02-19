@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAuth } from '@/features/auth';
 import { supabase } from '@/lib/supabaseClient';
 import styled from 'styled-components';
 import { User, LogOut, Package, Calendar, Download, Palette } from 'lucide-react';
@@ -170,7 +170,7 @@ interface Order {
 }
 
 export default function ProfilePage() {
-  const { user, isLoading, signOut, openAuthModal } = useAuthStore();
+  const { user, isLoading, signOut, openAuthModal } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { formatPrice } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -219,7 +219,7 @@ export default function ProfilePage() {
   // Load profile data (decrypted)
   useEffect(() => {
     async function loadProfile() {
-      const session = useAuthStore.getState().session;
+      const session = useAuth.getState().session;
       if (!user || !session?.access_token) return;
       try {
         // Dynamically import server action to avoid build issues if mixed
@@ -240,7 +240,7 @@ export default function ProfilePage() {
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    const session = useAuthStore.getState().session;
+    const session = useAuth.getState().session;
     if (!session?.access_token) {
       toast.error('Sesión no válida');
       return;

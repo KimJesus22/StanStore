@@ -4,8 +4,8 @@ import { useEffect, useState, Suspense } from 'react';
 import styled from 'styled-components';
 import { CheckCircle, Loader2, FileText } from 'lucide-react';
 import Link from 'next/link';
-import { useCartStore } from '@/store/useCartStore';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/features/cart';
+import { useAuth } from '@/features/auth';
 import { useSearchParams } from 'next/navigation';
 import { saveOrder } from '@/app/actions/orders';
 import toast from 'react-hot-toast';
@@ -51,7 +51,7 @@ const Button = styled(Link)`
 
 function SuccessContent() {
   const { items, clearCart } = useCartStore();
-  const { user, isLoading: authLoading } = useAuthStore();
+  const { user, isLoading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
 

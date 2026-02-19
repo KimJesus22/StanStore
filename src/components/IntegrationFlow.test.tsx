@@ -3,13 +3,11 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import HeaderSearch from './header/HeaderSearch';
-import SearchResults from './SearchResults';
-import ProductDetails from './ProductDetails';
-import CartDrawer from './CartDrawer';
-import { useCartStore } from '@/store/useCartStore';
+import { SearchResults, ProductDetails } from '@/features/product';
+import { CartDrawer, useCartStore } from '@/features/cart'; // Fixed import
 import { ThemeProvider } from 'styled-components';
 import { lightTheme } from '../theme'; // Relative path since file is in src/components
-import { Product } from '../types';
+import type { Product } from '../types';
 
 const mockAddToCart = vi.fn();
 // Default mock implementation
@@ -21,9 +19,13 @@ const mockUseCartFn = vi.fn(() => ({
     data: [] as any[], // Default empty
 }));
 
-vi.mock('@/hooks/useCart', () => ({
-    useCart: () => mockUseCartFn(),
-}));
+vi.mock('@/features/cart', async () => {
+    const actual = await vi.importActual('@/features/cart');
+    return {
+        ...actual,
+        useCart: () => mockUseCartFn(),
+    };
+});
 
 // --- Mocks ---
 

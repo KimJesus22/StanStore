@@ -1,18 +1,17 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { mockProducts } from '@/data/mockData';
-import ProductCard from '@/components/ProductCard';
-import ProductSkeleton from '@/components/ProductSkeleton';
-import FilterSidebar from '@/components/FilterSidebar';
-import SortSelector from '@/components/SortSelector';
-import { supabase } from '@/lib/supabaseClient';
-import type { Product } from '@/types';
 import { useTranslations } from 'next-intl';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
-import NoResultsFound from '@/components/NoResultsFound';
+import {
+    ProductList,
+    FilterSidebar,
+    SortSelector,
+    useProductFilters,
+    useProducts,
+    useArtists
+} from '@/features/product';
 
 const Main = styled.main`
   max-width: 1400px;
@@ -62,19 +61,6 @@ const ControlsContainer = styled.div`
   justify-content: flex-end;
   margin-bottom: 1.5rem;
 `;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 2rem;
-  
-  @media (max-width: 480px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-`;
-
-
 
 // Styled Components for Mobile
 const MobileFilterButton = styled.button`
@@ -162,81 +148,14 @@ const DesktopSidebarWrapper = styled.div`
 
 export default function Home() {
     const t = useTranslations('Home');
-    const searchParams = useSearchParams();
-    const router = useRouter();
-    const pathname = usePathname();
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-    // URL State
-    const currentSort = searchParams.get('sort') || 'newest';
-    const artistParamString = searchParams.get('artist');
-    const categoryParamString = searchParams.get('category');
+    // Hooks from Feature
+    const { filters, handlers } = useProductFilters();
+    const { products, loading } = useProducts(filters);
+    const { artists } = useArtists();
 
-    // Memoize array params to prevent unnecessary re-renders/fetches
-    const artistParams = useMemo(() =>
-        artistParamString ? artistParamString.split(',').filter(Boolean) : [],
-        [artistParamString]);
-
-    const categoryParams = useMemo(() =>
-        categoryParamString ? categoryParamString.split(',').filter(Boolean) : [],
-        [categoryParamString]);
-
-    const stockParam = searchParams.get('stock') === 'true';
-    const minPriceParam = searchParams.get('min') || '';
-    const maxPriceParam = searchParams.get('max') || '';
-
-    const [products, setProducts] = useState<Product[]>([]);
-    const [allArtists, setAllArtists] = useState<string[]>([]); // Derived from full dataset roughly or specific query
-    const [loading, setLoading] = useState(true);
-    const [isFilterOpen, setIsFilterOpen] = useState(false); // Mobile drawer state
-
-    // Helper to close drawer when applying filters (optional strategy, currently instant)
-    // We can auto-close or let user click 'View Results'.
-
-    // Update URL helper
-    const updateUrl = useCallback((key: string, value: string | null) => {
-        const params = new URLSearchParams(searchParams.toString());
-        if (value) {
-            params.set(key, value);
-        } else {
-            params.delete(key);
-        }
-        // Reset page if we had pagination? (not implemented yet)
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
-    }, [searchParams, router, pathname]);
-
-    // Handlers
-    const handleSortChange = (sort: string) => updateUrl('sort', sort);
-
-    const handleArtistChange = (artist: string) => {
-        const newArtists = artistParams.includes(artist)
-            ? artistParams.filter(a => a !== artist)
-            : [...artistParams, artist];
-        updateUrl('artist', newArtists.length > 0 ? newArtists.join(',') : null);
-    };
-
-    const handleCategoryChange = (category: string) => {
-        const newCategories = categoryParams.includes(category)
-            ? categoryParams.filter(c => c !== category)
-            : [...categoryParams, category];
-        updateUrl('category', newCategories.length > 0 ? newCategories.join(',') : null);
-    };
-
-    const handleStockChange = (checked: boolean) => {
-        updateUrl('stock', checked ? 'true' : null);
-    };
-
-    const handlePriceChange = (min: string, max: string) => {
-        const params = new URLSearchParams(searchParams.toString());
-        if (min) params.set('min', min); else params.delete('min');
-        if (max) params.set('max', max); else params.delete('max');
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
-    };
-
-    const handleReset = () => {
-        router.push(pathname);
-    };
-
-    // Close drawer on resize to desktop (cleanup)
+    // Close drawer on resize to desktop
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth > 768) {
@@ -247,93 +166,17 @@ export default function Home() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Fetch Unique Artists for Sidebar (Ideally this is a separate RPC or table query)
-    useEffect(() => {
-        const fetchArtists = async () => {
-            const { data } = await supabase.from('products').select('artist');
-            if (data) {
-                const unique = Array.from(new Set(data.map(p => p.artist))).sort();
-                setAllArtists(unique);
-            } else {
-                // Fallback to mock
-                const unique = Array.from(new Set(mockProducts.map(p => p.artist))).sort();
-                setAllArtists(unique);
-            }
-        };
-        fetchArtists();
-    }, []);
-
-    const fetchProducts = useCallback(async () => {
-        setLoading(true);
-        try {
-            let query = supabase.from('products').select('*');
-
-            // Apply Filters
-            if (artistParams.length > 0) {
-                query = query.in('artist', artistParams);
-            }
-            if (categoryParams.length > 0) {
-                query = query.in('category', categoryParams);
-            }
-            if (stockParam) {
-                query = query.gt('stock', 0);
-            }
-            if (minPriceParam) {
-                query = query.gte('price', parseFloat(minPriceParam));
-            }
-            if (maxPriceParam) {
-                query = query.lte('price', parseFloat(maxPriceParam));
-            }
-
-            // Apply Sorting
-            switch (currentSort) {
-                case 'price_asc':
-                    query = query.order('price', { ascending: true });
-                    break;
-                case 'price_desc':
-                    query = query.order('price', { ascending: false });
-                    break;
-                case 'alphabetical':
-                    query = query.order('name', { ascending: true });
-                    break;
-                case 'newest':
-                default:
-                    query = query.order('created_at', { ascending: false });
-                    break;
-            }
-
-            const { data, error } = await query;
-
-            if (error) {
-                console.error('Supabase query error:', error);
-                setProducts(mockProducts); // Fallback relies on client filtering (omitted for brevity in this block, assumed mostly DB driven)
-            } else {
-                setProducts(data as Product[]);
-            }
-
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            setProducts(mockProducts);
-        } finally {
-            setLoading(false);
-        }
-    }, [currentSort, artistParams, categoryParams, stockParam, minPriceParam, maxPriceParam]);
-
-    useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts]);
-
     const commonFilterProps = {
-        artists: allArtists,
-        selectedArtists: artistParams,
-        selectedCategories: categoryParams,
-        inStockOnly: stockParam,
-        priceRange: { min: minPriceParam, max: maxPriceParam },
-        onArtistChange: handleArtistChange,
-        onCategoryChange: handleCategoryChange,
-        onStockChange: handleStockChange,
-        onPriceChange: handlePriceChange,
-        onReset: handleReset
+        artists,
+        selectedArtists: filters.artists,
+        selectedCategories: filters.categories,
+        inStockOnly: filters.stock,
+        priceRange: filters.price,
+        onArtistChange: handlers.onArtistChange,
+        onCategoryChange: handlers.onCategoryChange,
+        onStockChange: handlers.onStockChange,
+        onPriceChange: handlers.onPriceChange,
+        onReset: handlers.onReset
     };
 
     return (
@@ -370,30 +213,16 @@ export default function Home() {
                 <ProductSection>
                     <ControlsContainer>
                         <SortSelector
-                            currentSort={currentSort}
-                            onSortChange={handleSortChange}
+                            currentSort={filters.sort}
+                            onSortChange={handlers.onSortChange}
                         />
                     </ControlsContainer>
 
-                    {loading ? (
-                        <Grid>
-                            {Array.from({ length: 6 }).map((_, i) => (
-                                <ProductSkeleton key={i} />
-                            ))}
-                        </Grid>
-                    ) : (
-                        <>
-                            {products.length > 0 ? (
-                                <Grid>
-                                    {products.map((product, index) => (
-                                        <ProductCard key={product.id} product={product} index={index} />
-                                    ))}
-                                </Grid>
-                            ) : (
-                                <NoResultsFound onReset={handleReset} />
-                            )}
-                        </>
-                    )}
+                    <ProductList
+                        products={products}
+                        loading={loading}
+                        onReset={handlers.onReset}
+                    />
                 </ProductSection>
             </ContentLayout>
         </Main>

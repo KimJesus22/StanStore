@@ -4,8 +4,8 @@ import styled from 'styled-components';
 import { Link, useRouter } from '@/navigation';
 import { ShoppingCart, User, Shield, Music } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useCartStore } from '@/store/useCartStore';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/features/cart';
+import { useAuth } from '@/features/auth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from '../LanguageSwitcher';
@@ -76,7 +76,7 @@ const RelativeContainer = styled.div`
 export default function HeaderNav() {
     const t = useTranslations('Navbar');
     const { items, toggleCart } = useCartStore();
-    const { user, openAuthModal } = useAuthStore();
+    const { user, openAuthModal } = useAuth();
     const { isAdmin } = useAdmin();
     const [mounted, setMounted] = useState(false);
     const router = useRouter();

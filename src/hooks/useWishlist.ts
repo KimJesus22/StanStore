@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAuth } from '@/features/auth';
 import { Product } from '@/types';
 
 export interface WishlistItem extends Product {
@@ -15,7 +15,7 @@ const fetchWishlist = async (): Promise<WishlistItem[]> => {
 };
 
 export const useWishlist = () => {
-    const user = useAuthStore((state) => state.user);
+    const user = useAuth((state) => state.user);
 
     return useQuery({
         queryKey: ['wishlist', user?.id],
