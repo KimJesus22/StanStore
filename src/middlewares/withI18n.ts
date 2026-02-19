@@ -6,7 +6,8 @@ import { MiddlewareFactory } from './chain';
 const intlMiddleware = createMiddleware({
     locales,
     defaultLocale: 'es',
-    localePrefix,
+    localeDetection: true,  // Lee automáticamente el header Accept-Language
+    localePrefix,           // 'always' → /es/home, /en/home (mejor SEO)
     pathnames
 });
 
