@@ -28,9 +28,15 @@ export default async function ProofPage() {
         .select('*', { count: 'exact', head: true })
         .eq('status_type', 'SUCCESS');
 
+    const formattedUpdates = updates?.map(u => ({
+        ...u,
+        group_orders: Array.isArray(u.group_orders) ? u.group_orders[0] : u.group_orders
+    })) ?? [];
+
     return (
         <ProofGrid
-            updates={updates ?? []}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            updates={formattedUpdates as any}
             totalDelivered={totalDelivered ?? 0}
         />
     );
