@@ -110,6 +110,9 @@
             "message": "Intenta ajustar tus filtros o buscar algo diferente.",
             "reset": "Borrar todos los filtros",
             "popular": "Productos Populares"
+        },
+        "common": {
+            "close": "Cerrar"
         }
     },
     "Metadata": {
