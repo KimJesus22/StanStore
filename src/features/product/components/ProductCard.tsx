@@ -51,8 +51,8 @@ const ImageContainer = styled.div`
 `;
 
 const Artist = styled.span`
-  font-size: 0.8rem;
-  color: ${({ theme }) => theme.colors.text}; /* Removed opacity for max contrast */
+  font-size: 0.875rem;
+  color: ${({ theme }) => theme.colors.text};
   margin-bottom: 0.25rem;
   text-transform: uppercase;
   font-weight: 600;

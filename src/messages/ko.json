@@ -2,6 +2,7 @@
     "Navbar": {
         "home": "홈",
         "search": "검색",
+        "clearSearch": "검색 지우기",
         "profile": "프로필",
         "cart": "장바구니",
         "login": "로그인",
@@ -49,7 +50,8 @@
         "title": "장바구니",
         "empty": "장바구니가 비어 있습니다",
         "total": "합계",
-        "checkout": "결제하기"
+        "checkout": "결제하기",
+        "close": "장바구니 닫기"
     },
     "Home": {
         "title": "신상품",

@@ -59,13 +59,27 @@ const CloseButton = styled.button`
   border: none;
   cursor: pointer;
   color: ${({ theme }) => theme.colors.text};
-  padding: 0.5rem;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.625rem;
   border-radius: 50%;
-  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.secondaryBackground};
     color: ${({ theme }) => theme.colors.primary};
+  }
+
+  &:active {
+    background-color: ${({ theme }) => theme.colors.border};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.primary};
+    outline-offset: 2px;
   }
 `;
 

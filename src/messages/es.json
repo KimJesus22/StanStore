@@ -2,6 +2,7 @@
     "Navbar": {
         "home": "Inicio",
         "search": "Buscar",
+        "clearSearch": "Limpiar búsqueda",
         "profile": "Perfil",
         "cart": "Carrito",
         "login": "Iniciar Sesión",
@@ -16,12 +17,12 @@
         "welcome": "¡Bienvenido de nuevo!"
     },
     "Validations": {
-        "required": "Este campo es requerido",
-        "email": "El correo electrónico no es válido",
-        "passwordMin": "La contraseña debe tener al menos {min} caracteres",
-        "passwordUppercase": "Debe contener al menos una mayúscula",
-        "passwordNumber": "Debe contener al menos un número",
-        "searchMax": "La búsqueda es demasiado larga"
+        "required": "Este campo es obligatorio, por favor complétalo",
+        "email": "Por favor, ingresa un correo electrónico válido para recibir tu recibo",
+        "passwordMin": "La contraseña debe tener al menos {min} caracteres por seguridad",
+        "passwordUppercase": "Agrega al menos una letra mayúscula a tu contraseña",
+        "passwordNumber": "Agrega al menos un número a tu contraseña",
+        "searchMax": "La búsqueda no puede superar los {max} caracteres"
     },
     "Validation": {
         "required": "Este campo es requerido",
@@ -55,7 +56,8 @@
         "title": "Tu Carrito",
         "empty": "Tu carrito está vacío",
         "total": "Total",
-        "checkout": "Pagar"
+        "checkout": "Pagar",
+        "close": "Cerrar carrito"
     },
     "Home": {
         "title": "Novedades",

@@ -10,11 +10,30 @@ export const GlobalStyles = createGlobalStyle`
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }
 
-  /* Foco visible de alto contraste para accesibilidad */
+  /* ── Foco visible WCAG 2.1 AA (2.4.7 / 2.4.11) ─────────────────────────
+     Solo se activa con teclado (Tab/Shift+Tab), nunca con clic de ratón.
+     ──────────────────────────────────────────────────────────────────────── */
   :focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.text};
+    outline: 2px solid ${({ theme }) => theme.colors.primary};
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Botones: outline más pegado al borde redondeado del componente */
+  button:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.primary};
     outline-offset: 2px;
-    box-shadow: 0 0 0 4px ${({ theme }) => theme.colors.background};
+    border-radius: 6px;
+  }
+
+  /* Inputs, selects, textareas */
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.primary};
+    outline-offset: 1px;
+    border-radius: 4px;
   }
 
   a {

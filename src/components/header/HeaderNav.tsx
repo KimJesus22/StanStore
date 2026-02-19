@@ -131,7 +131,7 @@ export default function HeaderNav() {
                     </IconWrapper>
                 </>
             ) : (
-                <IconWrapper>
+                <IconWrapper aria-label="Iniciar Sesión">
                     <User />
                 </IconWrapper>
             )}

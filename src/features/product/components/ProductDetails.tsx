@@ -89,7 +89,7 @@ const BackLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: ${({ theme }) => theme.colors.text}E6; /* ~90% opacity */
+  color: ${({ theme }) => theme.colors.textMuted};
   text-decoration: none;
   font-weight: 500;
   margin-bottom: 2rem;
@@ -102,7 +102,7 @@ const BackLink = styled(Link)`
 
 const Artist = styled.h2`
   font-size: 1.25rem;
-  color: ${({ theme }) => theme.colors.text}E6;
+  color: ${({ theme }) => theme.colors.text};
   font-weight: 600;
   text-transform: uppercase;
   margin-bottom: 0.5rem;
@@ -127,7 +127,7 @@ const Price = styled.div`
 const Description = styled.p`
   font-size: 1.1rem;
   line-height: 1.7;
-  color: ${({ theme }) => theme.colors.text}90;
+  color: ${({ theme }) => theme.colors.textMuted};
   margin-bottom: 3rem;
 `;
 

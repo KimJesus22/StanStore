@@ -68,14 +68,14 @@ const Badge = styled.span`
     gap: 0.25rem;
     background: ${({ theme }) => theme.colors.primary}18;
     color: ${({ theme }) => theme.colors.primary};
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 700;
     padding: 0.25rem 0.65rem;
     border-radius: 20px;
 `;
 
 const GenreTag = styled.span`
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: ${({ theme }) => theme.colors.textMuted};
     white-space: nowrap;
     overflow: hidden;
