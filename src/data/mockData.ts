@@ -4,7 +4,7 @@ export const mockProducts: Product[] = [
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b5c',
         name: 'Map of the Soul: 7',
-        price: 29.99,
+        price: 490,
         image_url: '/images/map-of-the-soul-7.jpg',
         category: 'album',
         artist: 'BTS',
@@ -18,7 +18,7 @@ export const mockProducts: Product[] = [
     {
         id: 'f1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5d',
         name: 'NewJeans 2nd EP "Get Up"',
-        price: 24.50,
+        price: 420,
         image_url: '/images/newjeans-get-up-haerin.jpg',
         category: 'album',
         artist: 'NewJeans',
@@ -32,7 +32,7 @@ export const mockProducts: Product[] = [
     {
         id: 'a1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5e',
         name: 'Caratbong V3',
-        price: 55.00,
+        price: 1200,
         image_url: '/images/caratbong-v3.png',
         category: 'lightstick',
         artist: 'Seventeen',
@@ -46,7 +46,7 @@ export const mockProducts: Product[] = [
     {
         id: 'b1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b5f',
         name: 'BORN PINK World Tour Hoodie',
-        price: 65.00,
+        price: 1100,
         image_url: '/images/born-pink-hoodie.jpg',
         category: 'merch',
         artist: 'BLACKPINK',
@@ -60,7 +60,7 @@ export const mockProducts: Product[] = [
     {
         id: 'c1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b60',
         name: '5-STAR (Limited Ver.)',
-        price: 32.00,
+        price: 500,
         image_url: '/images/5-star-limited-ver.jpg',
         category: 'album',
         artist: 'Stray Kids',
@@ -74,7 +74,7 @@ export const mockProducts: Product[] = [
     {
         id: 'd1b2c3d4-e5f6-47a8-8b9c-0d1e2f3a4b61',
         name: 'CANDYBONG ∞',
-        price: 58.00,
+        price: 950,
         image_url: '/images/candybong.jpg',
         category: 'lightstick',
         artist: 'TWICE',
@@ -88,7 +88,7 @@ export const mockProducts: Product[] = [
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b62',
         name: 'The Name Chapter: FREEFALL',
-        price: 35.00,
+        price: 480,
         image_url: '/images/The Name Chapter FREEFALL.png',
         category: 'album',
         artist: 'TXT',
@@ -101,8 +101,8 @@ export const mockProducts: Product[] = [
     },
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b63',
-        name: 'LE SSERAFIM - Unforgiven 1st Studio Album',
-        price: 28.50,
+        name: 'UNFORGIVEN (1st Studio Album)',
+        price: 480,
         image_url: '/images/LE SSERAFIM 1st Studio Album UNFORGIVEN.jpg',
         category: 'album',
         artist: 'LE SSERAFIM',
@@ -116,7 +116,7 @@ export const mockProducts: Product[] = [
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b64',
         name: 'Drama - The 4th Mini Album [Scene Ver.]',
-        price: 26.00,
+        price: 400,
         image_url: '/images/Drama - The 4th Mini Album [Scene Ver.].jpg',
         category: 'album',
         artist: 'aespa',
@@ -130,7 +130,7 @@ export const mockProducts: Product[] = [
     {
         id: 'e0a1c2d3-e4f5-46a7-8b9c-0d1e2f3a4b65',
         name: 'ORANGE BLOOD',
-        price: 32.00,
+        price: 420,
         image_url: '/images/ORANGE BLOOD.png',
         category: 'album',
         artist: 'ENHYPEN',
@@ -144,7 +144,7 @@ export const mockProducts: Product[] = [
     {
         id: 'f2b3c4d5-e6f7-48a9-9b0c-1d2e3f4a5b66',
         name: 'THE ALBUM',
-        price: 35.00,
+        price: 490,
         image_url: '/images/the-album.webp',
         category: 'album',
         artist: 'BLACKPINK',
@@ -158,7 +158,7 @@ export const mockProducts: Product[] = [
     {
         id: 'g3b4c5d6-e7f8-49a0-0b1c-2d3e4f5a6b77',
         name: 'SKZOO Plush (Wolf Chan)',
-        price: 45.00,
+        price: 650,
         image_url: '/images/skzoo-plush-wolf-chan.webp',
         category: 'merch',
         artist: 'Stray Kids',
@@ -172,7 +172,7 @@ export const mockProducts: Product[] = [
     {
         id: 'h4b5c6d7-e8f9-50a1-1b2c-3d4e5f6a7b88',
         name: 'KILL MY DOUBT',
-        price: 27.00,
+        price: 400,
         image_url: '/images/kill-my-doubt.jpeg',
         category: 'album',
         artist: 'ITZY',
@@ -186,7 +186,7 @@ export const mockProducts: Product[] = [
     {
         id: 'i5b6c7d8-e9f0-51a2-2b3c-4d5e6f7a8b99',
         name: 'THE WORLD EP.FIN : WILL',
-        price: 30.00,
+        price: 480,
         image_url: '/images/ateez-the-world-ep-fin-will.webp',
         category: 'album',
         artist: 'ATEEZ',
