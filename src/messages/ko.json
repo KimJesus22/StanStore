@@ -23,6 +23,15 @@
         "passwordNumber": "숫자를 최소 하나 포함해야 합니다",
         "searchMax": "검색어가 너무 깁니다"
     },
+    "Validation": {
+        "required": "필수 항목입니다",
+        "email": "유효하지 않은 이메일 주소입니다",
+        "passwordMin": "비밀번호는 최소 {min}자 이상이어야 합니다",
+        "passwordUppercase": "대문자를 최소 하나 포함해야 합니다",
+        "passwordNumber": "숫자를 최소 하나 포함해야 합니다",
+        "passwordsMatch": "비밀번호가 일치하지 않습니다",
+        "searchMax": "검색어는 최대 {max}자를 초과할 수 없습니다"
+    },
     "Product": {
         "addToCart": "장바구니 담기",
         "addedToCart": "장바구니에 {quantity}개 추가됨",

@@ -23,6 +23,15 @@
         "passwordNumber": "Must contain at least one number",
         "searchMax": "Search query is too long"
     },
+    "Validation": {
+        "required": "This field is required",
+        "email": "Invalid email address",
+        "passwordMin": "Password must be at least {min} characters",
+        "passwordUppercase": "Must contain at least one uppercase letter",
+        "passwordNumber": "Must contain at least one number",
+        "passwordsMatch": "Passwords do not match",
+        "searchMax": "Search query cannot exceed {max} characters"
+    },
     "Product": {
         "addToCart": "Add to Cart",
         "addedToCart": "Added {quantity} {count, plural, =1 {product} other {products}} to cart",

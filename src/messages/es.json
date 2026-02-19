@@ -23,6 +23,15 @@
         "passwordNumber": "Debe contener al menos un número",
         "searchMax": "La búsqueda es demasiado larga"
     },
+    "Validation": {
+        "required": "Este campo es requerido",
+        "email": "El correo electrónico no es válido",
+        "passwordMin": "La contraseña debe tener al menos {min} caracteres",
+        "passwordUppercase": "Debe contener al menos una mayúscula",
+        "passwordNumber": "Debe contener al menos un número",
+        "passwordsMatch": "Las contraseñas no coinciden",
+        "searchMax": "La búsqueda no puede superar los {max} caracteres"
+    },
     "Product": {
         "addToCart": "Añadir al Carrito",
         "addedToCart": "Añadido {quantity} {count, plural, =1 {producto} other {productos}} al carrito",
