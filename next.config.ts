@@ -19,6 +19,9 @@ const nextConfig: NextConfig = {
   output: "standalone",
   transpilePackages: ['styled-components'],
   turbopack: {},
+  // Excluye swagger-ui-react del bundle del servidor para evitar
+  // ReferenceError: React is not defined al evaluar el módulo en build time.
+  serverExternalPackages: ['swagger-ui-react'],
   images: {
     // loader: 'custom',
     // loaderFile: './src/lib/cloudinaryLoader.ts',
