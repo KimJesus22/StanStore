@@ -102,7 +102,7 @@ VALUES
     (
         'a0000001-0000-0000-0000-000000000007',
         'aespa',
-        '{"es": "Grupo femenino de K-Pop formado en 2020 bajo SM Entertainment. Pioneras del concepto de universo virtual con sus avatares digitales 'æ'.", "en": "South Korean girl group formed in 2020 under SM Entertainment. Pioneers of a virtual universe concept with their digital avatars 'æ'.", "ko": "2020년 SM 엔터테인먼트 소속으로 결성된 대한민국 걸그룹. 디지털 아바타 'æ'를 통한 가상 세계관의 선구자입니다."}',
+        '{"es": "Grupo femenino de K-Pop formado en 2020 bajo SM Entertainment. Pioneras del concepto de universo virtual con sus avatares digitales ''æ''.", "en": "South Korean girl group formed in 2020 under SM Entertainment. Pioneers of a virtual universe concept with their digital avatars ''æ''.", "ko": "2020년 SM 엔터테인먼트 소속으로 결성된 대한민국 걸그룹. 디지털 아바타 ''æ''를 통한 가상 세계관의 선구자입니다."}',
         NULL,
         'K-Pop',
         89,
@@ -129,7 +129,7 @@ VALUES
     (
         'a0000001-0000-0000-0000-000000000010',
         'ENHYPEN',
-        '{"es": "Grupo masculino de K-Pop formado en 2020 bajo BELIFT LAB. Surgidos del reality show 'I-Land', exploran temáticas oscuras y vampíricas.", "en": "South Korean boy group formed in 2020 under BELIFT LAB. Born from the reality show 'I-Land', they explore dark and vampiric themes.", "ko": "2020년 빌리프랩 소속으로 결성된 대한민국 보이그룹. 오디션 프로그램 'I-Land' 출신으로 어둡고 뱀파이어 같은 테마를 탐구합니다."}',
+        '{"es": "Grupo masculino de K-Pop formado en 2020 bajo BELIFT LAB. Surgidos del reality show ''I-Land'', exploran temáticas oscuras y vampíricas.", "en": "South Korean boy group formed in 2020 under BELIFT LAB. Born from the reality show ''I-Land'', they explore dark and vampiric themes.", "ko": "2020년 빌리프랩 소속으로 결성된 대한민국 보이그룹. 오디션 프로그램 ''I-Land'' 출신으로 어둡고 뱀파이어 같은 테마를 탐구합니다."}',
         NULL,
         'K-Pop',
         83,
