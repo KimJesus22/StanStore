@@ -8,9 +8,9 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
-import { useCurrency } from '@/context/CurrencyContext';
 import { useRouter } from 'next/navigation';
 import CartItem from './CartItem';
+import CartSummary from './CartSummary';
 import { Link } from '@/navigation';
 
 const Overlay = styled(motion.div)`
@@ -183,7 +183,6 @@ export default function CartDrawer() {
   // Fallback to empty array if undefined
   const items = serverItems || [];
 
-  const { formatPrice } = useCurrency();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
@@ -194,8 +193,6 @@ export default function CartDrawer() {
   }, []);
 
   if (!mounted) return null;
-
-  const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const handleCheckout = () => {
     if (items.length === 0) return;
@@ -252,10 +249,7 @@ export default function CartDrawer() {
             )}
 
             <Footer>
-              <TotalRow>
-                <span>{t('total')}</span>
-                <span>{formatPrice(total)}</span>
-              </TotalRow>
+              <CartSummary items={items} showShippingEstimator />
 
               <TermsCheckbox>
                 <input
