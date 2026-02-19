@@ -1,1 +1,1 @@
-export * from './components/CheckoutForm';
+export { default as CheckoutForm } from './components/CheckoutForm';

@@ -1,6 +1,6 @@
 import { Metadata, ResolvingMetadata } from 'next';
 import { supabase } from '@/lib/supabaseClient';
-import ProductDetails from '@/components/ProductDetails';
+import { ProductDetails } from '@/features/product';
 import { mockProducts } from '@/data/mockData';
 
 import { locales } from '@/navigation';

@@ -1,4 +1,4 @@
-import CheckoutForm from '@/components/CheckoutForm';
+import { CheckoutForm } from '@/features/checkout';
 
 export const dynamic = 'force-dynamic';
 

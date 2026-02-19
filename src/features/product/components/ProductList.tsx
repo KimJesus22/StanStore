@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import ProductCard from './ProductCard';
 import ProductSkeleton from '@/components/ui/ProductSkeleton';
-import NoResultsFound from '@/components/NoResultsFound';
+import NoResultsFound from '@/components/ui/NoResultsFound';
 import { Product } from '@/types';
 
 const Grid = styled.div`

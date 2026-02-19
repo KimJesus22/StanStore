@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import { Product } from '@/types';
 import ProductCard from './ProductCard';
-import Spinner from '@/components/Spinner';
+import Spinner from '@/components/ui/Spinner';
 import { Frown, TrendingUp } from 'lucide-react';
 import { mockProducts } from '@/data/mockData';
 

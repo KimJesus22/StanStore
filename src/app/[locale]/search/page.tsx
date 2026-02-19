@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabaseClient';
 import styled from 'styled-components';
 import { Product } from '@/types';
 import { mockProducts } from '@/data/mockData';
-import SearchResults from '@/components/SearchResults';
+import { SearchResults } from '@/features/product';
 
 const PageContainer = styled.div`
   max-width: 1200px;
