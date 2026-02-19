@@ -55,6 +55,7 @@
     "recharts": "^3.7.0",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
+    "resend": "^6.9.2",
     "stripe": "^20.3.1",
     "styled-components": "^6.3.10",
     "swagger-ui-react": "^5.31.1",
