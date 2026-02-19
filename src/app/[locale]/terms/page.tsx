@@ -1,31 +1,74 @@
-// import { useTranslations } from 'next-intl';
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
+import { remark } from 'remark';
+import html from 'remark-html';
 
-export default function TermsPage() {
+async function getTermsContent(locale: string) {
+    const termsDirectory = path.join(process.cwd(), 'src/content/terms');
+
+    // Intentar cargar el archivo del idioma solicitado
+    let fullPath = path.join(termsDirectory, `terms.${locale}.md`);
+    let isFallback = false;
+
+    if (!fs.existsSync(fullPath)) {
+        // Fallback a español si no existe
+        fullPath = path.join(termsDirectory, 'terms.es.md');
+        isFallback = true;
+    }
+
+    if (!fs.existsSync(fullPath)) {
+        // Si ni siquiera existe el de español, retornar error o contenido dummy
+        return {
+            title: 'Error',
+            date: '',
+            contentHtml: '<p>Terms and conditions not found.</p>',
+            isFallback: false
+        };
+    }
+
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const matterResult = matter(fileContents);
+
+    const processedContent = await remark()
+        .use(html)
+        .process(matterResult.content);
+
+    const contentHtml = processedContent.toString();
+
+    return {
+        title: matterResult.data.title,
+        date: matterResult.data.date,
+        contentHtml,
+        isFallback,
+    };
+}
+
+export default async function TermsPage({ params }: { params: { locale: string } }) {
+    const { locale } = params;
+    const { title, date, contentHtml, isFallback } = await getTermsContent(locale);
+
     return (
         <div style={{ maxWidth: '800px', margin: '4rem auto', padding: '0 1.5rem', fontFamily: 'sans-serif' }}>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 700, marginBottom: '2rem' }}>Términos y Condiciones</h1>
+            {isFallback && (
+                <div style={{
+                    backgroundColor: '#fff3cd',
+                    color: '#856404',
+                    padding: '0.75rem 1.25rem',
+                    marginBottom: '1rem',
+                    borderRadius: '0.25rem',
+                    border: '1px solid #ffeeba',
+                    fontSize: '0.9rem'
+                }}>
+                    Document only available in Spanish for now.
+                </div>
+            )}
 
-            <p style={{ marginBottom: '1rem', color: '#666' }}>Última actualización: {new Date().toLocaleDateString()}</p>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: 700, marginBottom: '2rem' }}>{title}</h1>
 
-            <section style={{ marginBottom: '2rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem' }}>1. Aceptación de los Términos</h2>
-                <p>Al acceder y utilizar este sitio web, usted acepta estar sujeto a estos términos y condiciones de uso, todas las leyes y regulaciones aplicables, y acepta que es responsable del cumplimiento de las leyes locales aplicables.</p>
-            </section>
+            {date && <p style={{ marginBottom: '1rem', color: '#666' }}>Last updated: {date}</p>}
 
-            <section style={{ marginBottom: '2rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem' }}>2. Licencia de Uso</h2>
-                <p>Se concede permiso para descargar temporalmente una copia de los materiales (información o software) en el sitio web de StanStore solo para visualización transitoria personal y no comercial.</p>
-            </section>
-
-            <section style={{ marginBottom: '2rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem' }}>3. Compras y Pagos</h2>
-                <p>Todos los precios están sujetos a cambios sin previo aviso. Nos reservamos el derecho de rechazar cualquier pedido que realice con nosotros.</p>
-            </section>
-
-            <section style={{ marginBottom: '2rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem' }}>4. Devoluciones y Reembolsos</h2>
-                <p>Nuestra política de devoluciones dura 30 días. Si han pasado 30 días desde su compra, desafortunadamente no podemos ofrecerle un reembolso o cambio.</p>
-            </section>
+            <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
         </div>
     );
 }

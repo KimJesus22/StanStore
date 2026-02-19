@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Music, Users, TrendingUp, ExternalLink } from 'lucide-react';
-import ArtistSkeleton from '@/components/ArtistSkeleton';
+import ArtistSkeleton from '@/components/ui/ArtistSkeleton';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -172,10 +172,19 @@ export default function ArtistsPage() {
   useEffect(() => {
     fetch('/api/spotify/kpop')
       .then(r => r.json())
-      .then(data => {
-        if (data.artists) setArtists(data.artists);
+      .then((data: { artists?: Artist[] }) => {
+        console.log('Artists Data:', data);
+        if (data && Array.isArray(data.artists)) {
+          setArtists(data.artists);
+        } else {
+          console.warn('Invalid artists data structure:', data);
+          setArtists([]);
+        }
       })
-      .catch(err => console.error('Error loading artists:', err))
+      .catch(err => {
+        console.error('Error loading artists:', err);
+        setArtists([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -195,7 +204,7 @@ export default function ArtistsPage() {
             <ArtistSkeleton key={i} />
           ))}
         </Grid>
-      ) : (
+      ) : artists.length > 0 ? (
         <Grid>
           {artists.map(artist => (
             <Card
@@ -236,6 +245,11 @@ export default function ArtistsPage() {
             </Card>
           ))}
         </Grid>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+          <h2>No artists found</h2>
+          <p>Try refreshing the page or checking your connection.</p>
+        </div>
       )}
     </PageContainer>
   );

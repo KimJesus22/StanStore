@@ -32,6 +32,29 @@ export interface Database {
                     created_at?: string
                 }
             }
+            artists: {
+                Row: {
+                    id: string
+                    name: string
+                    bio: Json | null // JSONB: { "es": "...", "en": "..." }
+                    image_url: string | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    name: string
+                    bio?: Json | null
+                    image_url?: string | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    name?: string
+                    bio?: Json | null
+                    image_url?: string | null
+                    created_at?: string
+                }
+            }
             products: {
                 Row: {
                     id: string
