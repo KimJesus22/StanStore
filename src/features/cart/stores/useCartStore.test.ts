@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useCartStore } from '../useCartStore';
+import { useCartStore } from './useCartStore';
 
 // Mock Product
 const mockProduct = {

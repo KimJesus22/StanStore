@@ -1,3 +1,7 @@
+import React from 'react';
+// styled-components CJS bundle expects React in global scope
+Object.assign(globalThis, { React });
+
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import { mockSupabase } from './src/test/mocks/supabase';

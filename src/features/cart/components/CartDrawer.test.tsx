@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import CartDrawer from './CartDrawer';
@@ -7,6 +8,12 @@ import { ThemeProvider } from '@/context/ThemeContext';
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
     useRouter: () => ({ push: mockPush }),
+}));
+
+vi.mock('@/navigation', () => ({
+    Link: ({ children, ...props }: { children: React.ReactNode;[key: string]: unknown }) => <a {...props}>{children}</a>,
+    useRouter: () => ({ push: mockPush }),
+    usePathname: () => '/',
 }));
 
 vi.mock('next-intl', () => ({

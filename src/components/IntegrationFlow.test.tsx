@@ -6,6 +6,7 @@ import HeaderSearch from './header/HeaderSearch';
 import { SearchResults, ProductDetails } from '@/features/product';
 import { CartDrawer, useCartStore } from '@/features/cart'; // Fixed import
 import { ThemeProvider } from 'styled-components';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { lightTheme } from '../theme'; // Relative path since file is in src/components
 import type { Product } from '../types';
 
@@ -26,6 +27,11 @@ vi.mock('@/features/cart', async () => {
         useCart: () => mockUseCartFn(),
     };
 });
+
+// CartDrawer imports useCart from its internal path, need to mock that too
+vi.mock('@/features/cart/hooks/useCart', () => ({
+    useCart: () => mockUseCartFn(),
+}));
 
 // --- Mocks ---
 
@@ -161,11 +167,17 @@ const mockProduct: Product = {
     is_new: false,
 };
 
+const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+});
+
 const renderWithTheme = (ui: React.ReactElement) => {
     return render(
-        <ThemeProvider theme={lightTheme}>
-            {ui}
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+            <ThemeProvider theme={lightTheme}>
+                {ui}
+            </ThemeProvider>
+        </QueryClientProvider>
     );
 };
 
