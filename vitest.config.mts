@@ -23,7 +23,19 @@ export default defineConfig({
           environment: 'happy-dom',
           globals: true,
           include: ['src/**/*.test.{ts,tsx}'],
+          exclude: ['src/tests/env.security.test.ts'],
           setupFiles: ['./vitest.setup.ts'],
+          alias: {
+            '@': path.resolve(__dirname, './src')
+          }
+        }
+      },
+      {
+        test: {
+          name: 'security',
+          environment: 'node',
+          globals: true,
+          include: ['src/tests/env.security.test.ts'],
           alias: {
             '@': path.resolve(__dirname, './src')
           }
