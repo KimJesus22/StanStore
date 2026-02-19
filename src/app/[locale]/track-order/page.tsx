@@ -23,7 +23,7 @@ const PageTitle = styled.h1`
 `;
 
 const PageSubtitle = styled.p`
-  color: ${({ theme }) => theme.colors.text}80;
+  color: ${({ theme }) => theme.colors.textMuted};
   font-size: 1rem;
   margin-bottom: 2rem;
 `;
@@ -100,17 +100,17 @@ const StatusRow = styled.div`
 `;
 
 const StatusIcon = styled.div<{ $active?: boolean }>`
-  color: ${({ $active, theme }) => $active ? theme.colors.primary : `${theme.colors.text}30`};
+  color: ${({ $active, theme }) => $active ? theme.colors.primary : theme.colors.textMuted};
   transition: color 0.3s;
 `;
 
 const StatusText = styled.span<{ $active?: boolean }>`
   font-weight: ${({ $active }) => $active ? 700 : 400};
-  opacity: ${({ $active }) => $active ? 1 : 0.5};
+  color: ${({ $active, theme }) => $active ? theme.colors.text : theme.colors.textMuted};
 `;
 
 const InfoText = styled.p`
-  color: ${({ theme }) => theme.colors.text}80;
+  color: ${({ theme }) => theme.colors.textMuted};
   font-size: 0.9rem;
   margin-top: 1rem;
   padding-top: 1rem;
