@@ -1,6 +1,7 @@
 import { Metadata, ResolvingMetadata } from 'next';
 import { supabase } from '@/lib/supabaseClient';
-import { ProductDetails } from '@/features/product';
+// eslint-disable-next-line no-restricted-imports -- Server Component: barrel re-exports client hooks
+import ProductDetails from '@/features/product/components/ProductDetails';
 import { mockProducts } from '@/data/mockData';
 
 import { locales } from '@/navigation';

@@ -2,7 +2,7 @@
 
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
-import ProductCard from './ProductCard';
+import { ProductCard } from '@/features/product';
 import { Product } from '@/types';
 import { mockProducts } from '@/data/mockData'; // Using mock as fallback for now
 
@@ -76,28 +76,28 @@ const Grid = styled.div`
 `;
 
 interface NoResultsFoundProps {
-    onReset: () => void;
+  onReset: () => void;
 }
 
 export default function NoResultsFound({ onReset }: NoResultsFoundProps) {
-    const t = useTranslations('Home.noResults');
-    const popularProducts = mockProducts.slice(0, 4); // Show 4 random items
+  const t = useTranslations('Home.noResults');
+  const popularProducts = mockProducts.slice(0, 4); // Show 4 random items
 
-    return (
-        <Container>
-            <IconWrapper>🔍</IconWrapper>
-            <Title>{t('title')}</Title>
-            <Message>{t('message')}</Message>
-            <ResetButton onClick={onReset}>{t('reset')}</ResetButton>
+  return (
+    <Container>
+      <IconWrapper>🔍</IconWrapper>
+      <Title>{t('title')}</Title>
+      <Message>{t('message')}</Message>
+      <ResetButton onClick={onReset}>{t('reset')}</ResetButton>
 
-            <PopularSection>
-                <PopularTitle>{t('popular')}</PopularTitle>
-                <Grid>
-                    {popularProducts.map((product, index) => (
-                        <ProductCard key={product.id} product={product} index={index} />
-                    ))}
-                </Grid>
-            </PopularSection>
-        </Container>
-    );
+      <PopularSection>
+        <PopularTitle>{t('popular')}</PopularTitle>
+        <Grid>
+          {popularProducts.map((product, index) => (
+            <ProductCard key={product.id} product={product} index={index} />
+          ))}
+        </Grid>
+      </PopularSection>
+    </Container>
+  );
 }
