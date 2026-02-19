@@ -3,11 +3,18 @@
 import { supabase } from '@/lib/supabaseClient';
 import { revalidatePath } from 'next/cache';
 import createDOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
 
-// Initialize DOMPurify with JSDOM
-const window = new JSDOM('').window;
-const DOMPurify = createDOMPurify(window);
+// Lazy singleton — JSDOM is only loaded when sanitize() is first called.
+// This prevents ESM/CJS conflicts when the module is imported in Vitest.
+let _purify: ReturnType<typeof createDOMPurify> | null = null;
+function getPurify() {
+    if (!_purify) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { JSDOM } = require('jsdom') as typeof import('jsdom');
+        _purify = createDOMPurify(new JSDOM('').window as unknown as Window);
+    }
+    return _purify;
+}
 
 interface SubmitReviewParams {
     productId: string;
@@ -25,7 +32,7 @@ export async function submitReview({ productId, rating, comment, userId }: Submi
         }
 
         // 2. Sanitize Comment
-        const cleanComment = DOMPurify.sanitize(comment);
+        const cleanComment = getPurify().sanitize(comment);
 
         // 3. Insert Review
         const { error } = await supabase

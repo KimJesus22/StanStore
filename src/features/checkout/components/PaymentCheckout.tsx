@@ -186,8 +186,6 @@ export default function PaymentCheckout({ onPaymentSuccess }: PaymentCheckoutPro
                             // Offline methods: OXXO, SPEI, etc.
                             ticket: 'all',
                             bankTransfer: 'all',
-                            // Disable wallets to keep the flow simple
-                            mercadoPago: 'wallet_purchase',
                         },
                         visual: {
                             style: {
