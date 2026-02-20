@@ -180,8 +180,7 @@ export default function CartDrawer() {
   const { isCartOpen, closeCart } = useCartStore();
   const { data: serverItems, isLoading } = useCart();
 
-  // Fallback to empty array if undefined
-  const items = serverItems || [];
+  const items = Array.isArray(serverItems) ? serverItems : [];
 
   const router = useRouter();
   const [mounted, setMounted] = useState(false);

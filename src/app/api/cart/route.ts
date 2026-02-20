@@ -38,8 +38,7 @@ export async function GET() {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError || !user) {
-            // Return empty cart for unauthenticated users (or handle guest cart logic if complex, but simple empty array for now)
-            return NextResponse.json({ items: [] });
+            return NextResponse.json([]);
         }
 
         const { data, error } = await supabase
