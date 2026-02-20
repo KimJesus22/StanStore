@@ -67,6 +67,24 @@ export const useCart = () => {
             return { previousItems };
         },
 
+        onSuccess: (_data, variables) => {
+            const product = (variables as AddToCartWithProduct).product;
+            const name = product?.name ?? 'Producto';
+            toast.success(`✅ ${name} añadido al carrito`, {
+                style: {
+                    background: '#10B981',
+                    color: '#FFFFFF',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    fontWeight: 500,
+                },
+                iconTheme: {
+                    primary: '#FFFFFF',
+                    secondary: '#10B981',
+                },
+            });
+        },
+
         onError: (_error, _variables, context) => {
             // ── Rollback ───────────────────────────────────────
             // Revert Zustand store to previous snapshot

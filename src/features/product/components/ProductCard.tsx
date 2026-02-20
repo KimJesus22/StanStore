@@ -2,7 +2,7 @@
 
 import styled from 'styled-components';
 import { Product } from '@/types';
-import { useCartStore } from '@/features/cart';
+import { useCart } from '@/features/cart';
 import { Link } from '@/navigation';
 import { ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -162,7 +162,7 @@ const OutOfStockOverlay = styled.div`
 `;
 
 export default function ProductCard({ product, index = 0, isLoading = false, priority = false }: ProductCardProps) {
-  const addToCart = useCartStore((state) => state.addToCart);
+  const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -170,20 +170,7 @@ export default function ProductCard({ product, index = 0, isLoading = false, pri
     e.stopPropagation();
 
     if (product.stock > 0) {
-      addToCart(product);
-      toast.success(`✅ ${product.name} añadido al carrito`, {
-        style: {
-          background: '#10B981',
-          color: '#FFFFFF',
-          padding: '12px 16px',
-          borderRadius: '8px',
-          fontWeight: 500,
-        },
-        iconTheme: {
-          primary: '#FFFFFF',
-          secondary: '#10B981',
-        },
-      });
+      addToCart({ productId: product.id, quantity: 1, product });
     } else {
       toast.error('Producto sin stock', {
         style: {
