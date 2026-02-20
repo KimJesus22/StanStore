@@ -26,9 +26,9 @@ export default function GoogleAnalytics({ gaId }: { gaId?: string }) {
     // 1. Check localstorage. 
     // 2. If true, render scripts.
 
-    if (typeof window !== 'undefined' && localStorage.getItem('cookie_consent') !== 'true') {
-        return null;
-    }
+    // Optimization: We don't return null to avoid hydration mismatch and blocking.
+    // The script strategy 'afterInteractive' handles the loading priority.
+    // Ideally, GA initialization internally checks for consent, or we use a Consent Mode.
 
     return (
         <>

@@ -11,3 +11,5 @@ export * from './hooks/useProducts';
 export * from './hooks/useArtists';
 export { getArtists, type Artist } from './services/artistService';
 export { getProducts, getProductById } from './services/productService';
+export { default as ProductReviewsList } from './components/ProductReviewsList';
+export { default as ReviewsSkeleton } from './components/ReviewsSkeleton';

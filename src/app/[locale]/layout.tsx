@@ -31,7 +31,7 @@ const Footer = dynamicLoader(() => import('@/components/Footer'), {
   loading: () => <div style={{ padding: '2rem' }}><Skeleton $height="300px" /></div>
 });
 
-import { DynamicCookieBanner, DynamicInstallPrompt, DynamicGoogleAnalytics } from '@/components/ClientLayoutHelpers';
+import { DynamicCookieBanner, DynamicInstallPrompt, DynamicGoogleAnalytics, DynamicThirdPartyScripts } from '@/components/ClientLayoutHelpers';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,6 +92,7 @@ export default async function LocaleLayout({
           <Providers>
             <StyledComponentsRegistry>
               <DynamicGoogleAnalytics gaId="G-XXXXXXXXXX" />
+              <DynamicThirdPartyScripts />
               <Toaster position="bottom-center" />
               <ThemeProvider>
                 <AuthProvider>

@@ -1,11 +1,16 @@
 import { Metadata, ResolvingMetadata } from 'next';
 import { supabase } from '@/lib/supabaseClient';
-// eslint-disable-next-line no-restricted-imports -- Server Component: barrel re-exports client hooks
-import ProductDetails from '@/features/product/components/ProductDetails';
+ 
+import {
+  ProductDetails,
+  getProductById,
+  ProductReviewsList,
+  ReviewsSkeleton
+} from '@/features/product';
 import { mockProducts } from '@/data/mockData';
-import { getProductById } from '@/features/product';
 
 import { locales } from '@/navigation';
+import { Suspense } from 'react';
 
 export const dynamicParams = true; // Permitir productos nuevos bajo demanda
 
@@ -101,5 +106,14 @@ export default async function ProductPage({ params }: Props) {
     return <div>Producto no encontrado</div>;
   }
 
-  return <ProductDetails product={displayProduct} />;
+  return (
+    <ProductDetails
+      product={displayProduct}
+      reviewsSlot={
+        <Suspense fallback={<ReviewsSkeleton />}>
+          <ProductReviewsList productId={displayProduct.id} />
+        </Suspense>
+      }
+    />
+  );
 }

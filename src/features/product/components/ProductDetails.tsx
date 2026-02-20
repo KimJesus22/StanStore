@@ -19,24 +19,25 @@ import { Skeleton } from '@/components/ui/Skeleton';
 
 const SpotifyPlayer = dynamic(() => import('@/features/product/components/SpotifyPlayer'), {
   ssr: false,
-  loading: () => <Skeleton $height="80px" />
+  loading: () => <Skeleton $height="152px" style={{ marginTop: '2rem', borderRadius: '12px' }} />
 });
 const ArtistInfo = dynamic(() => import('@/features/product/components/ArtistInfo'), {
-  loading: () => <Skeleton $height="150px" />
+  loading: () => <Skeleton $height="200px" style={{ marginTop: '2rem', borderRadius: '16px' }} />
 });
 const TrackPreviews = dynamic(() => import('@/features/product/components/TrackPreviews'), {
   ssr: false,
-  loading: () => <Skeleton $height="200px" />
+  loading: () => <Skeleton $height="300px" style={{ marginTop: '2rem', borderRadius: '16px' }} />
 });
 const YouTubePlayer = dynamic(() => import('@/features/product/components/YouTubePlayer'), {
   ssr: false,
-  loading: () => <Skeleton $height="300px" />
+  loading: () => <Skeleton style={{ marginTop: '2rem', aspectRatio: '16/9', height: 'auto', borderRadius: '12px' }} />
 });
 const FanModeEffects = dynamic(() => import('@/features/product/components/FanModeEffects'), { ssr: false });
-const ReviewForm = dynamic(() => import('@/features/product/components/ReviewForm'), { ssr: false });
-const ReviewList = dynamic(() => import('@/features/product/components/ReviewList'), {
-  loading: () => <Skeleton $height="100px" />
+const ReviewForm = dynamic(() => import('@/features/product/components/ReviewForm'), {
+  ssr: false,
+  loading: () => <Skeleton $height="300px" style={{ marginBottom: '2rem' }} />
 });
+
 const SimilarProducts = dynamic(() => import('@/features/product/components/SimilarProducts'), {
   loading: () => <Skeleton $height="250px" />
 });
@@ -265,7 +266,7 @@ const FanButton = styled.button<{ $isActive: boolean, $themeColor?: string }>`
   }
 `;
 
-export default function ProductDetails({ product }: { product: Product }) {
+export default function ProductDetails({ product, reviewsSlot }: { product: Product, reviewsSlot?: React.ReactNode }) {
   const t = useTranslations('Product');
   const format = useFormatter();
   const locale = useLocale();
@@ -528,7 +529,7 @@ export default function ProductDetails({ product }: { product: Product }) {
             />
           )}
 
-          <ReviewList productId={product.id} />
+          {reviewsSlot}
 
           <SimilarProducts productId={product.id} />
         </div>

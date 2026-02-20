@@ -108,15 +108,7 @@ const Footer = styled.div`
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
-const TotalRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.text};
-`;
+
 
 const CheckoutButton = styled(motion.button)`
   width: 100%;
@@ -265,6 +257,7 @@ export default function CartDrawer() {
               <CheckoutButton
                 disabled={items.length === 0 || !acceptedTerms}
                 onClick={handleCheckout}
+                onMouseEnter={() => router.prefetch(`/${locale}/checkout`)}
                 whileHover={{ scale: 1.02, backgroundColor: '#000' }}
                 whileTap={{ scale: 0.98 }}
               >

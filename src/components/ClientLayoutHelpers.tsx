@@ -9,3 +9,4 @@ const GoogleAnalytics = dynamic(() => import('@/components/GoogleAnalytics'), { 
 export const DynamicCookieBanner = CookieBanner;
 export const DynamicInstallPrompt = InstallPrompt;
 export const DynamicGoogleAnalytics = GoogleAnalytics;
+export const DynamicThirdPartyScripts = dynamic(() => import('@/components/ThirdPartyScripts'), { ssr: false });
