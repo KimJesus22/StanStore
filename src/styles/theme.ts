@@ -4,6 +4,7 @@ export const theme = {
         backgroundSecondary: 'var(--bg-secondary)',
         text: 'var(--text-primary)',
         textSecondary: 'var(--text-secondary)',
+        textMuted: 'var(--text-secondary)',
         primary: 'var(--primary)',
         primaryForeground: 'var(--primary-foreground)',
         accent: 'var(--accent-neon)',
