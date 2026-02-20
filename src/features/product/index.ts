@@ -10,3 +10,4 @@ export * from './hooks/useProductFilters';
 export * from './hooks/useProducts';
 export * from './hooks/useArtists';
 export { getArtists, type Artist } from './services/artistService';
+export { getProducts, getProductById } from './services/productService';

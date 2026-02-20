@@ -3,10 +3,10 @@ import { supabase } from '@/lib/supabaseClient';
 // eslint-disable-next-line no-restricted-imports -- Server Component: barrel re-exports client hooks
 import ProductDetails from '@/features/product/components/ProductDetails';
 import { mockProducts } from '@/data/mockData';
+import { getProductById } from '@/features/product';
 
 import { locales } from '@/navigation';
 
-export const revalidate = 3600; // Revalidar cada hora
 export const dynamicParams = true; // Permitir productos nuevos bajo demanda
 
 export async function generateStaticParams() {
@@ -40,11 +40,7 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const id = (await params).id;
-  const { data: product } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const product = await getProductById(id);
 
   if (!product) {
     return {
@@ -78,11 +74,7 @@ export async function generateMetadata(
 export default async function ProductPage({ params }: Props) {
   const id = (await params).id;
 
-  const { data: product } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const product = await getProductById(id);
 
   let displayProduct = product;
 
@@ -96,6 +88,17 @@ export default async function ProductPage({ params }: Props) {
         description_ko: product.description_ko || mockProduct.description_ko,
       };
     }
+  }
+
+  // Handle case where product is null (not found) to avoid crash in ProductDetails if it doesn't handle null
+  // Assuming ProductDetails expects a Product, we might need to handle 404 here ideally, 
+  // but preserving current behavior of passing possibly null/undefined if that's what it did, 
+  // though getProductById returns Product | null.
+  // Original code: const { data: product } = ... single(); -> product could be null.
+
+  if (!displayProduct) {
+    // Basic 404 handling if not present
+    return <div>Producto no encontrado</div>;
   }
 
   return <ProductDetails product={displayProduct} />;

@@ -356,7 +356,7 @@ export default function ProductDetails({ product }: { product: Product }) {
     }
 
     for (let i = 0; i < quantity; i++) {
-      addToCart({ productId: product.id, quantity: 1 });
+      addToCart({ productId: product.id, quantity: 1, product });
     }
     openCart(); // Open drawer after adding
 

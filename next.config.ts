@@ -51,6 +51,12 @@ const nextConfig: NextConfig = {
     // Mock for build time if missing
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || 'sk_test_mock_key_for_build',
   },
+  experimental: {
+    staleTimes: {
+      dynamic: 30,  // 30 segundos para rutas dinámicas
+      static: 180,  // 3 minutos para rutas estáticas
+    },
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports

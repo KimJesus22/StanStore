@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient';
+import { cacheLife } from 'next/cache';
 
 export interface Artist {
     id: string;
@@ -22,6 +23,8 @@ export async function getArtists(
     locale: string = 'es',
     options: GetArtistsOptions = {}
 ): Promise<Artist[]> {
+    "use cache";
+    cacheLife('hours');
     const { genre, orderBy = 'name' } = options;
 
     try {

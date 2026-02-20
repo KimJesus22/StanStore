@@ -1,6 +1,10 @@
+'use client';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/features/auth';
+import { useCartStore } from '../stores/useCartStore';
 import { Product } from '@/types';
+import toast from 'react-hot-toast';
 
 export interface CartItem extends Product {
     quantity: number;
@@ -32,6 +36,7 @@ const addToCartApi = async ({ productId, quantity }: { productId: string; quanti
 export const useCart = () => {
     const user = useAuth((state) => state.user);
     const queryClient = useQueryClient();
+    const zustandAddToCart = useCartStore((state) => state.addToCart);
 
     const query = useQuery({
         queryKey: ['cart', user?.id],
@@ -43,15 +48,71 @@ export const useCart = () => {
 
     const addToCartMutation = useMutation({
         mutationFn: addToCartApi,
-        onSuccess: () => {
+
+        // ── Optimistic Update ──────────────────────────────────
+        onMutate: async (variables) => {
+            // 1. Cancel any outgoing refetches so they don't overwrite our optimistic update
+            await queryClient.cancelQueries({ queryKey: ['cart'] });
+
+            // 2. Snapshot the previous cart state (for rollback)
+            const previousItems = useCartStore.getState().items;
+
+            // 3. Optimistically update Zustand store → badge sube INSTANTÁNEAMENTE
+            const product = (variables as AddToCartWithProduct).product;
+            if (product) {
+                zustandAddToCart(product);
+            }
+
+            // Return context with the snapshot for rollback
+            return { previousItems };
+        },
+
+        onError: (_error, _variables, context) => {
+            // ── Rollback ───────────────────────────────────────
+            // Revert Zustand store to previous snapshot
+            if (context?.previousItems) {
+                useCartStore.setState({ items: context.previousItems });
+            }
+
+            // Show error toast
+            toast.error('Error al añadir al carrito. Inténtalo de nuevo.', {
+                style: {
+                    background: '#EF4444',
+                    color: '#FFFFFF',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    fontWeight: 500,
+                },
+                iconTheme: {
+                    primary: '#FFFFFF',
+                    secondary: '#EF4444',
+                },
+            });
+        },
+
+        onSettled: () => {
+            // ── Sync with server ───────────────────────────────
+            // Always refetch after error or success to ensure server/client are in sync
             queryClient.invalidateQueries({ queryKey: ['cart'] });
         },
     });
 
     return {
         ...query,
-        addToCart: addToCartMutation.mutate,
+        addToCart: (params: AddToCartParams) => addToCartMutation.mutate(params),
         addToCartAsync: addToCartMutation.mutateAsync,
         isAdding: addToCartMutation.isPending,
     };
 };
+
+// ── Types ──────────────────────────────────────────────────
+interface AddToCartBase {
+    productId: string;
+    quantity: number;
+}
+
+interface AddToCartWithProduct extends AddToCartBase {
+    product: Product;
+}
+
+export type AddToCartParams = AddToCartBase | AddToCartWithProduct;

@@ -2,6 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { stripe } from '@/lib/stripe';
+import { revalidateTag } from 'next/cache';
 
 // Use Service Role to ensure we can save orders even if auth context is lost in Server Action
 // (Common issue in basic Next.js + Supabase setups without full auth helpers)
@@ -66,6 +67,24 @@ export async function saveOrder(orderData: {
         if (error) {
             console.error('Error saving order (Supabase):', error);
             return { success: false, error: error.message || 'Database error' };
+        }
+
+        // Revalidate cache for products
+        try {
+            // Invalidate the general products list
+            revalidateTag('products', 'max');
+
+            // Invalidate each specific product cache
+            if (items && Array.isArray(items)) {
+                for (const item of items) {
+                    if (item.product_id) {
+                        revalidateTag(`product-${item.product_id}`, 'max');
+                    }
+                }
+            }
+        } catch (revalidateError) {
+            // Do not fail the order if revalidation fails
+            console.error('Error revalidating cache:', revalidateError);
         }
 
         return { success: true, order: data };
