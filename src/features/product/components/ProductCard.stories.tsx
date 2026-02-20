@@ -33,6 +33,10 @@ const theme = {
         border: "#eaeaea",
         textMuted: "#888888",
     },
+    breakpoints: {
+        mobile: '768px',
+        desktop: '1024px',
+    },
 };
 
 const messages = {

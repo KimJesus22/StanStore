@@ -11,6 +11,10 @@ export const lightTheme: DefaultTheme = {
         border: '#E0E0E0',
         textMuted: '#616161', // High contrast gray
     },
+    breakpoints: {
+        mobile: '768px',
+        desktop: '1024px',
+    },
 };
 
 export const darkTheme: DefaultTheme = {
@@ -23,5 +27,9 @@ export const darkTheme: DefaultTheme = {
         accent: '#FFB74D', // Lighter orange for dark mode
         border: '#333333',
         textMuted: '#B0B0B0', // Light gray for dark bg
+    },
+    breakpoints: {
+        mobile: '768px',
+        desktop: '1024px',
     },
 };
