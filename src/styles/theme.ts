@@ -1,4 +1,5 @@
 export const theme = {
+    name: 'Light',
     colors: {
         background: 'var(--bg-primary)',
         backgroundSecondary: 'var(--bg-secondary)',
