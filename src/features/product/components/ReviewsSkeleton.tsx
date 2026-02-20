@@ -1,3 +1,5 @@
+'use client';
+
 import { Skeleton } from '@/components/ui/Skeleton';
 import styled from 'styled-components';
 

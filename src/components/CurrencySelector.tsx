@@ -1,3 +1,5 @@
+'use client';
+
 import { useCurrency } from '@/context/CurrencyContext';
 import styled from 'styled-components';
 
