@@ -2,6 +2,7 @@ export const theme = {
     colors: {
         background: 'var(--bg-primary)',
         backgroundSecondary: 'var(--bg-secondary)',
+        secondaryBackground: 'var(--bg-secondary)',
         text: 'var(--text-primary)',
         textSecondary: 'var(--text-secondary)',
         textMuted: 'var(--text-secondary)',
