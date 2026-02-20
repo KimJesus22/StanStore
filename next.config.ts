@@ -52,6 +52,16 @@ const nextConfig: NextConfig = {
       static: 180,  // 3 minutos para rutas estáticas
     },
   },
+  webpack: (config, { webpack }) => {
+    // Algunos módulos (styled-components v6 con new JSX transform) referencian
+    // React como global. ProvidePlugin lo inyecta automáticamente en esos módulos.
+    config.plugins.push(
+      new webpack.ProvidePlugin({
+        React: 'react',
+      })
+    );
+    return config;
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
