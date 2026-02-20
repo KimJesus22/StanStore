@@ -20,6 +20,13 @@ const Select = styled.select`
   &:hover {
     border-color: ${({ theme }) => theme.colors.primary};
   }
+
+  @media (max-width: 768px) {
+    max-width: 58px;
+    min-width: 0;
+    padding: 0.4rem 0.1rem 0.4rem 0.2rem;
+    margin-right: 0;
+  }
 `;
 
 export default function CurrencySelector() {

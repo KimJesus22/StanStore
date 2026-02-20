@@ -22,6 +22,13 @@ const Select = styled.select`
   option {
     color: #000;
   }
+
+  @media (max-width: 768px) {
+    max-width: 42px;
+    min-width: 0;
+    padding: 0.4rem 0.1rem 0.4rem 0.2rem;
+    font-size: 1rem;
+  }
 `;
 
 export default function LanguageSwitcher() {

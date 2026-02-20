@@ -17,7 +17,7 @@ const NavContainer = styled.div`
   align-items: center;
 
   @media (max-width: 768px) {
-    gap: 0.5rem;
+    gap: 0.25rem;
   }
 `;
 
