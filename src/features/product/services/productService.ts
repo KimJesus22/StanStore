@@ -4,6 +4,11 @@ import { Product } from '@/types';
 
 export const getProducts = unstable_cache(
     async (): Promise<Product[]> => {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+            console.warn('Skipping getProducts: Missing Supabase keys');
+            return [];
+        }
+
         const { data, error } = await supabase
             .from('products')
             .select('*')
@@ -25,6 +30,11 @@ export const getProducts = unstable_cache(
 
 export const getProductById = unstable_cache(
     async (id: string): Promise<Product | null> => {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+            console.warn('Skipping getProductById: Missing Supabase keys');
+            return null;
+        }
+
         const { data, error } = await supabase
             .from('products')
             .select('*')

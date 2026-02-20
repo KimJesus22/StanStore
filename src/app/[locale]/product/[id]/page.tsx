@@ -1,6 +1,6 @@
 import { Metadata, ResolvingMetadata } from 'next';
 import { supabase } from '@/lib/supabaseClient';
- 
+
 import {
   ProductDetails,
   getProductById,
@@ -15,24 +15,8 @@ import { Suspense } from 'react';
 export const dynamicParams = true; // Permitir productos nuevos bajo demanda
 
 export async function generateStaticParams() {
-  // Obtener los 100 productos más recientes para pre-renderizar
-  const { data: products } = await supabase
-    .from('products')
-    .select('id')
-    .order('created_at', { ascending: false })
-    .limit(100);
-
-  if (!products) return [];
-
-  // Generar params para cada locale y cada producto
-  const params = [];
-  for (const locale of locales) {
-    for (const product of products) {
-      params.push({ locale, id: product.id });
-    }
-  }
-
-  return params;
+  // Desactivado temporalmente para build, permitir renderizado bajo demanda
+  return [];
 }
 
 type Props = {
@@ -96,11 +80,6 @@ export default async function ProductPage({ params }: Props) {
   }
 
   // Handle case where product is null (not found) to avoid crash in ProductDetails if it doesn't handle null
-  // Assuming ProductDetails expects a Product, we might need to handle 404 here ideally, 
-  // but preserving current behavior of passing possibly null/undefined if that's what it did, 
-  // though getProductById returns Product | null.
-  // Original code: const { data: product } = ... single(); -> product could be null.
-
   if (!displayProduct) {
     // Basic 404 handling if not present
     return <div>Producto no encontrado</div>;

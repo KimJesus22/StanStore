@@ -1,31 +1,36 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { X, Download } from 'lucide-react';
 import styled from 'styled-components';
-import { X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
-const Banner = styled(motion.div)`
+// Definición de tipos para el evento beforeinstallprompt no estándar
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed';
+    platform: string;
+  }>;
+  prompt(): Promise<void>;
+}
+
+const InstallBanner = styled(motion.div)`
   position: fixed;
   bottom: 20px;
   left: 20px;
   right: 20px;
-  background-color: #111;
-  color: white;
+  background-color: ${({ theme }) => theme.colors.text}; // Usually dark
+  color: ${({ theme }) => theme.colors.background}; // Usually light
   padding: 1rem;
-  border-radius: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  z-index: 9999;
-  max-width: 400px;
+  max-width: 500px;
   margin: 0 auto;
-
-  @media (min-width: 768px) {
-    left: auto;
-    right: 20px;
-  }
 `;
 
 const Content = styled.div`
@@ -34,69 +39,62 @@ const Content = styled.div`
   gap: 1rem;
 `;
 
-const Icon = styled.div`
-  width: 40px;
-  height: 40px;
-  background-color: #10CFBD;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-`;
-
-const Text = styled.div`
+const TextContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
 
 const Title = styled.span`
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: bold;
+  font-size: 1rem;
 `;
 
 const Subtitle = styled.span`
-  font-size: 0.8rem;
-  color: #ccc;
+  font-size: 0.85rem;
+  opacity: 0.9;
 `;
 
 const InstallButton = styled.button`
-  background-color: #10CFBD;
-  color: #111;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: #fff;
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: 20px;
+  border-radius: 50px;
   font-weight: 600;
-  font-size: 0.85rem;
   cursor: pointer;
-  margin-right: 0.5rem;
+  transition: transform 0.2s;
+  white-space: nowrap;
+
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
 
 const CloseButton = styled.button`
   background: none;
   border: none;
-  color: #666;
+  color: inherit;
   cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  opacity: 0.7;
+  padding: 0.5rem;
+  
+  &:hover {
+    opacity: 1;
+  }
 `;
 
 export default function InstallPrompt() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [showBanner, setShowBanner] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handler = (e: any) => {
-      // Prevent the mini-infobar from appearing on mobile
+    const handler = (e: Event) => {
+      // Prevenir que el navegador muestre el prompt nativo inmediatamente
       e.preventDefault();
-      // Stash the event so it can be triggered later.
-      setDeferredPrompt(e);
-      // Update UI notify the user they can install the PWA
-      setShowBanner(true);
+      // Guardar el evento para dispararlo después
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      // Mostrar nuestra UI personalizada
+      setIsVisible(true);
     };
 
     window.addEventListener('beforeinstallprompt', handler);
@@ -109,46 +107,58 @@ export default function InstallPrompt() {
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
 
-    // Show the install prompt
-    deferredPrompt.prompt();
+    // Ocultar nuestra UI
+    setIsVisible(false);
 
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response to the install prompt: ${outcome}`);
+    // Mostrar el prompt nativo
+    await deferredPrompt.prompt();
 
-    // We've used the prompt, and can't use it again, throw it away
+    // Esperar a que el usuario responda
+    const choiceResult = await deferredPrompt.userChoice;
+
+    if (choiceResult.outcome === 'accepted') {
+      console.log('Usuario aceptó la instalación');
+    } else {
+      console.log('Usuario dechazó la instalación');
+    }
+
+    // El evento ya no sirve, limpiar
     setDeferredPrompt(null);
-    setShowBanner(false);
   };
 
   const handleClose = () => {
-    setShowBanner(false);
+    setIsVisible(false);
+    setDeferredPrompt(null); // Opcional: si queremos que vuelva a aparecer en la próxima visita, no lo nulleamos, solo ocultamos.
   };
 
-  if (!showBanner) return null;
+  if (!isVisible) return null;
 
   return (
     <AnimatePresence>
-      <Banner
+      <InstallBanner
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
-        transition={{ type: 'spring', damping: 20 }}
       >
         <Content>
-          <Icon>S</Icon>
-          <Text>
+          <div style={{ background: '#333', padding: '0.5rem', borderRadius: '8px' }}>
+            {/* Icono de App o Logo */}
+            <Download size={24} color="#fff" />
+          </div>
+          <TextContainer>
             <Title>Instalar App</Title>
-            <Subtitle>Accede más rápido y offline</Subtitle>
-          </Text>
+            <Subtitle>Acceso rápido a tus Group Orders</Subtitle>
+          </TextContainer>
         </Content>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <InstallButton onClick={handleInstallClick}>Instalar</InstallButton>
-          <CloseButton onClick={handleClose} aria-label="Cerrar aviso de instalación">
-            <X size={18} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <InstallButton onClick={handleInstallClick}>
+            Instalar
+          </InstallButton>
+          <CloseButton onClick={handleClose}>
+            <X size={20} />
           </CloseButton>
         </div>
-      </Banner>
+      </InstallBanner>
     </AnimatePresence>
   );
 }

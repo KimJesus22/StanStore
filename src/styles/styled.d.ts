@@ -1,7 +1,7 @@
 import 'styled-components';
-import { ThemeType } from './themes';
+import { Theme } from './theme';
 
 declare module 'styled-components' {
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    export interface DefaultTheme extends ThemeType { }
+    export interface DefaultTheme extends Theme { }
 }

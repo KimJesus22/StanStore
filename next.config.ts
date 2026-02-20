@@ -1,18 +1,13 @@
-import withPWAInit from "@ducanh2912/next-pwa";
+import withSerwistInit from "@serwist/next";
 import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-const withPWA = withPWAInit({
-  dest: "public",
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
+const withSerwist = withSerwistInit({
+  swSrc: "src/app/sw.ts",
+  swDest: "public/sw.js",
   disable: process.env.NODE_ENV === "development",
-  workboxOptions: {
-    disableDevLogs: true,
-  },
 });
 
 const nextConfig: NextConfig = {
@@ -66,7 +61,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 import { withSentryConfig } from "@sentry/nextjs";
 
-export default withSentryConfig(withBundleAnalyzer(withNextIntl(withPWA(nextConfig))), {
+export default withSentryConfig(withBundleAnalyzer(withNextIntl(withSerwist(nextConfig))), {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
