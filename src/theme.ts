@@ -4,12 +4,15 @@ export const lightTheme: DefaultTheme = {
     name: 'Light',
     colors: {
         background: '#FFFFFF',
+        backgroundSecondary: '#F5F5F5',
+        secondaryBackground: '#F5F5F5',
         text: '#1A1A1A',
-        primary: '#D13639', // Red from Clancy theme
-        secondaryBackground: '#F5F5F5', // Acts as cardBg
+        textSecondary: '#616161',
+        textMuted: '#616161',
+        primary: '#D13639',
+        primaryForeground: '#FFFFFF',
         accent: '#F57F17',
         border: '#E0E0E0',
-        textMuted: '#616161', // High contrast gray
     },
     breakpoints: {
         mobile: '768px',
@@ -21,12 +24,15 @@ export const darkTheme: DefaultTheme = {
     name: 'Dark',
     colors: {
         background: '#121212',
+        backgroundSecondary: '#1E1E1E',
+        secondaryBackground: '#1E1E1E',
         text: '#E0E0E0',
-        primary: '#EF5350', // Lighter red for dark mode contrast
-        secondaryBackground: '#1E1E1E', // Dark card background
-        accent: '#FFB74D', // Lighter orange for dark mode
+        textSecondary: '#B0B0B0',
+        textMuted: '#B0B0B0',
+        primary: '#EF5350',
+        primaryForeground: '#FFFFFF',
+        accent: '#FFB74D',
         border: '#333333',
-        textMuted: '#B0B0B0', // Light gray for dark bg
     },
     breakpoints: {
         mobile: '768px',
