@@ -1,5 +1,5 @@
+import { unstable_cache } from 'next/cache';
 import { supabase } from '@/lib/supabaseClient';
-import { cacheLife } from 'next/cache';
 
 export interface Artist {
     id: string;
@@ -19,12 +19,10 @@ interface GetArtistsOptions {
     orderBy?: OrderByField;
 }
 
-export async function getArtists(
-    locale: string = 'es',
-    options: GetArtistsOptions = {}
+async function fetchArtists(
+    locale: string,
+    options: GetArtistsOptions
 ): Promise<Artist[]> {
-    "use cache";
-    cacheLife('hours');
     const { genre, orderBy = 'name' } = options;
 
     try {
@@ -72,6 +70,21 @@ export async function getArtists(
 
 function getLocalizedBio(content: Record<string, string> | null, locale: string): string {
     if (!content || typeof content !== 'object') return '';
-    // Fallback: locale solicitado → español → cadena vacía
     return content[locale] || content['es'] || '';
+}
+
+const getCachedArtists = unstable_cache(
+    fetchArtists,
+    ['getArtists'],
+    {
+        revalidate: 3600,
+        tags: ['artists'],
+    }
+);
+
+export async function getArtists(
+    locale: string = 'es',
+    options: GetArtistsOptions = {}
+): Promise<Artist[]> {
+    return getCachedArtists(locale, options);
 }

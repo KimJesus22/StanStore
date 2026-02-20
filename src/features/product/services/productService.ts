@@ -1,40 +1,46 @@
+import { unstable_cache } from 'next/cache';
 import { supabase } from '@/lib/supabaseClient';
-import { cacheLife, cacheTag } from 'next/cache';
 import { Product } from '@/types';
 
-export async function getProducts(): Promise<Product[]> {
-    "use cache";
-    cacheLife('hours');
-    cacheTag('products');
+export const getProducts = unstable_cache(
+    async (): Promise<Product[]> => {
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-    const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
+        if (error) {
+            console.error('Error fetching products:', error);
+            return [];
+        }
 
-    if (error) {
-        console.error('Error fetching products:', error);
-        return [];
+        return data as Product[];
+    },
+    ['getProducts'],
+    {
+        revalidate: 3600,
+        tags: ['products'],
     }
+);
 
-    return data as Product[];
-}
+export const getProductById = unstable_cache(
+    async (id: string): Promise<Product | null> => {
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', id)
+            .single();
 
-export async function getProductById(id: string): Promise<Product | null> {
-    "use cache";
-    cacheLife('hours');
-    cacheTag('products', `product-${id}`);
+        if (error) {
+            console.error(`Error fetching product ${id}:`, error);
+            return null;
+        }
 
-    const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-    if (error) {
-        console.error(`Error fetching product ${id}:`, error);
-        return null;
+        return data as Product;
+    },
+    ['getProductById'],
+    {
+        revalidate: 3600,
+        tags: ['products'],
     }
-
-    return data as Product;
-}
+);
