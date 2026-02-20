@@ -26,12 +26,15 @@ const theme = {
     name: 'light',
     colors: {
         background: "#ffffff",
+        backgroundSecondary: "#f5f5f5",
         secondaryBackground: "#f5f5f5",
         text: "#000000",
+        textSecondary: "#666666",
+        textMuted: "#888888",
         primary: "#0070f3",
+        primaryForeground: "#ffffff",
         accent: "#0070f3",
         border: "#eaeaea",
-        textMuted: "#888888",
     },
     breakpoints: {
         mobile: '768px',
