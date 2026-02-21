@@ -3,6 +3,19 @@ import ProofGrid from './ProofGrid';
 
 export const dynamic = 'force-dynamic';
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return {
+    alternates: {
+      canonical: `https://stan-store.com/${locale}/proof`,
+    },
+  };
+}
+
 export default async function ProofPage() {
     const supabase = await createClient();
 

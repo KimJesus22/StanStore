@@ -13,7 +13,10 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'Metadata' });
 
   return {
-    title: t('homeTitle')
+    title: t('homeTitle'),
+    alternates: {
+      canonical: `https://stan-store.com/${locale}`,
+    },
   };
 }
 

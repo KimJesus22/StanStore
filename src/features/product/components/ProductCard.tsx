@@ -208,7 +208,7 @@ export default function ProductCard({ product, index = 0, isLoading = false, pri
               src={product.image_url}
               product={product}
               fill
-              sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               priority={priority}
               placeholder="blur"
               blurDataURL={BLUR_DATA_URL}
@@ -228,7 +228,7 @@ export default function ProductCard({ product, index = 0, isLoading = false, pri
               src={product.image_url}
               product={product}
               fill
-              sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               priority={priority}
               placeholder="blur"
               blurDataURL={BLUR_DATA_URL}
