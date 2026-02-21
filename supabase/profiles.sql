@@ -25,13 +25,18 @@ CREATE POLICY "Users can update own profile."
   USING ( auth.uid() = id );
 
 -- Function to handle new user
-CREATE OR REPLACE FUNCTION public.handle_new_user() 
+CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.profiles (id, theme)
   VALUES (new.id, 'Clancy')
-  ON CONFLICT (id) DO NOTHING; -- Prevent error if profile already exists
+  ON CONFLICT (id) DO NOTHING;
   RETURN new;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Never block signup even if profile creation fails
+    RAISE WARNING 'handle_new_user failed for user %: %', new.id, SQLERRM;
+    RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

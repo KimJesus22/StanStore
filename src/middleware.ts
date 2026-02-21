@@ -18,5 +18,6 @@ export default chain([
 
 export const config = {
     // Matcher unificado para todos los middlewares
-    matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+    // Excluye: api, _next, _vercel, archivos estáticos, y /monitoring (Sentry tunnel)
+    matcher: ['/((?!api|_next|_vercel|monitoring|.*\\..*).*)']
 };
