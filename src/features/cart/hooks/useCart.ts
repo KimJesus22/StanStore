@@ -115,9 +115,17 @@ export const useCart = () => {
         },
     });
 
+    const addToCart = (params: AddToCartParams) => {
+        if (!user) {
+            useAuth.getState().openAuthModal();
+            return;
+        }
+        addToCartMutation.mutate(params);
+    };
+
     return {
         ...query,
-        addToCart: (params: AddToCartParams) => addToCartMutation.mutate(params),
+        addToCart,
         addToCartAsync: addToCartMutation.mutateAsync,
         isAdding: addToCartMutation.isPending,
     };

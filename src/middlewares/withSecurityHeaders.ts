@@ -12,6 +12,8 @@ function generateCSP() {
         "https://js.stripe.com",
         "https://m.stripe.network",
         "https://va.vercel-scripts.com",
+        "https://www.googletagmanager.com",
+        "https://www.google-analytics.com",
         ...(isProduction ? [] : ["'unsafe-eval'"])
     ];
 
@@ -35,6 +37,9 @@ function generateCSP() {
         "https://api.stripe.com",
         "https://maps.googleapis.com",
         "https://vitals.vercel-insights.com",
+        "https://www.google-analytics.com",
+        "https://analytics.google.com",
+        "https://region1.google-analytics.com",
         supabaseUrl ? `https://${new URL(supabaseUrl).hostname}` : "https://*.supabase.co",
         ...(isProduction ? [] : ["ws://localhost:3000", "ws://localhost:6006"])
     ];
@@ -64,7 +69,8 @@ function generateCSP() {
         'block-all-mixed-content': [],
         'upgrade-insecure-requests': [],
         'connect-src': connectSrc,
-        'frame-src': frameSrc
+        'frame-src': frameSrc,
+        'worker-src': ["'self'", "blob:"]
     };
 
     if (process.env.CSP_MODE === 'report-only') {
