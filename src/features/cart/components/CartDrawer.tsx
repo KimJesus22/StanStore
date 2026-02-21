@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import { useCartStore } from '../stores/useCartStore';
 import { useCart } from '../hooks/useCart';
-import { X, ShoppingBag, Loader2 } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,6 +12,8 @@ import { useRouter } from 'next/navigation';
 import CartItem from './CartItem';
 import CartSummary from './CartSummary';
 import { Link } from '@/navigation';
+import EmptyState from '@/components/ui/EmptyState';
+import { CartEmpty } from '@/components/illustrations';
 
 const Overlay = styled(motion.div)`
   position: fixed;
@@ -92,16 +94,6 @@ const Content = styled.div`
   gap: 1.5rem;
 `;
 
-const EmptyState = styled.div`
-  text-align: center;
-  margin-top: 3rem;
-  color: ${({ theme }) => theme.colors.text}80;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-`;
-
 const Footer = styled.div`
   padding: 1.5rem;
   border-top: 1px solid ${({ theme }) => theme.colors.border};
@@ -168,6 +160,7 @@ const TermsCheckbox = styled.div`
 
 export default function CartDrawer() {
   const t = useTranslations('Cart');
+  const tEmpty = useTranslations('EmptyStates');
   const locale = useLocale();
   const { isCartOpen, closeCart } = useCartStore();
   const { data: serverItems, isLoading } = useCart();
@@ -220,15 +213,26 @@ export default function CartDrawer() {
             </Header>
 
             {isLoading ? (
-              <EmptyState>
-                <Loader2 className="animate-spin" size={48} style={{ opacity: 0.2 }} />
-                <p>Cargando carrito...</p>
-              </EmptyState>
+              <Content style={{ justifyContent: 'center' }}>
+                <Loader2 className="animate-spin" size={48} style={{ opacity: 0.2, margin: '0 auto' }} />
+              </Content>
             ) : items.length === 0 ? (
-              <EmptyState>
-                <ShoppingBag size={48} style={{ opacity: 0.2 }} />
-                <p>{t('empty')}</p>
-              </EmptyState>
+              <Content style={{ justifyContent: 'center' }}>
+                <EmptyState
+                  icon={<CartEmpty />}
+                  title={tEmpty('cartTitle')}
+                  description={tEmpty('cartDesc')}
+                  action={
+                    <Link
+                      href="/"
+                      onClick={closeCart}
+                      className="inline-block rounded-full bg-black px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-105 dark:bg-white dark:text-black"
+                    >
+                      {tEmpty('cartAction')}
+                    </Link>
+                  }
+                />
+              </Content>
             ) : (
               <Content>
                 <AnimatePresence mode="popLayout">

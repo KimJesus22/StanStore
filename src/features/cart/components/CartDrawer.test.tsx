@@ -17,15 +17,22 @@ vi.mock('@/navigation', () => ({
 }));
 
 vi.mock('next-intl', () => ({
-    useTranslations: () => (key: string) => {
-        const messages: Record<string, string> = {
-            title: 'Tu Carrito',
-            close: 'Cerrar',
-            empty: 'Tu carrito está vacío',
-            total: 'Total',
-            checkout: 'Finalizar Compra'
+    useTranslations: (namespace: string) => (key: string) => {
+        const messages: Record<string, Record<string, string>> = {
+            Cart: {
+                title: 'Tu Carrito',
+                close: 'Cerrar',
+                empty: 'Tu carrito está vacío',
+                total: 'Total',
+                checkout: 'Finalizar Compra'
+            },
+            EmptyStates: {
+                cartTitle: 'Tu carrito está vacío',
+                cartDesc: 'Agrega productos para comenzar tu pedido.',
+                cartAction: 'Explorar Catálogo'
+            }
         };
-        return messages[key] || key;
+        return messages[namespace]?.[key] || key;
     },
     useLocale: () => 'es',
 }));

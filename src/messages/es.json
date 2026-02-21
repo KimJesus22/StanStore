@@ -172,6 +172,19 @@
         "reset": "Limpiar filtros",
         "apply": "Aplicar"
     },
+    "EmptyStates": {
+        "cartTitle": "Tu carrito está vacío",
+        "cartDesc": "Agrega productos para comenzar tu pedido.",
+        "cartAction": "Explorar Catálogo",
+        "searchTitle": "Sin resultados para \"{query}\"",
+        "searchDesc": "No encontramos merch que coincida. Intenta con otro nombre o revisa nuestras sugerencias.",
+        "searchAction": "Limpiar filtros",
+        "searchNoQueryTitle": "¿Qué estás buscando hoy?",
+        "searchNoQueryDesc": "Escribe el nombre de tu grupo o artista favorito para empezar.",
+        "ordersTitle": "Aún no tienes pedidos",
+        "ordersDesc": "Cuando realices tu primera compra, aparecerá aquí.",
+        "ordersAction": "Empezar tu primera compra"
+    },
     "Errors": {
         "generic": "Ha ocurrido un error",
         "notFound": "Página no encontrada",

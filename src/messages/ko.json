@@ -139,6 +139,19 @@
         "reset": "필터 초기화",
         "apply": "적용"
     },
+    "EmptyStates": {
+        "cartTitle": "장바구니가 비어 있습니다",
+        "cartDesc": "상품을 추가하여 주문을 시작하세요.",
+        "cartAction": "카탈로그 둘러보기",
+        "searchTitle": "\"{query}\"에 대한 결과 없음",
+        "searchDesc": "검색과 일치하는 굿즈를 찾을 수 없습니다. 다른 이름을 시도하거나 추천 상품을 확인해 보세요.",
+        "searchAction": "필터 초기화",
+        "searchNoQueryTitle": "무엇을 찾고 계신가요?",
+        "searchNoQueryDesc": "좋아하는 그룹이나 아티스트 이름을 입력하세요.",
+        "ordersTitle": "아직 주문이 없습니다",
+        "ordersDesc": "첫 구매를 하시면 여기에 표시됩니다.",
+        "ordersAction": "첫 구매 시작하기"
+    },
     "Errors": {
         "generic": "오류가 발생했습니다",
         "notFound": "페이지를 찾을 수 없습니다",

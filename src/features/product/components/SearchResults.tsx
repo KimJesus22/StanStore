@@ -4,8 +4,12 @@ import styled from 'styled-components';
 import { Product } from '@/types';
 import ProductCard from './ProductCard';
 import Spinner from '@/components/ui/Spinner';
-import { Frown, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import { mockProducts } from '@/data/mockData';
+import { useTranslations } from 'next-intl';
+import EmptyState from '@/components/ui/EmptyState';
+import { SearchEmpty } from '@/components/illustrations';
+import { Link } from '@/navigation';
 
 const Container = styled.div`
   width: 100%;
@@ -52,39 +56,7 @@ const LoadingContainer = styled.div`
   color: ${({ theme }) => theme.colors.text}99;
 `;
 
-const EmptyStateContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 4rem 1rem;
-  background-color: ${({ theme }) => theme.colors.secondaryBackground};
-  border-radius: 20px;
-  margin: 2rem 0;
-`;
 
-const EmptyIconWrapper = styled.div`
-  background-color: ${({ theme }) => theme.colors.background};
-  padding: 1.5rem;
-  border-radius: 50%;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-`;
-
-const EmptyTitle = styled.h3`
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const EmptyText = styled.p`
-  color: ${({ theme }) => theme.colors.text}99;
-  max-width: 400px;
-  line-height: 1.6;
-  margin-bottom: 2rem;
-`;
 
 const SuggestionSection = styled.div`
   margin-top: 3rem;
@@ -107,6 +79,8 @@ interface SearchResultsProps {
 }
 
 export default function SearchResults({ query, products, loading }: SearchResultsProps) {
+  const tEmpty = useTranslations('EmptyStates');
+
   if (loading) {
     return (
       <LoadingContainer>
@@ -118,13 +92,11 @@ export default function SearchResults({ query, products, loading }: SearchResult
 
   if (!query) {
     return (
-      <EmptyStateContainer>
-        <EmptyIconWrapper>
-          <TrendingUp size={48} color="#10CFBD" />
-        </EmptyIconWrapper>
-        <EmptyTitle>¿Qué estás buscando hoy?</EmptyTitle>
-        <EmptyText>Escribe el nombre de tu grupo o artista favorito para empezar.</EmptyText>
-      </EmptyStateContainer>
+      <EmptyState
+        icon={<SearchEmpty />}
+        title={tEmpty('searchNoQueryTitle')}
+        description={tEmpty('searchNoQueryDesc')}
+      />
     );
   }
 
@@ -135,13 +107,32 @@ export default function SearchResults({ query, products, loading }: SearchResult
           <Title>Resultados para <QueryText>&ldquo;{query}&rdquo;</QueryText></Title>
         </Header>
 
-        <EmptyStateContainer>
-          <EmptyIconWrapper>
-            <Frown size={48} color="#FF6B6B" />
-          </EmptyIconWrapper>
-          <EmptyTitle>Vaya, no hemos encontrado merch de ese artista 😢</EmptyTitle>
-          <EmptyText>Intenta buscar con otro nombre o revisa nuestra sección de sugerencias.</EmptyText>
-        </EmptyStateContainer>
+        <EmptyState
+          icon={<SearchEmpty />}
+          title={tEmpty('searchTitle', { query })}
+          description={tEmpty('searchDesc')}
+          action={
+            <Link
+              href="/"
+              className="inline-block rounded-full bg-black px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-105 dark:bg-white dark:text-black"
+            >
+              {tEmpty('searchAction')}
+            </Link>
+          }
+        />
+
+        {/* Categorías sugeridas */}
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          {['album', 'merch', 'lightstick'].map((cat) => (
+            <Link
+              key={cat}
+              href={`/?category=${cat}` as '/'}
+              className="rounded-full border border-gray-200 px-4 py-2 text-sm text-gray-600 transition-colors hover:border-black hover:text-black dark:border-gray-700 dark:text-gray-400 dark:hover:border-white dark:hover:text-white"
+            >
+              {cat === 'album' ? 'Álbumes' : cat === 'merch' ? 'Ropa' : 'Accesorios'}
+            </Link>
+          ))}
+        </div>
 
         <SuggestionSection>
           <SuggestionTitle>

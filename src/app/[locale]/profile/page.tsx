@@ -11,8 +11,12 @@ import toast from 'react-hot-toast';
 import { getUserData } from '@/app/actions/privacy';
 import { useTheme } from '@/context/ThemeContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import { useTranslations } from 'next-intl';
+import EmptyState from '@/components/ui/EmptyState';
+import { NoOrders } from '@/components/illustrations';
+import { Link } from '@/navigation';
 
- 
+
 const LoyaltyCard = dynamic(() => import('@/features/loyalty/components/LoyaltyCard'), {
   ssr: false,
   loading: () => <div style={{ background: '#fff', borderRadius: '20px', padding: '3rem', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginBottom: '2rem', textAlign: 'center', color: '#888' }}>Cargando programa de lealtad...</div>,
@@ -180,6 +184,7 @@ export default function ProfilePage() {
   const { user, isLoading, signOut, openAuthModal } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { formatPrice } = useCurrency();
+  const tEmpty = useTranslations('EmptyStates');
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const router = useRouter();
@@ -387,7 +392,19 @@ export default function ProfilePage() {
 
       <OrdersList>
         {orders.length === 0 ? (
-          <p style={{ color: '#888', fontStyle: 'italic' }}>No has realizado ninguna compra aún.</p>
+          <EmptyState
+            icon={<NoOrders />}
+            title={tEmpty('ordersTitle')}
+            description={tEmpty('ordersDesc')}
+            action={
+              <Link
+                href="/"
+                className="inline-block rounded-full bg-black px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-105 dark:bg-white dark:text-black"
+              >
+                {tEmpty('ordersAction')}
+              </Link>
+            }
+          />
         ) : (
           orders.map((order) => (
             <OrderCard key={order.id}>
