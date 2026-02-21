@@ -13,7 +13,6 @@ const withSerwist = withSerwistInit({
 const nextConfig: NextConfig = {
   output: "standalone",
   transpilePackages: ['styled-components'],
-  turbopack: {},
   images: {
     // loader: 'custom',
     // loaderFile: './src/lib/cloudinaryLoader.ts',

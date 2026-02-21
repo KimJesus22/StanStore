@@ -1,5 +1,6 @@
 'use server';
 
+import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe';
 import { supabase } from '@/lib/supabaseClient';
 import { logAuditAction } from '@/app/actions/audit';
@@ -19,7 +20,11 @@ export async function validatePromoCode(code: string) {
         }
 
         const promoCode = promoCodes.data[0];
-        const coupon = promoCode.coupon;
+        const coupon = promoCode.promotion.coupon;
+
+        if (!coupon || typeof coupon === 'string') {
+            return { error: 'Error al obtener datos del cupón' };
+        }
 
         return {
             id: promoCode.id,
@@ -125,8 +130,7 @@ export async function createCheckoutSession(
         }
 
         // 3. Create Stripe Session (single session with all discounts)
-        const sessionParams: Parameters<typeof stripe.checkout.sessions.create>[0] = {
-            payment_method_types: ['card'],
+        const sessionParams: Stripe.Checkout.SessionCreateParams = {
             line_items: lineItems,
             mode: 'payment',
             success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/success?session_id={CHECKOUT_SESSION_ID}`,
