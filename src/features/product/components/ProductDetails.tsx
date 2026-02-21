@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useCartStore } from '@/features/cart';
 import { useCart } from '@/features/cart';
@@ -44,6 +44,7 @@ const SimilarProducts = dynamic(() => import('@/features/product/components/Simi
 
 import { verifyPurchase } from '@/app/actions/reviews';
 import { useCurrency } from '@/context/CurrencyContext';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 
 const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
@@ -271,6 +272,7 @@ export default function ProductDetails({ product, reviewsSlot }: { product: Prod
   const locale = useLocale();
   const { addToCart, isAdding } = useCart();
   const openCart = useCartStore((state) => state.openCart); // Keep using store for UI state (open drawer)
+  const { addViewedProduct } = useRecentlyViewed();
 
   const description = locale === 'ko'
     ? (product.description_ko || product.description)
@@ -285,6 +287,16 @@ export default function ProductDetails({ product, reviewsSlot }: { product: Prod
   const [isFanMode, setIsFanMode] = useState(false);
   const searchParams = useSearchParams();
   const setReferrer = useReferralStore((s) => s.setReferrer);
+
+  // Registra el producto como visto al montar.
+  // El ref-guard evita la doble ejecución de React StrictMode (React 18 preserva
+  // los refs en el ciclo mount→unmount→remount simulado en desarrollo).
+  const trackedProductRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!product || trackedProductRef.current === product.id) return;
+    trackedProductRef.current = product.id;
+    addViewedProduct(product.id, product.category, product.artist);
+  }, [product, addViewedProduct]);
 
   // Capture ?ref= param from URL
   useEffect(() => {

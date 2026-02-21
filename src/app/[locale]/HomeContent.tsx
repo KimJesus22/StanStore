@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 
 import {
     ProductList,
@@ -12,6 +13,12 @@ import {
     useProducts,
     useArtists
 } from '@/features/product';
+
+// ssr: false — lee localStorage, invisible hasta que el cliente hidrata
+const PersonalizedRecommendations = dynamic(
+  () => import('@/features/product/components/PersonalizedRecommendations'),
+  { ssr: false },
+);
 
 const Main = styled.div`
   max-width: 1400px;
@@ -223,6 +230,8 @@ export default function Home() {
                         loading={loading}
                         onReset={handlers.onReset}
                     />
+
+                    <PersonalizedRecommendations />
                 </ProductSection>
             </ContentLayout>
         </Main>
