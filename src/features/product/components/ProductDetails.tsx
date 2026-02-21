@@ -65,19 +65,26 @@ const Container = styled.div`
 
 const ImageWrapper = styled.div`
   flex: 1;
-  background-color: ${({ theme }) => theme.colors.secondaryBackground};
-  border-radius: 20px;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.18),
+    0 24px 64px rgba(0, 0, 0, 0.22);
   aspect-ratio: 1 / 1;
   position: relative;
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  background: #111;
+  align-self: flex-start;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+
+  @media (max-width: 768px) {
+    border-radius: 16px;
   }
 `;
 
@@ -418,7 +425,7 @@ export default function ProductDetails({ product, reviewsSlot }: { product: Prod
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
           placeholder="blur"
           blurDataURL={BLUR_DATA_URL}
-          style={{ objectFit: 'contain' }}
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
         />
       </ImageWrapper>
 
