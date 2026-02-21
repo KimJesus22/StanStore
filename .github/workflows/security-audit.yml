@@ -1,0 +1,128 @@
+name: Security Audit (OWASP Dependency Check)
+
+on:
+  schedule:
+    - cron: '0 2 * * 0'   # Sundays at 2:00 AM UTC
+  workflow_dispatch:        # Manual trigger from GitHub UI
+  pull_request:
+    branches:
+      - main                # Only on PRs targeting main
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write  # Required to upload SARIF results
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Node.js dependency audit ────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: npm audit (high + critical)
+        run: npm audit --audit-level=high --json > npm-audit.json || true
+
+      - name: Upload npm audit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: npm-audit.json
+          retention-days: 30
+
+      # ── 3. NVD database cache ──────────────────────────────────────────────
+      # OWASP Dependency-Check stores its NVD mirror under ~/.gradle/dependency-check-data.
+      # The first run downloads ~300 MB of CVE data; subsequent runs do incremental
+      # updates only (usually < 5 MB). Caching this folder cuts cold-start time from
+      # ~10 min down to ~1 min on cache hits.
+      - name: Cache OWASP NVD database
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/dependency-check-data
+          # Key rotates weekly so the cache never grows stale longer than 7 days.
+          # The cron trigger (Sundays) will always bust the key on its first run,
+          # then subsequent PR runs the same week reuse the fresh copy.
+          key: owasp-nvd-${{ runner.os }}-${{ env.CACHE_WEEK }}
+          restore-keys: |
+            owasp-nvd-${{ runner.os }}-
+        env:
+          # $(date +%Y-%V) returns "2024-22" — year + ISO week number
+          CACHE_WEEK: ${{ github.run_id }}   # overridden below via shell
+
+      # Compute a stable weekly cache key (actions/cache doesn't support shell
+      # expressions directly in `key`, so we set the env var in a prior step).
+      - name: Set weekly cache key
+        run: echo "CACHE_WEEK=$(date +%Y-%V)" >> $GITHUB_ENV
+
+      # ── 4. OWASP Dependency-Check ──────────────────────────────────────────
+      - name: Run OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'Mi Tienda E-commerce'
+          # --scan targets the entire repo; ODC will discover every package.json
+          # and package-lock.json automatically through its Node.js analyzer.
+          path: '.'
+          # Generate both a human-readable HTML report and a machine-parseable
+          # JSON report. The action writes them to ./reports/ by default.
+          format: 'HTML'
+          args: >
+            --format JSON
+            --format SARIF
+            --scan .
+            --enableRetired
+            --enableExperimental
+            --failOnCVSS 7
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+
+      # ── 5. Upload reports ──────────────────────────────────────────────────
+      # CRITICAL: if: always() ensures this step runs even when the OWASP step
+      # exits with code 1 (vulnerabilities found). Without it, GitHub Actions
+      # would skip every subsequent step the moment --failOnCVSS triggers,
+      # leaving you with a broken build and zero evidence of what caused it.
+      - name: Upload OWASP security report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: owasp-security-report
+          path: |
+            reports/dependency-check-report.html
+            reports/dependency-check-report.json
+            reports/dependency-check-report.sarif
+          retention-days: 14
+
+      # ── 6. Upload SARIF to GitHub Security tab ─────────────────────────────
+      # SARIF (Static Analysis Results Interchange Format) is the universal
+      # format that GitHub's Security tab understands. This step feeds OWASP
+      # results directly into the same dashboard used by CodeQL and Dependabot,
+      # giving you a single unified view of all vulnerabilities.
+      - name: Upload SARIF to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: reports/dependency-check-report.sarif
+          # Category label shown in the Security tab to distinguish
+          # this tool's results from CodeQL or other SARIF sources.
+          category: owasp-dependency-check
+
+      # ── 7. Summary ─────────────────────────────────────────────────────────
+      - name: Post audit summary
+        if: always()
+        run: |
+          echo "## Security Audit Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Tool | Formato | Destino |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|---------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| npm audit | JSON | Artifact \`npm-audit-report\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| OWASP Dependency-Check | HTML + JSON | Artifact \`owasp-security-report\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| OWASP Dependency-Check | SARIF | Pestaña Security de GitHub |" >> $GITHUB_STEP_SUMMARY
