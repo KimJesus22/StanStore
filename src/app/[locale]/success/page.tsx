@@ -53,7 +53,13 @@ function SuccessContent() {
   const { items, clearCart } = useCartStore();
   const { user, isLoading: authLoading } = useAuth();
   const searchParams = useSearchParams();
-  const sessionId = searchParams.get('session_id');
+  const sessionId = searchParams.get('session_id'); // Stripe
+  // MercadoPago params
+  const mpPaymentId = searchParams.get('payment_id');
+  const mpStatus = searchParams.get('status');
+  const mpApproved = mpStatus === 'approved' || mpStatus === 'pending';
+  // Unified payment key used for order saving
+  const paymentKey = sessionId || (mpApproved && mpPaymentId ? `mp_${mpPaymentId}` : null);
 
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -76,7 +82,7 @@ function SuccessContent() {
     // Esperar a que auth termine de cargar antes de procesar
     if (authLoading) return;
 
-    if (sessionId && items.length > 0 && user && !isSaving && !saved) {
+    if (paymentKey && items.length > 0 && user && !isSaving && !saved) {
       const processOrder = async () => {
         setIsSaving(true);
         console.log('Processing order for user:', user.email);
@@ -95,7 +101,7 @@ function SuccessContent() {
               price: item.price,
               image_url: item.image_url
             })),
-            sessionId: sessionId
+            sessionId: paymentKey
           });
 
           if (result.success && result.order) {
@@ -118,7 +124,7 @@ function SuccessContent() {
       };
 
       processOrder();
-    } else if (sessionId && items.length > 0 && !user) {
+    } else if (paymentKey && items.length > 0 && !user) {
       // Guest logic
       if (!isSaving && !saved) {
         const timer = setTimeout(() => {
@@ -127,7 +133,7 @@ function SuccessContent() {
         return () => clearTimeout(timer);
       }
     }
-  }, [sessionId, items, user, authLoading, clearCart, isSaving, saved]);
+  }, [paymentKey, items, user, authLoading, clearCart, isSaving, saved]);
 
   return (
     <>

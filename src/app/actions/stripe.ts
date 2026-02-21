@@ -6,6 +6,32 @@ import { logAuditAction } from '@/app/actions/audit';
 import { ShippingInfo } from '@/types';
 import { POINTS_DISCOUNT_MXN } from '@/features/cart';
 
+export async function validatePromoCode(code: string) {
+    try {
+        const promoCodes = await stripe.promotionCodes.list({
+            code: code.trim().toUpperCase(),
+            active: true,
+            limit: 1,
+        });
+
+        if (promoCodes.data.length === 0) {
+            return { error: 'Código de descuento inválido o expirado' };
+        }
+
+        const promoCode = promoCodes.data[0];
+        const coupon = promoCode.coupon;
+
+        return {
+            id: promoCode.id,
+            percentOff: coupon.percent_off ?? null,
+            amountOff: coupon.amount_off ? coupon.amount_off / 100 : null, // centavos → MXN
+        };
+    } catch (error) {
+        console.error('Error validating promo code:', error);
+        return { error: 'Error al validar el código' };
+    }
+}
+
 export async function createCheckoutSession(
     cartItems: { id: string; quantity: number }[],
     legalMetadata?: { agreedAt: string; userAgent: string },
@@ -13,7 +39,8 @@ export async function createCheckoutSession(
     shippingInfo?: ShippingInfo,
     referrerId?: string,
     usePoints?: boolean,
-    userId?: string
+    userId?: string,
+    promoCodeId?: string
 ) {
     try {
         // Stripe instance comes from lib/stripe with version checks
@@ -72,85 +99,62 @@ export async function createCheckoutSession(
             throw new Error('No valid items in cart');
         }
 
-        // 2. Create Stripe Session
-        const session = await stripe.checkout.sessions.create({
+        // 2. Build discounts array
+        const discounts: { coupon?: string; promotion_code?: string }[] = [];
+
+        // Points discount: deduct atomically before creating session
+        if (usePoints && userId) {
+            const { redeemLoyaltyPoints } = await import('@/app/actions/loyalty');
+            const redemption = await redeemLoyaltyPoints(userId);
+            if (!redemption.success) {
+                return { error: redemption.error || 'Error al canjear puntos' };
+            }
+            const coupon = await stripe.coupons.create({
+                amount_off: POINTS_DISCOUNT_MXN * 100,
+                currency: 'mxn',
+                duration: 'once',
+                name: 'Descuento Lealtad (500 pts)',
+                max_redemptions: 1,
+            });
+            discounts.push({ coupon: coupon.id });
+        }
+
+        // Promo code discount
+        if (promoCodeId) {
+            discounts.push({ promotion_code: promoCodeId });
+        }
+
+        // 3. Create Stripe Session (single session with all discounts)
+        const sessionParams: Parameters<typeof stripe.checkout.sessions.create>[0] = {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
             success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/`,
             metadata: {
-                // We serialize the items to retrieve them in the webhook
                 items: JSON.stringify(cartItems.map(item => ({ id: item.id, quantity: item.quantity }))),
-                // Legal Metadata
                 agreedAt: legalMetadata?.agreedAt || '',
                 userAgent: legalMetadata?.userAgent || '',
-                // Shipping Info
                 shippingInfo: shippingInfo ? JSON.stringify(shippingInfo) : '',
-                // Referral tracking
                 referrerId: referrerId || '',
-                // Points redemption
                 pointsRedeemed: usePoints ? 'true' : '',
                 redeemerUserId: userId || '',
             },
-        });
+        };
 
-        // If user is redeeming points, apply discount via Stripe coupon
-        if (usePoints && userId) {
-            // Deduct points atomically BEFORE redirecting to Stripe
-            const { redeemLoyaltyPoints } = await import('@/app/actions/loyalty');
-            const redemption = await redeemLoyaltyPoints(userId);
-
-            if (!redemption.success) {
-                return { error: redemption.error || 'Error al canjear puntos' };
-            }
-
-            // Create a one-time Stripe coupon and apply it
-            const coupon = await stripe.coupons.create({
-                amount_off: POINTS_DISCOUNT_MXN * 100, // centavos
-                currency: 'mxn',
-                duration: 'once',
-                name: 'Descuento Lealtad (500 pts)',
-                max_redemptions: 1,
-            });
-
-            // Update session with the discount
-            // Since we can't modify a session, we need to create a new one with the discount
-            // Let's recreate the session with the discount applied
-            const discountSession = await stripe.checkout.sessions.create({
-                payment_method_types: ['card'],
-                line_items: lineItems,
-                mode: 'payment',
-                discounts: [{ coupon: coupon.id }],
-                success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/success?session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/`,
-                metadata: {
-                    items: JSON.stringify(cartItems.map(item => ({ id: item.id, quantity: item.quantity }))),
-                    agreedAt: legalMetadata?.agreedAt || '',
-                    userAgent: legalMetadata?.userAgent || '',
-                    shippingInfo: shippingInfo ? JSON.stringify(shippingInfo) : '',
-                    referrerId: referrerId || '',
-                    pointsRedeemed: 'true',
-                    redeemerUserId: userId,
-                },
-            });
-
-            await logAuditAction('CHECKOUT_SESSION_CREATED', {
-                amountTotal: lineItems.reduce((acc, item) => acc + (item.price_data.unit_amount * item.quantity), 0) / 100,
-                itemCount: cartItems.length,
-                legalAgreement: !!legalMetadata,
-                pointsRedeemed: true,
-                discount: POINTS_DISCOUNT_MXN,
-            });
-
-            return { url: discountSession.url };
+        if (discounts.length > 0) {
+            sessionParams.discounts = discounts;
         }
+
+        const session = await stripe.checkout.sessions.create(sessionParams);
 
         // Audit Log
         await logAuditAction('CHECKOUT_SESSION_CREATED', {
             amountTotal: lineItems.reduce((acc, item) => acc + (item.price_data.unit_amount * item.quantity), 0) / 100,
             itemCount: cartItems.length,
-            legalAgreement: !!legalMetadata
+            legalAgreement: !!legalMetadata,
+            pointsRedeemed: !!usePoints,
+            promoCode: promoCodeId ? true : false,
         });
 
         return { url: session.url };

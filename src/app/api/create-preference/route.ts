@@ -31,9 +31,10 @@ import { supabase } from '@/lib/supabaseClient';
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { items, locale = 'es' } = body as {
+        const { items, locale = 'es', discountAmount = 0 } = body as {
             items: { id: string; quantity: number }[];
             locale?: string;
+            discountAmount?: number;
         };
 
         if (!items || items.length === 0) {
@@ -42,6 +43,8 @@ export async function POST(req: NextRequest) {
 
         // Fetch real prices from DB to prevent price tampering
         const preferenceItems = [];
+        let subtotal = 0;
+
         for (const item of items) {
             const { data: product, error } = await supabase
                 .from('products')
@@ -54,10 +57,11 @@ export async function POST(req: NextRequest) {
                 continue;
             }
 
+            subtotal += product.price * item.quantity;
+
             preferenceItems.push({
                 id: item.id,
                 title: product.name,
-                // MercadoPago requires unit_price as a float (MXN)
                 unit_price: Math.round(product.price * 100) / 100,
                 quantity: item.quantity,
                 currency_id: 'MXN',
@@ -67,6 +71,14 @@ export async function POST(req: NextRequest) {
 
         if (preferenceItems.length === 0) {
             return NextResponse.json({ error: 'No valid items in cart' }, { status: 400 });
+        }
+
+        // Apply discount proportionally across items
+        if (discountAmount > 0 && subtotal > 0) {
+            const discountFactor = Math.max(0, 1 - discountAmount / subtotal);
+            for (const item of preferenceItems) {
+                item.unit_price = Math.round(item.unit_price * discountFactor * 100) / 100;
+            }
         }
 
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
@@ -82,16 +94,17 @@ export async function POST(req: NextRequest) {
                 },
                 auto_return: 'approved',
                 notification_url: `${baseUrl}/api/webhooks/mercadopago`,
-                // Store item metadata to reconcile in the webhook
                 metadata: {
-                    items: JSON.stringify(
-                        items.map(i => ({ id: i.id, quantity: i.quantity }))
-                    ),
+                    items: JSON.stringify(items.map(i => ({ id: i.id, quantity: i.quantity }))),
+                    discountAmount: String(discountAmount),
                 },
             },
         });
 
-        return NextResponse.json({ preferenceId: result.id });
+        return NextResponse.json({
+            preferenceId: result.id,
+            initPoint: result.init_point,
+        });
     } catch (error) {
         console.error('MercadoPago preference error:', error);
         return NextResponse.json(

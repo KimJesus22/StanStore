@@ -428,6 +428,119 @@ const DiscountRow = styled.div`
     font-weight: 600;
 `;
 
+const PromoSection = styled.div`
+    margin: 1rem 0 0.5rem;
+`;
+
+const PromoRow = styled.div`
+    display: flex;
+    gap: 0.5rem;
+`;
+
+const PromoInput = styled.input`
+    flex: 1;
+    padding: 0.65rem 0.875rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #111;
+    background: #fff;
+    outline: none;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    &:focus { border-color: #111; }
+    &::placeholder { text-transform: none; letter-spacing: normal; color: #aaa; }
+    &:disabled { background: #f5f5f5; }
+`;
+
+const PromoApplyButton = styled.button`
+    padding: 0.65rem 1rem;
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: background 0.2s;
+    &:disabled { background: #ccc; cursor: not-allowed; }
+    &:hover:not(:disabled) { background: #000; }
+`;
+
+const PromoSuccess = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #16a34a;
+    font-weight: 600;
+`;
+
+const PromoRemove = styled.button`
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #16a34a;
+    opacity: 0.6;
+    padding: 0;
+    line-height: 1;
+    font-size: 1rem;
+    &:hover { opacity: 1; }
+`;
+
+const PromoError = styled.div`
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: #e53935;
+`;
+
+const PaymentMethodSection = styled.div`
+    margin: 1.25rem 0 1rem;
+`;
+
+const PaymentMethodLabel = styled.div`
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+`;
+
+const PaymentMethodGrid = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+`;
+
+const PaymentMethodCard = styled.button<{ $active: boolean }>`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 0.75rem;
+    border: 2px solid ${({ $active }) => ($active ? '#111' : '#e5e5e5')};
+    border-radius: 10px;
+    background: ${({ $active }) => ($active ? '#111' : '#fff')};
+    color: ${({ $active }) => ($active ? '#fff' : '#444')};
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    &:hover {
+        border-color: #111;
+    }
+`;
+
 /* ─── Component ─── */
 
 export default function CheckoutForm() {
@@ -446,6 +559,20 @@ export default function CheckoutForm() {
     const [userPoints, setUserPoints] = useState<number>(0);
     const [usePoints, setUsePoints] = useState(false);
     const [loadingPoints, setLoadingPoints] = useState(true);
+
+    // Promo code state
+    const [promoInput, setPromoInput] = useState('');
+    const [promoLoading, setPromoLoading] = useState(false);
+    const [promoError, setPromoError] = useState('');
+    const [appliedPromo, setAppliedPromo] = useState<{
+        id: string;
+        code: string;
+        percentOff: number | null;
+        amountOff: number | null;
+    } | null>(null);
+
+    // Payment method
+    const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'mercadopago'>('stripe');
 
     // Fetch user's loyalty points
     useEffect(() => {
@@ -500,9 +627,34 @@ export default function CheckoutForm() {
     // Watch fields for floating labels
     const watchedFields = watch();
 
+    const handleApplyPromo = async () => {
+        if (!promoInput.trim()) return;
+        setPromoLoading(true);
+        setPromoError('');
+        const { validatePromoCode } = await import('@/app/actions/stripe');
+        const result = await validatePromoCode(promoInput.trim());
+        if ('error' in result && result.error) {
+            setPromoError(result.error);
+            setAppliedPromo(null);
+        } else if ('id' in result) {
+            setAppliedPromo({
+                id: result.id!,
+                code: promoInput.trim().toUpperCase(),
+                percentOff: result.percentOff ?? null,
+                amountOff: result.amountOff ?? null,
+            });
+        }
+        setPromoLoading(false);
+    };
+
     const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    const discount = usePoints ? POINTS_DISCOUNT_MXN : 0;
-    const finalTotal = Math.max(0, total - discount);
+    const promoDiscount = appliedPromo
+        ? appliedPromo.percentOff
+            ? Math.round(total * (appliedPromo.percentOff / 100))
+            : (appliedPromo.amountOff || 0)
+        : 0;
+    const pointsDiscount = usePoints ? POINTS_DISCOUNT_MXN : 0;
+    const finalTotal = Math.max(0, total - pointsDiscount - promoDiscount);
 
     const onSubmit = async (data: CheckoutSchema) => {
         if (items.length === 0) {
@@ -512,6 +664,31 @@ export default function CheckoutForm() {
 
         setLoading(true);
         try {
+            const totalDiscount = pointsDiscount + promoDiscount;
+
+            if (paymentMethod === 'mercadopago') {
+                const res = await fetch('/api/create-preference', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        items: items.map(item => ({ id: item.id, quantity: item.quantity })),
+                        locale,
+                        discountAmount: totalDiscount,
+                    }),
+                });
+                const prefData = await res.json();
+                if (prefData.error) {
+                    toast.error('Error al iniciar el pago: ' + prefData.error);
+                    return;
+                }
+                if (prefData.initPoint) {
+                    clearReferrer();
+                    window.location.href = prefData.initPoint;
+                }
+                return;
+            }
+
+            // Stripe flow
             const { createCheckoutSession } = await import('@/app/actions/stripe');
 
             const legalMetadata = {
@@ -537,7 +714,8 @@ export default function CheckoutForm() {
                 },
                 referrerId || undefined,
                 usePoints,
-                user?.id
+                user?.id,
+                appliedPromo?.id
             );
 
             if (error) {
@@ -754,6 +932,47 @@ export default function CheckoutForm() {
                     <span>{formatPrice(total)}</span>
                 </TotalRow>
 
+                {/* Promo Code */}
+                <PromoSection>
+                    {!appliedPromo ? (
+                        <>
+                            <PromoRow>
+                                <PromoInput
+                                    type="text"
+                                    placeholder="Código de descuento"
+                                    value={promoInput}
+                                    onChange={(e) => { setPromoInput(e.target.value); setPromoError(''); }}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleApplyPromo()}
+                                    disabled={promoLoading}
+                                />
+                                <PromoApplyButton
+                                    type="button"
+                                    onClick={handleApplyPromo}
+                                    disabled={promoLoading || !promoInput.trim()}
+                                >
+                                    {promoLoading ? <Loader2 size={14} className="animate-spin" /> : 'Aplicar'}
+                                </PromoApplyButton>
+                            </PromoRow>
+                            {promoError && <PromoError>{promoError}</PromoError>}
+                        </>
+                    ) : (
+                        <PromoSuccess>
+                            <span>
+                                ✓ {appliedPromo.code} —{' '}
+                                {appliedPromo.percentOff
+                                    ? `${appliedPromo.percentOff}% de descuento`
+                                    : `${formatPrice(appliedPromo.amountOff || 0)} de descuento`}
+                            </span>
+                            <PromoRemove
+                                type="button"
+                                onClick={() => { setAppliedPromo(null); setPromoInput(''); }}
+                            >
+                                ✕
+                            </PromoRemove>
+                        </PromoSuccess>
+                    )}
+                </PromoSection>
+
                 {/* Points Redemption */}
                 {!loadingPoints && user && userPoints >= POINTS_REQUIRED && (
                     <PointsRedeemCard
@@ -778,10 +997,17 @@ export default function CheckoutForm() {
                     </PointsRedeemCard>
                 )}
 
+                {appliedPromo && (
+                    <DiscountRow>
+                        <span>Código {appliedPromo.code}</span>
+                        <span>-{formatPrice(promoDiscount)}</span>
+                    </DiscountRow>
+                )}
+
                 {usePoints && (
                     <DiscountRow>
                         <span>Descuento Lealtad (-{POINTS_REQUIRED} pts)</span>
-                        <span>-{formatPrice(POINTS_DISCOUNT_MXN)}</span>
+                        <span>-{formatPrice(pointsDiscount)}</span>
                     </DiscountRow>
                 )}
 
@@ -789,6 +1015,27 @@ export default function CheckoutForm() {
                     <span style={{ fontWeight: 800 }}>Total</span>
                     <span style={{ fontWeight: 800 }}>{formatPrice(finalTotal)}</span>
                 </TotalRow>
+
+                {/* Payment Method Selector */}
+                <PaymentMethodSection>
+                    <PaymentMethodLabel>Método de pago</PaymentMethodLabel>
+                    <PaymentMethodGrid>
+                        <PaymentMethodCard
+                            type="button"
+                            $active={paymentMethod === 'stripe'}
+                            onClick={() => setPaymentMethod('stripe')}
+                        >
+                            💳 Stripe
+                        </PaymentMethodCard>
+                        <PaymentMethodCard
+                            type="button"
+                            $active={paymentMethod === 'mercadopago'}
+                            onClick={() => setPaymentMethod('mercadopago')}
+                        >
+                            🟡 MercadoPago
+                        </PaymentMethodCard>
+                    </PaymentMethodGrid>
+                </PaymentMethodSection>
 
                 <PayButton
                     onClick={handleSubmit(onSubmit)}
@@ -798,8 +1045,10 @@ export default function CheckoutForm() {
                         <>
                             <Loader2 size={18} className="animate-spin" /> Procesando...
                         </>
+                    ) : paymentMethod === 'mercadopago' ? (
+                        `Pagar con MercadoPago ${formatPrice(finalTotal)}`
                     ) : (
-                        `Pagar ${formatPrice(finalTotal)}`
+                        `Pagar con Stripe ${formatPrice(finalTotal)}`
                     )}
                 </PayButton>
             </SummaryPanel>
