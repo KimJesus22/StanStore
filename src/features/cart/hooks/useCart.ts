@@ -123,11 +123,53 @@ export const useCart = () => {
         addToCartMutation.mutate(params);
     };
 
+    const removeFromCartMutation = useMutation({
+        mutationFn: async (productId: string) => {
+            const response = await fetch('/api/cart', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId }),
+            });
+            if (!response.ok) throw new Error('Failed to remove from cart');
+            return response.json();
+        },
+        onMutate: async (productId: string) => {
+            await queryClient.cancelQueries({ queryKey: ['cart'] });
+            const previousItems = queryClient.getQueryData<CartItem[]>(['cart', user?.id]);
+            // Optimistic update: remove from React Query cache immediately
+            queryClient.setQueryData<CartItem[]>(['cart', user?.id], (old) =>
+                old ? old.filter((item) => item.id !== productId) : []
+            );
+            // Also update Zustand store for badge count
+            useCartStore.getState().removeFromCart(productId);
+            return { previousItems };
+        },
+        onError: (_error, _productId, context) => {
+            if (context?.previousItems) {
+                queryClient.setQueryData(['cart', user?.id], context.previousItems);
+            }
+            toast.error('Error al eliminar del carrito. Inténtalo de nuevo.');
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['cart'] });
+        },
+    });
+
+    const removeFromCart = (productId: string) => {
+        if (!user) {
+            useCartStore.getState().removeFromCart(productId);
+            return;
+        }
+        removeFromCartMutation.mutate(productId);
+    };
+
     return {
         ...query,
         addToCart,
         addToCartAsync: addToCartMutation.mutateAsync,
         isAdding: addToCartMutation.isPending,
+        removeFromCart,
+        isRemoving: removeFromCartMutation.isPending,
     };
 };
 

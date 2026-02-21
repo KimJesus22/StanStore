@@ -43,10 +43,9 @@ const SimilarProducts = dynamic(() => import('@/features/product/components/Simi
 });
 
 import { verifyPurchase } from '@/app/actions/reviews';
-// import { useCurrency } from '@/context/CurrencyContext'; // Replaced by PriceTag
-import PriceTag from '@/components/ui/PriceTag';
+import { useCurrency } from '@/context/CurrencyContext';
 
-const BLUR_DATA_URL = "data:image/png;base664,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 const Container = styled.div`
   max-width: 1200px;
@@ -278,7 +277,7 @@ export default function ProductDetails({ product, reviewsSlot }: { product: Prod
     : locale === 'en'
       ? (product.description_en || product.description)
       : product.description;
-  // const { formatPrice } = useCurrency(); // Removed
+  const { formatPrice } = useCurrency();
   const [quantity, setQuantity] = useState(1);
   const [currentStock, setCurrentStock] = useState(product?.stock || 0);
   const [canReview, setCanReview] = useState(false);
@@ -438,8 +437,7 @@ export default function ProductDetails({ product, reviewsSlot }: { product: Prod
         )}
 
         <Price>
-          {/* Usando PriceTag con useFormatter */}
-          <PriceTag amount={product.price} currency="USD" />
+          {formatPrice(product.price)}
         </Price>
 
         {/* Ejemplo de formateo de fecha */}

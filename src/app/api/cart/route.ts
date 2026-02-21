@@ -122,3 +122,38 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
+export async function DELETE(request: Request) {
+    try {
+        const supabase = await createSupabaseServerClient();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const body = await request.json();
+        const { productId } = body;
+
+        if (!productId) {
+            return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
+        }
+
+        const { error } = await supabase
+            .from('cart_items')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('product_id', productId);
+
+        if (error) {
+            console.error('Error removing from cart:', error);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+
+        return NextResponse.json({ success: true });
+
+    } catch (error) {
+        console.error('Unexpected error in DELETE /api/cart:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}

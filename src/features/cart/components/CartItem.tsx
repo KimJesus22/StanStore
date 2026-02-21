@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { Trash2 } from 'lucide-react';
 import ProductImage from '@/components/ui/ProductImage';
 import { useCurrency } from '@/context/CurrencyContext';
-import { useCartStore, CartItem as CartItemType } from '../stores/useCartStore';
+import { CartItem as CartItemType } from '../stores/useCartStore';
+import { useCart } from '../hooks/useCart';
 
 const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
@@ -82,7 +83,7 @@ interface CartItemProps {
 }
 
 export default function CartItem({ item }: CartItemProps) {
-    const { removeFromCart } = useCartStore();
+    const { removeFromCart } = useCart();
     const { formatPrice } = useCurrency();
 
     return (
