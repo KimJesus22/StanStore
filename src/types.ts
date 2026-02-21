@@ -9,6 +9,10 @@ export interface Product {
     description?: string;
     description_en?: string;
     description_ko?: string;
+    description_pt?: string;
+    description_fr?: string;
+    name_pt?: string;
+    name_fr?: string;
     stock: number;
     spotify_album_id?: string;
     theme_color?: string;

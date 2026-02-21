@@ -1,0 +1,193 @@
+{
+    "Navbar": {
+        "home": "Accueil",
+        "search": "Rechercher",
+        "clearSearch": "Effacer la recherche",
+        "profile": "Profil",
+        "cart": "Panier",
+        "login": "Connexion",
+        "logout": "Déconnexion"
+    },
+    "Auth": {
+        "loginButton": "Entrer",
+        "login": "Connexion",
+        "register": "S'inscrire",
+        "logout": "Déconnexion",
+        "error": "Une erreur s'est produite",
+        "welcome": "Bon retour parmi nous!"
+    },
+    "Validations": {
+        "required": "Ce champ est obligatoire, veuillez le remplir",
+        "email": "Veuillez entrer une adresse courriel valide pour recevoir votre reçu",
+        "passwordMin": "Votre mot de passe doit comporter au moins {min} caractères pour la sécurité",
+        "passwordUppercase": "Ajoutez au moins une lettre majuscule à votre mot de passe",
+        "passwordNumber": "Ajoutez au moins un chiffre à votre mot de passe",
+        "searchMax": "La recherche ne peut pas dépasser {max} caractères"
+    },
+    "Validation": {
+        "required": "Ce champ est obligatoire",
+        "email": "Adresse courriel invalide",
+        "passwordMin": "Le mot de passe doit comporter au moins {min} caractères",
+        "passwordUppercase": "Doit contenir au moins une lettre majuscule",
+        "passwordNumber": "Doit contenir au moins un chiffre",
+        "passwordsMatch": "Les mots de passe ne correspondent pas",
+        "searchMax": "La recherche ne peut pas dépasser {max} caractères",
+        "acceptTerms": "Vous devez accepter les termes et conditions pour participer à la commande groupée",
+        "phoneMin": "Le numéro de téléphone doit comporter au moins 10 chiffres"
+    },
+    "TermsAlert": {
+        "title": "Informations Importantes",
+        "point1": "Il s'agit d'une Commande Groupée (Pré-commande).",
+        "point2": "Aucune annulation après la date de clôture de la commande.",
+        "point3": "La livraison internationale et les droits de douane seront facturés séparément à l'arrivée des articles."
+    },
+    "Gamification": {
+        "shareTitle": "Aidez-nous à atteindre l'objectif!",
+        "shareText": "Je viens de rejoindre la Commande Groupée! Rejoignez ici:",
+        "couponTitle": "Merci pour votre soutien!",
+        "couponText": "Voici un coupon de 5% de réduction pour votre prochaine Commande Groupée:",
+        "copy": "Copier",
+        "copied": "Copié!"
+    },
+    "Product": {
+        "addToCart": "Ajouter au Panier",
+        "addedToCart": "Ajouté {quantity} {count, plural, =1 {produit} other {produits}} au panier",
+        "back": "Retour",
+        "notFound": "Produit introuvable",
+        "notFoundMessage": "Désolé, le produit que vous cherchez n'existe pas.",
+        "backHome": "Retour à l'Accueil",
+        "outOfStock": "Rupture de Stock",
+        "onlyLeft": "Seulement {count} restant(s)!",
+        "stockLimit": "Impossible d'ajouter plus de {stock} unités",
+        "reviewsTitle": "Avis des Fans",
+        "similarProducts": "✨ Vous pourriez aussi aimer..."
+    },
+    "CookieBanner": {
+        "message": "Nous utilisons des témoins pour améliorer votre expérience et analyser notre trafic. En continuant, vous acceptez notre <link>Politique de Confidentialité</link>.",
+        "privacyPolicy": "Politique de Confidentialité",
+        "decline": "Refuser",
+        "accept": "Tout Accepter"
+    },
+    "Cart": {
+        "title": "Votre Panier",
+        "empty": "Votre panier est vide",
+        "total": "Total",
+        "checkout": "Passer la Commande",
+        "close": "Fermer le panier"
+    },
+    "Home": {
+        "title": "Nouveautés",
+        "subtitle": "Les dernières sorties de vos artistes préférés",
+        "loading": "Chargement des produits...",
+        "categoryAll": "Tous",
+        "sort": {
+            "label": "Trier par:",
+            "newest": "Plus Récents",
+            "price_asc": "Prix: Croissant",
+            "price_desc": "Prix: Décroissant",
+            "alphabetical": "Ordre Alphabétique A-Z"
+        },
+        "filters": {
+            "title": "Filtres",
+            "artist": "Artiste",
+            "category": "Catégorie",
+            "availability": "Disponibilité",
+            "inStock": "En Stock Seulement",
+            "categories": {
+                "album": "Albums",
+                "lightstick": "Lightsticks",
+                "merch": "Merch & Accessoires"
+            },
+            "price": "Fourchette de Prix",
+            "min": "Min",
+            "max": "Max",
+            "reset": "Effacer les filtres",
+            "viewResults": "Voir les Résultats",
+            "mobileFilter": "Filtrer & Trier"
+        },
+        "noResults": {
+            "title": "Oups! Aucun résultat trouvé",
+            "message": "Essayez d'ajuster vos filtres ou cherchez autre chose.",
+            "reset": "Effacer tous les filtres",
+            "popular": "Produits Populaires"
+        },
+        "common": {
+            "close": "Fermer"
+        }
+    },
+    "Metadata": {
+        "title": "StanStore - Merch K-Pop",
+        "description": "La meilleure boutique d'albums, lightsticks et merch exclusif K-Pop.",
+        "homeTitle": "Achetez du Merch K-Pop | StanStore",
+        "termsTitle": "Termes et Conditions | StanStore",
+        "termsDescription": "Lisez nos Termes et Conditions concernant les achats, la livraison et les retours."
+    },
+    "pdp": {
+        "reviews": {
+            "title": "Avis des Fans",
+            "writeReview": "Écrire un avis",
+            "placeholder": "Laissez votre commentaire ici...",
+            "noReviews": "Aucun avis pour l'instant",
+            "rating": "Note",
+            "comment": "Commentaire",
+            "submit": "Soumettre l'Avis",
+            "submitting": "Envoi en cours...",
+            "success": "Merci pour votre avis!",
+            "errorRating": "Veuillez sélectionner une note.",
+            "errorComment": "Veuillez écrire un commentaire.",
+            "loading": "Chargement des avis..."
+        },
+        "related": {
+            "title": "Vous pourriez aussi aimer..."
+        }
+    },
+    "RouteAnnouncer": {
+        "navigatedTo": "Naviguée vers: {title}"
+    },
+    "TrackOrder": {
+        "title": "Suivre la Commande",
+        "subtitle": "Entrez votre numéro de commande pour vérifier l'état de votre livraison.",
+        "placeholder": "ex.: ORD-2025-XXXXX",
+        "search": "Rechercher",
+        "searching": "Recherche en cours...",
+        "notFound": "Aucune commande trouvée avec l'ID: {orderId}",
+        "help": "Si vous venez de passer votre commande, attendez quelques minutes et réessayez. Si le problème persiste, contactez-nous.",
+        "statusExample": "États de livraison:",
+        "statusConfirmed": "Commande Confirmée",
+        "statusProcessing": "En Traitement",
+        "statusShipped": "Expédiée",
+        "statusDelivered": "Livrée"
+    },
+    "Navigation": {
+        "home": "Accueil",
+        "products": "Produits",
+        "artists": "Artistes",
+        "search": "Rechercher"
+    },
+    "Filters": {
+        "price": "Prix",
+        "category": "Catégorie",
+        "artist": "Artiste",
+        "availability": "Disponibilité",
+        "reset": "Effacer les filtres",
+        "apply": "Appliquer"
+    },
+    "EmptyStates": {
+        "cartTitle": "Votre panier est vide",
+        "cartDesc": "Ajoutez des produits pour commencer votre commande.",
+        "cartAction": "Parcourir le Catalogue",
+        "searchTitle": "Aucun résultat pour \"{query}\"",
+        "searchDesc": "Nous n'avons trouvé aucun merch correspondant à votre recherche. Essayez un nom différent ou consultez nos suggestions.",
+        "searchAction": "Effacer les filtres",
+        "searchNoQueryTitle": "Que cherchez-vous?",
+        "searchNoQueryDesc": "Tapez le nom de votre groupe ou artiste préféré pour commencer.",
+        "ordersTitle": "Aucune commande encore",
+        "ordersDesc": "Lorsque vous effectuerez votre premier achat, il apparaîtra ici.",
+        "ordersAction": "Commencez votre premier achat"
+    },
+    "Errors": {
+        "generic": "Une erreur s'est produite",
+        "notFound": "Page introuvable",
+        "unauthorized": "Vous n'avez pas la permission de voir cette page"
+    }
+}

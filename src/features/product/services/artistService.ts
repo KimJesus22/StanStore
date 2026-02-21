@@ -68,9 +68,24 @@ async function fetchArtists(
     }
 }
 
+// COALESCE-style fallback chain for artist bios stored in JSONB.
+// Try the requested locale first, then walk the chain until a non-empty value is found.
+const BIO_FALLBACK_CHAIN: Record<string, string[]> = {
+    'es':    ['es'],
+    'en':    ['en', 'es'],
+    'ko':    ['ko', 'en', 'es'],
+    'pt-BR': ['pt-BR', 'en', 'es'],
+    'fr-CA': ['fr-CA', 'en', 'es'],
+};
+
 function getLocalizedBio(content: Record<string, string> | null, locale: string): string {
     if (!content || typeof content !== 'object') return '';
-    return content[locale] || content['es'] || '';
+    const chain = BIO_FALLBACK_CHAIN[locale] ?? BIO_FALLBACK_CHAIN['en'];
+    for (const lang of chain) {
+        const val = content[lang];
+        if (typeof val === 'string' && val.trim() !== '') return val;
+    }
+    return '';
 }
 
 const getCachedArtists = unstable_cache(

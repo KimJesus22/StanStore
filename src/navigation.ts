@@ -1,6 +1,6 @@
 import { createNavigation } from 'next-intl/navigation';
 
-export const locales = ['en', 'es', 'ko'] as const;
+export const locales = ['en', 'es', 'ko', 'pt-BR', 'fr-CA'] as const;
 export const localePrefix = 'always'; // Default
 
 export const pathnames = {
@@ -8,7 +8,9 @@ export const pathnames = {
     '/privacy': {
         en: '/privacy-policy',
         es: '/politica-de-privacidad',
-        ko: '/privacy-policy'
+        ko: '/privacy-policy',
+        'pt-BR': '/politica-de-privacidade',
+        'fr-CA': '/politique-de-confidentialite'
     },
     '/artists': '/artists',
     '/profile': '/profile',

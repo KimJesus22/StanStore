@@ -1,0 +1,193 @@
+{
+    "Navbar": {
+        "home": "Início",
+        "search": "Buscar",
+        "clearSearch": "Limpar busca",
+        "profile": "Perfil",
+        "cart": "Carrinho",
+        "login": "Entrar",
+        "logout": "Sair"
+    },
+    "Auth": {
+        "loginButton": "Entrar",
+        "login": "Entrar",
+        "register": "Cadastrar",
+        "logout": "Sair",
+        "error": "Ocorreu um erro",
+        "welcome": "Bem-vindo(a) de volta!"
+    },
+    "Validations": {
+        "required": "Este campo é obrigatório, por favor preencha-o",
+        "email": "Por favor insira um endereço de e-mail válido para receber seu recibo",
+        "passwordMin": "Sua senha deve ter pelo menos {min} caracteres por segurança",
+        "passwordUppercase": "Adicione pelo menos uma letra maiúscula à sua senha",
+        "passwordNumber": "Adicione pelo menos um número à sua senha",
+        "searchMax": "A busca não pode ter mais de {max} caracteres"
+    },
+    "Validation": {
+        "required": "Este campo é obrigatório",
+        "email": "Endereço de e-mail inválido",
+        "passwordMin": "A senha deve ter pelo menos {min} caracteres",
+        "passwordUppercase": "Deve conter pelo menos uma letra maiúscula",
+        "passwordNumber": "Deve conter pelo menos um número",
+        "passwordsMatch": "As senhas não coincidem",
+        "searchMax": "A busca não pode ter mais de {max} caracteres",
+        "acceptTerms": "Você deve aceitar os termos e condições para participar do pedido em grupo",
+        "phoneMin": "O número de telefone deve ter pelo menos 10 dígitos"
+    },
+    "TermsAlert": {
+        "title": "Informações Importantes",
+        "point1": "Este é um Pedido em Grupo (Pré-venda).",
+        "point2": "Sem cancelamentos após a data de encerramento do pedido.",
+        "point3": "Frete internacional e taxas alfandegárias serão cobrados separadamente quando os itens chegarem."
+    },
+    "Gamification": {
+        "shareTitle": "Ajude-nos a atingir a meta!",
+        "shareText": "Acabei de entrar no Pedido em Grupo! Entre aqui:",
+        "couponTitle": "Obrigado(a) pelo seu apoio!",
+        "couponText": "Aqui está um cupom de 5% de desconto para seu próximo Pedido em Grupo:",
+        "copy": "Copiar",
+        "copied": "Copiado!"
+    },
+    "Product": {
+        "addToCart": "Adicionar ao Carrinho",
+        "addedToCart": "Adicionado {quantity} {count, plural, =1 {produto} other {produtos}} ao carrinho",
+        "back": "Voltar",
+        "notFound": "Produto não encontrado",
+        "notFoundMessage": "Desculpe, o produto que você está procurando não existe.",
+        "backHome": "Voltar ao Início",
+        "outOfStock": "Sem Estoque",
+        "onlyLeft": "Apenas {count} restante(s)!",
+        "stockLimit": "Não é possível adicionar mais de {stock} unidades",
+        "reviewsTitle": "Avaliações dos Fãs",
+        "similarProducts": "✨ Você também pode gostar..."
+    },
+    "CookieBanner": {
+        "message": "Usamos cookies para melhorar sua experiência e analisar nosso tráfego. Ao continuar, você concorda com nossa <link>Política de Privacidade</link>.",
+        "privacyPolicy": "Política de Privacidade",
+        "decline": "Recusar",
+        "accept": "Aceitar Tudo"
+    },
+    "Cart": {
+        "title": "Seu Carrinho",
+        "empty": "Seu carrinho está vazio",
+        "total": "Total",
+        "checkout": "Finalizar Compra",
+        "close": "Fechar carrinho"
+    },
+    "Home": {
+        "title": "Novidades",
+        "subtitle": "Os últimos lançamentos dos seus artistas favoritos",
+        "loading": "Carregando produtos...",
+        "categoryAll": "Todos",
+        "sort": {
+            "label": "Ordenar por:",
+            "newest": "Mais Recentes",
+            "price_asc": "Preço: Menor ao Maior",
+            "price_desc": "Preço: Maior ao Menor",
+            "alphabetical": "Ordem Alfabética A-Z"
+        },
+        "filters": {
+            "title": "Filtros",
+            "artist": "Artista",
+            "category": "Categoria",
+            "availability": "Disponibilidade",
+            "inStock": "Somente em Estoque",
+            "categories": {
+                "album": "Álbuns",
+                "lightstick": "Lightsticks",
+                "merch": "Merch & Acessórios"
+            },
+            "price": "Faixa de Preço",
+            "min": "Mín",
+            "max": "Máx",
+            "reset": "Limpar filtros",
+            "viewResults": "Ver Resultados",
+            "mobileFilter": "Filtrar & Ordenar"
+        },
+        "noResults": {
+            "title": "Ops! Nenhum resultado encontrado",
+            "message": "Tente ajustar seus filtros ou busque por outra coisa.",
+            "reset": "Limpar todos os filtros",
+            "popular": "Produtos Populares"
+        },
+        "common": {
+            "close": "Fechar"
+        }
+    },
+    "Metadata": {
+        "title": "StanStore - Merch K-Pop",
+        "description": "A melhor loja de álbuns, lightsticks e merch exclusivo de K-Pop.",
+        "homeTitle": "Compre Merch K-Pop | StanStore",
+        "termsTitle": "Termos e Condições | StanStore",
+        "termsDescription": "Leia nossos Termos e Condições sobre compras, envio e devoluções."
+    },
+    "pdp": {
+        "reviews": {
+            "title": "Avaliações dos Fãs",
+            "writeReview": "Escrever uma avaliação",
+            "placeholder": "Deixe seu comentário aqui...",
+            "noReviews": "Nenhuma avaliação ainda",
+            "rating": "Avaliação",
+            "comment": "Comentário",
+            "submit": "Enviar Avaliação",
+            "submitting": "Enviando...",
+            "success": "Obrigado(a) pela sua avaliação!",
+            "errorRating": "Por favor selecione uma avaliação.",
+            "errorComment": "Por favor escreva um comentário.",
+            "loading": "Carregando avaliações..."
+        },
+        "related": {
+            "title": "Você também pode gostar..."
+        }
+    },
+    "RouteAnnouncer": {
+        "navigatedTo": "Navegado para: {title}"
+    },
+    "TrackOrder": {
+        "title": "Rastrear Pedido",
+        "subtitle": "Insira seu número de pedido para verificar o status do envio.",
+        "placeholder": "ex.: ORD-2025-XXXXX",
+        "search": "Buscar",
+        "searching": "Buscando...",
+        "notFound": "Nenhum pedido encontrado com ID: {orderId}",
+        "help": "Se você acabou de fazer seu pedido, aguarde alguns minutos e tente novamente. Se o problema persistir, entre em contato conosco.",
+        "statusExample": "Status de envio:",
+        "statusConfirmed": "Pedido Confirmado",
+        "statusProcessing": "Em Processamento",
+        "statusShipped": "Enviado",
+        "statusDelivered": "Entregue"
+    },
+    "Navigation": {
+        "home": "Início",
+        "products": "Produtos",
+        "artists": "Artistas",
+        "search": "Buscar"
+    },
+    "Filters": {
+        "price": "Preço",
+        "category": "Categoria",
+        "artist": "Artista",
+        "availability": "Disponibilidade",
+        "reset": "Limpar filtros",
+        "apply": "Aplicar"
+    },
+    "EmptyStates": {
+        "cartTitle": "Seu carrinho está vazio",
+        "cartDesc": "Adicione produtos para iniciar seu pedido.",
+        "cartAction": "Explorar Catálogo",
+        "searchTitle": "Nenhum resultado para \"{query}\"",
+        "searchDesc": "Não encontramos nenhum merch correspondente à sua busca. Tente um nome diferente ou veja nossas sugestões.",
+        "searchAction": "Limpar filtros",
+        "searchNoQueryTitle": "O que você está procurando?",
+        "searchNoQueryDesc": "Digite o nome do seu grupo ou artista favorito para começar.",
+        "ordersTitle": "Nenhum pedido ainda",
+        "ordersDesc": "Quando você fizer sua primeira compra, ela aparecerá aqui.",
+        "ordersAction": "Faça sua primeira compra"
+    },
+    "Errors": {
+        "generic": "Ocorreu um erro",
+        "notFound": "Página não encontrada",
+        "unauthorized": "Você não tem permissão para ver esta página"
+    }
+}

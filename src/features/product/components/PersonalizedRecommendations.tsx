@@ -26,32 +26,33 @@ async function fetchPersonalized(
   targetCategory: string | null,
   excludeIds: string[],
 ): Promise<RecoProduct[]> {
-  const applyExclude = (q: ReturnType<typeof supabase.from>) =>
-    excludeIds.length > 0
-      ? q.not('id', 'in', `(${excludeIds.join(',')})`)
-      : q;
+  // .not() is a filter method — must be applied before .limit() (which returns
+  // PostgrestTransformBuilder, a narrower type that no longer has filter methods).
+  const exclude = excludeIds.length > 0;
 
   if (targetArtist) {
-    const { data } = await applyExclude(
-      supabase
-        .from('products')
-        .select('id, name, price, image_url, artist, category')
-        .eq('artist', targetArtist)
-        .gt('stock', 0)
-        .limit(LIMIT),
-    );
+    let q = supabase
+      .from('products')
+      .select('id, name, price, image_url, artist, category')
+      .eq('artist', targetArtist)
+      .gt('stock', 0);
+
+    if (exclude) q = q.not('id', 'in', `(${excludeIds.join(',')})`);
+
+    const { data } = await q.limit(LIMIT);
     if (data && data.length > 0) return data as RecoProduct[];
   }
 
   if (targetCategory) {
-    const { data } = await applyExclude(
-      supabase
-        .from('products')
-        .select('id, name, price, image_url, artist, category')
-        .eq('category', targetCategory)
-        .gt('stock', 0)
-        .limit(LIMIT),
-    );
+    let q = supabase
+      .from('products')
+      .select('id, name, price, image_url, artist, category')
+      .eq('category', targetCategory)
+      .gt('stock', 0);
+
+    if (exclude) q = q.not('id', 'in', `(${excludeIds.join(',')})`);
+
+    const { data } = await q.limit(LIMIT);
     if (data && data.length > 0) return data as RecoProduct[];
   }
 

@@ -5,29 +5,53 @@ import { usePathname, useRouter } from '@/navigation';
 import { ChangeEvent, useTransition } from 'react';
 import styled from 'styled-components';
 
+// Native name + region label for each supported locale.
+// Intentionally avoids flag emojis: flags carry geopolitical implications,
+// render inconsistently across OS/browsers, and fail on some screen readers.
+const LOCALE_LABELS: Record<string, string> = {
+    'es':    'Español (Latam)',
+    'en':    'English (US)',
+    'ko':    '한국어',
+    'pt-BR': 'Português (Brasil)',
+    'fr-CA': 'Français (Canada)',
+};
+
+// Order in which locales appear in the dropdown
+const LOCALE_ORDER = ['es', 'en', 'ko', 'pt-BR', 'fr-CA'] as const;
+
 const Select = styled.select`
   background: transparent;
   color: inherit;
   border: 1px solid #999;
-  padding: 0.5rem;
+  /* min-width accommodates the longest label "Português (Brasil)" without overflow */
+  min-width: max-content;
+  padding: 0.4rem 2rem 0.4rem 0.6rem;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  /* Chevron spacing via padding-right so the arrow never overlaps text */
+  appearance: auto;
 
   &:focus {
-    outline: none;
-    border-color: #10CFBD;
+    outline: 2px solid ${({ theme }) => theme.colors?.primary ?? '#10CFBD'};
+    outline-offset: 2px;
+    border-color: transparent;
   }
-  
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
   option {
     color: #000;
+    background: #fff;
   }
 
   @media (max-width: 768px) {
-    max-width: 42px;
-    min-width: 0;
-    padding: 0.4rem 0.1rem 0.4rem 0.2rem;
-    font-size: 1rem;
+    /* On mobile show a compact size but keep it readable */
+    font-size: 0.8rem;
+    padding: 0.35rem 1.5rem 0.35rem 0.4rem;
   }
 `;
 
@@ -47,14 +71,16 @@ export default function LanguageSwitcher() {
 
   return (
     <Select
-      defaultValue={locale}
+      value={locale}
       onChange={onSelectChange}
       disabled={isPending}
-      aria-label="Seleccionar idioma"
+      aria-label="Select language / Seleccionar idioma"
     >
-      <option value="es">🇲🇽 Español</option>
-      <option value="en">🇺🇸 English</option>
-      <option value="ko">🇰🇷 한국어</option>
+      {LOCALE_ORDER.map((code) => (
+        <option key={code} value={code}>
+          {LOCALE_LABELS[code]}
+        </option>
+      ))}
     </Select>
   );
 }
