@@ -55,17 +55,14 @@ export const withAuth: MiddlewareFactory = (next: NextMiddleware) => {
         // Lógica de Protección de Rutas
         const pathname = request.nextUrl.pathname;
 
-        // 1. Proteger /admin
+        // 1. Proteger /admin — solo usuarios con email @stanstore.com
         if (pathname.startsWith('/admin') || pathname.includes('/admin/')) {
-            if (!user) {
-                // Redirigir a login si no hay usuario
+            const isAdmin = user?.email?.endsWith('@stanstore.com') ?? false;
+            if (!isAdmin) {
                 const url = request.nextUrl.clone();
-                url.pathname = '/login';
-                // Mantenemos la respuesta limpia, pero cambiamos a redirect
+                url.pathname = '/';
                 return NextResponse.redirect(url);
             }
-            // Aquí podríamos chequear roles también si tuviéramos un custom claim
-            // if (user.role !== 'admin') ...
         }
 
         // 2. Proteger /dashboard (ejemplo)
