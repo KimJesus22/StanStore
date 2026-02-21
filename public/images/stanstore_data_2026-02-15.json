@@ -1,9 +1,0 @@
-{
-  "generated_at": "2026-02-15T02:58:56.187Z",
-  "user_id": "2a15d913-2a07-4a1a-84f8-aa4e4b5456b5",
-  "personal_data": {
-    "note": "Basic profile data is managed via Supabase Auth. This export contains your activity data."
-  },
-  "orders": [],
-  "reviews": []
-}
