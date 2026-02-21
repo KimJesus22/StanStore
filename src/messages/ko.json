@@ -84,7 +84,7 @@
         "homeTitle": "K-Pop 굿즈 구매 | StanStore"
     },
     "CookieBanner": {
-        "message": "MISSING_TRANSLATION: Usamos cookies para mejorar tu experiencia y analizar nuestro tráfico. Al continuar, aceptas nuestra {link}.",
+        "message": "쿠키를 사용하여 경험을 개선하고 트래픽을 분석합니다. 계속하면 <link>개인정보 처리방침</link>에 동의하는 것입니다.",
         "privacyPolicy": "MISSING_TRANSLATION: Política de Privacidad",
         "decline": "MISSING_TRANSLATION: Rechazar",
         "accept": "MISSING_TRANSLATION: Aceptar Todas"

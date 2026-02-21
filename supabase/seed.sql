@@ -71,19 +71,6 @@ VALUES
     TRUE,
     'El nuevo lightstick oficial de TWICE, CANDYBONG Infinity. Diseño mejorado con panel táctil y nuevos modos de iluminación. Perfecto para iluminar los estadios.',
     NULL, NULL, NULL
-  ),
-  (
-    '123e4567-e89b-12d3-a456-426614174000',
-    'Clancy',
-    35.00,
-    '/images/clancy-twenty-one-pilots.jpg',
-    'album',
-    'Twenty One Pilots',
-    TRUE,
-    'El esperado nuevo álbum de Twenty One Pilots, Clancy. Cierra la narrativa de Dema con un sonido explosivo y visuales inmersivos.',
-    '50e50235b2a9d8001e3bd6e4', -- Spotify Album ID (Clancy)
-    '#FCE300', -- Yellow/Red Theme
-    'UcfZ9s39z40' -- Overcompensate MV
   )
 ON CONFLICT (id) DO UPDATE SET 
   spotify_album_id = EXCLUDED.spotify_album_id,

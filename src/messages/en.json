@@ -63,7 +63,7 @@
         "similarProducts": "✨ You might also like..."
     },
     "CookieBanner": {
-        "message": "We use cookies to improve your experience and analyze our traffic. By continuing, you agree to our {link}.",
+        "message": "We use cookies to improve your experience and analyze our traffic. By continuing, you agree to our <link>Privacy Policy</link>.",
         "privacyPolicy": "Privacy Policy",
         "decline": "Decline",
         "accept": "Accept All"

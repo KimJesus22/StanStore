@@ -63,7 +63,7 @@
         "similarProducts": "✨ Quizás te guste..."
     },
     "CookieBanner": {
-        "message": "Usamos cookies para mejorar tu experiencia y analizar nuestro tráfico. Al continuar, aceptas nuestra {link}.",
+        "message": "Usamos cookies para mejorar tu experiencia y analizar nuestro tráfico. Al continuar, aceptas nuestra <link>Política de Privacidad</link>.",
         "privacyPolicy": "Política de Privacidad",
         "decline": "Rechazar",
         "accept": "Aceptar Todas"
