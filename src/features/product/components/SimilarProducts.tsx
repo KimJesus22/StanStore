@@ -197,9 +197,11 @@ export default function SimilarProducts({ productId }: { productId: string }) {
                                     <ProductName>{product.name}</ProductName>
                                     <ArtistName>{product.artist}</ArtistName>
                                     <Price>{formatPrice(product.price)}</Price>
-                                    <SimilarityBadge>
-                                        {Math.round(product.similarity * 100)}% match
-                                    </SimilarityBadge>
+                                    {typeof product.similarity === 'number' && !isNaN(product.similarity) && (
+                                        <SimilarityBadge>
+                                            {Math.round(product.similarity * 100)}% match
+                                        </SimilarityBadge>
+                                    )}
                                 </CardContent>
                             </ProductCard>
                         </Link>

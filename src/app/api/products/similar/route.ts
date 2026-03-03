@@ -117,7 +117,6 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json({ similar });
-        return NextResponse.json({ similar });
     } catch (error) {
         console.error('Error en /api/products/similar:', error);
 
