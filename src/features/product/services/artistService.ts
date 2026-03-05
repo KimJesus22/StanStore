@@ -26,29 +26,30 @@ async function fetchArtists(
     const { genre, orderBy = 'name' } = options;
 
     try {
+        // Query artists without products(count) — no FK exists between artists.id and products.artist
         let query = supabase
             .from('artists')
-            .select(`
-                id,
-                name,
-                bio,
-                image_url,
-                genre,
-                popularity_score,
-                debut_date,
-                products(count)
-            `)
+            .select('id, name, bio, image_url, genre, popularity_score, debut_date')
             .order(orderBy, { ascending: orderBy === 'name' });
 
         if (genre) {
             query = query.eq('genre', genre);
         }
 
-        const { data, error } = await query;
+        const [{ data, error }, { data: productRows }] = await Promise.all([
+            query,
+            supabase.from('products').select('artist'),
+        ]);
 
         if (error) {
             console.error('Error fetching artists:', error);
             return [];
+        }
+
+        // Build product count map by artist name (products.artist is a plain TEXT column)
+        const countByArtist: Record<string, number> = {};
+        for (const p of productRows ?? []) {
+            countByArtist[p.artist] = (countByArtist[p.artist] ?? 0) + 1;
         }
 
         return (data ?? []).map((artist) => ({
@@ -56,7 +57,7 @@ async function fetchArtists(
             name: artist.name,
             image_url: artist.image_url,
             bio: getLocalizedBio(artist.bio as Record<string, string> | null, locale),
-            products_count: (artist.products as Array<{ count: number }>)?.[0]?.count ?? 0,
+            products_count: countByArtist[artist.name] ?? 0,
             genre: artist.genre ?? null,
             popularity_score: artist.popularity_score ?? null,
             debut_date: artist.debut_date ?? null,

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { Music } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import ArtistSkeleton from '@/components/ui/ArtistSkeleton';
-import { ArtistCard, ArtistFilters, getArtists, type Artist } from '@/features/product';
+import { ArtistCard, ArtistFilters, type Artist } from '@/features/product';
 
 const PageContainer = styled.div`
     max-width: 1200px;
@@ -58,8 +58,12 @@ export default function ArtistsContent() {
 
     useEffect(() => {
         setLoading(true);
-        getArtists(locale, { genre, orderBy: sort })
+        const params = new URLSearchParams({ locale, sort });
+        if (genre) params.set('genre', genre);
+        fetch(`/api/artists?${params}`)
+            .then(res => res.json())
             .then(setArtists)
+            .catch(() => setArtists([]))
             .finally(() => setLoading(false));
     }, [locale, genre, sort]);
 
