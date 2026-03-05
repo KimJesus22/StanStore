@@ -90,7 +90,7 @@ interface ArtistData {
     name: string;
     image: string | null;
     genres: string[];
-    popularity: number;
+    popularity: number | null;
     followers: number;
     externalUrl: string | null;
 }
@@ -115,14 +115,11 @@ export default function ArtistInfo({ artistName }: ArtistInfoProps) {
         const fetchArtist = async () => {
             try {
                 const res = await fetch(`/api/spotify/search?q=${encodeURIComponent(artistName)}&type=artist`);
+                if (!res.ok) return;
                 const data = await res.json();
 
-                if (data.results && data.results.length > 0) {
-                    // Get full artist info
-                    const topResult = data.results[0];
-                    const detailRes = await fetch(`/api/spotify/artist/${topResult.id}`);
-                    const detail = await detailRes.json();
-                    setArtist(detail);
+                if (Array.isArray(data.results) && data.results.length > 0) {
+                    setArtist(data.results[0]);
                 }
             } catch (error) {
                 console.error('Error fetching artist info:', error);
@@ -150,7 +147,7 @@ export default function ArtistInfo({ artistName }: ArtistInfoProps) {
                 </div>
             </Header>
 
-            {artist.genres.length > 0 && (
+            {(artist.genres?.length ?? 0) > 0 && (
                 <GenresRow>
                     {artist.genres.map(genre => (
                         <Genre key={genre}><Music size={10} /> {genre}</Genre>
@@ -163,10 +160,12 @@ export default function ArtistInfo({ artistName }: ArtistInfoProps) {
                     <Users size={14} />
                     <StatValue>{formatNumber(artist.followers)}</StatValue> seguidores
                 </Stat>
-                <Stat>
-                    <TrendingUp size={14} />
-                    Popularidad: <StatValue>{artist.popularity}/100</StatValue>
-                </Stat>
+                {artist.popularity != null && (
+                    <Stat>
+                        <TrendingUp size={14} />
+                        Popularidad: <StatValue>{artist.popularity}/100</StatValue>
+                    </Stat>
+                )}
             </StatsRow>
         </Card>
     );

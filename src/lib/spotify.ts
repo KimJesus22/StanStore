@@ -93,10 +93,11 @@ export async function searchArtists(query: string, limit = 5) {
     return data.artists.items.map((a) => ({
         id: a.id,
         name: a.name,
-        image: a.images?.[1]?.url || a.images?.[0]?.url || null,
+        image: a.images?.[0]?.url || null,
         genres: a.genres?.slice(0, 3) || [],
-        popularity: a.popularity,
-        followers: a.followers?.total || 0,
+        popularity: a.popularity ?? null,
+        followers: a.followers?.total ?? 0,
+        externalUrl: a.external_urls?.spotify ?? null,
     }));
 }
 
