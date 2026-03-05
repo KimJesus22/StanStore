@@ -67,7 +67,7 @@ export default function RegisterForm() {
         formState: { errors, isSubmitting },
     } = useForm<RegisterInput>({
         resolver: zodResolver(registerSchema),
-        mode: 'onChange',
+        mode: 'onBlur',
     });
 
     const onSubmit = async (data: RegisterInput) => {

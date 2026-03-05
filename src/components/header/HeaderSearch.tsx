@@ -83,6 +83,11 @@ const SearchInput = styled.input<{ $isOpen: boolean }>`
   transition: opacity 0.2s 0.1s;
   height: 100%;
 
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
   @media (max-width: 640px) { display: none; }
 `;
 
@@ -118,6 +123,11 @@ const MobileInput = styled.input`
   font-size: 1rem;
   color: ${({ theme }) => theme.colors.text};
   margin-left: 0.75rem;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
 `;
 
 const MobileSuggestionsWrapper = styled.div`
