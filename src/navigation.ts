@@ -17,8 +17,13 @@ export const pathnames = {
     '/track-order': '/track-order',
     '/terms': '/terms',
     '/admin': '/admin',
+    '/admin/health': '/admin/health',
     '/search': '/search',
-    '/product/[id]': '/product/[id]'
+    '/product/[id]': '/product/[id]',
+    '/checkout': '/checkout',
+    '/success': '/success',
+    '/proof': '/proof',
+    '/security': '/security',
 } as const;
 
 export const { Link, redirect, usePathname, useRouter } =
