@@ -52,6 +52,26 @@ async function fetchArtists(
             countByArtist[p.artist] = (countByArtist[p.artist] ?? 0) + 1;
         }
 
+        // Fallback: if the artists table is empty (migration not yet run),
+        // derive artists directly from the products table so the page is never blank.
+        if ((data ?? []).length === 0 && Object.keys(countByArtist).length > 0) {
+            const derived = Object.entries(countByArtist)
+                .map(([name, products_count]) => ({
+                    id: name,
+                    name,
+                    bio: '',
+                    image_url: null as string | null,
+                    products_count,
+                    genre: null as string | null,
+                    popularity_score: null as number | null,
+                    debut_date: null as string | null,
+                }));
+
+            if (genre) return [];          // can't filter by genre without metadata
+            if (orderBy === 'name') derived.sort((a, b) => a.name.localeCompare(b.name));
+            return derived;
+        }
+
         return (data ?? []).map((artist) => ({
             id: artist.id,
             name: artist.name,

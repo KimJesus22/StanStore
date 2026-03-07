@@ -135,6 +135,42 @@ VALUES
         83,
         '2020-11-30'
     )
+    (
+        'a0000001-0000-0000-0000-000000000011',
+        'ITZY',
+        '{"es": "Grupo femenino de K-Pop formado en 2019 bajo JYP Entertainment. Conocidas por su actitud segura y su mensaje de autoaceptación.", "en": "South Korean girl group formed in 2019 under JYP Entertainment. Known for their confident attitude and message of self-acceptance.", "ko": "2019년 JYP 엔터테인먼트 소속으로 결성된 대한민국 걸그룹. 자신감 있는 태도와 자기 수용의 메시지로 유명합니다."}',
+        NULL,
+        'K-Pop',
+        82,
+        '2019-02-12'
+    ),
+    (
+        'a0000001-0000-0000-0000-000000000012',
+        'IVE',
+        '{"es": "Grupo femenino de K-Pop debutado en 2021 bajo Starship Entertainment. Conocidas por su concepto maduro y elegante.", "en": "South Korean girl group that debuted in 2021 under Starship Entertainment. Known for their mature and elegant concept.", "ko": "2021년 스타쉽 엔터테인먼트 소속으로 데뷔한 대한민국 걸그룹. 성숙하고 우아한 콘셉트로 유명합니다."}',
+        NULL,
+        'K-Pop',
+        86,
+        '2021-12-01'
+    ),
+    (
+        'a0000001-0000-0000-0000-000000000013',
+        'ATEEZ',
+        '{"es": "Grupo masculino de K-Pop formado en 2018 bajo KQ Entertainment. Destacan por sus actuaciones teatrales y su universo narrativo épico.", "en": "South Korean boy group formed in 2018 under KQ Entertainment. Known for their theatrical performances and epic narrative universe.", "ko": "2018년 KQ 엔터테인먼트 소속으로 결성된 대한민국 보이그룹. 극적인 퍼포먼스와 웅장한 세계관으로 주목받습니다."}',
+        NULL,
+        'K-Pop',
+        84,
+        '2018-10-24'
+    ),
+    (
+        'a0000001-0000-0000-0000-000000000014',
+        'NCT 127',
+        '{"es": "Sub-unidad de NCT formada en 2016 bajo SM Entertainment. Su sonido experimental y su formación rotativa los hacen únicos en el K-Pop.", "en": "Sub-unit of NCT formed in 2016 under SM Entertainment. Their experimental sound and rotational lineup make them unique in K-Pop.", "ko": "2016년 SM 엔터테인먼트 소속으로 결성된 NCT의 서브유닛. 실험적인 사운드와 순환 라인업으로 K-Pop에서 독보적인 위치를 차지합니다."}',
+        NULL,
+        'K-Hip-Hop',
+        81,
+        '2016-07-07'
+    )
 ON CONFLICT (id) DO UPDATE SET
     genre            = EXCLUDED.genre,
     popularity_score = EXCLUDED.popularity_score,
