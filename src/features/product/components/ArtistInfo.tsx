@@ -118,9 +118,21 @@ export default function ArtistInfo({ artistName }: ArtistInfoProps) {
                 if (!res.ok) return;
                 const data = await res.json();
 
-                if (Array.isArray(data.results) && data.results.length > 0) {
-                    setArtist(data.results[0]);
+                if (!Array.isArray(data.results) || data.results.length === 0) return;
+
+                const first = data.results[0];
+
+                // Search API may return followers=0 for simplified artist objects.
+                // In that case, fetch the full artist endpoint for accurate data.
+                if (first.followers === 0 && first.id) {
+                    const fullRes = await fetch(`/api/spotify/artist/${first.id}`);
+                    if (fullRes.ok) {
+                        setArtist(await fullRes.json());
+                        return;
+                    }
                 }
+
+                setArtist(first);
             } catch (error) {
                 console.error('Error fetching artist info:', error);
             } finally {
