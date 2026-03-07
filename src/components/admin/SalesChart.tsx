@@ -13,7 +13,6 @@ import styled from 'styled-components';
 
 const ChartContainer = styled.div`
   width: 100%;
-  height: 300px;
   background: white;
   padding: 1rem;
   border-radius: 8px;
@@ -32,11 +31,23 @@ interface SalesData {
     total: number;
 }
 
+const EmptyState = styled.div`
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 0.9rem;
+`;
+
 export default function SalesChart({ data }: { data: SalesData[] }) {
     return (
         <ChartContainer>
             <Title>Ventas por Día</Title>
-            <ResponsiveContainer width="100%" height="100%">
+            {data.length === 0 ? (
+                <EmptyState>Sin datos de ventas disponibles.</EmptyState>
+            ) : (
+            <ResponsiveContainer width="100%" height={220}>
                 <LineChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
@@ -54,6 +65,7 @@ export default function SalesChart({ data }: { data: SalesData[] }) {
                     />
                 </LineChart>
             </ResponsiveContainer>
+            )}
         </ChartContainer>
     );
 }

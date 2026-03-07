@@ -12,7 +12,6 @@ import styled from 'styled-components';
 
 const ChartContainer = styled.div`
   width: 100%;
-  height: 300px;
   background: white;
   padding: 1rem;
   border-radius: 8px;
@@ -33,11 +32,23 @@ interface CategoryData {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
+const EmptyState = styled.div`
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 0.9rem;
+`;
+
 export default function CategoryChart({ data }: { data: CategoryData[] }) {
     return (
         <ChartContainer>
             <Title>Ventas por Categoría</Title>
-            <ResponsiveContainer width="100%" height="100%">
+            {data.length === 0 ? (
+                <EmptyState>Sin datos de categorías disponibles.</EmptyState>
+            ) : (
+            <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
                     <Pie
                         data={data}
@@ -58,6 +69,7 @@ export default function CategoryChart({ data }: { data: CategoryData[] }) {
                     <Legend />
                 </PieChart>
             </ResponsiveContainer>
+            )}
         </ChartContainer>
     );
 }
