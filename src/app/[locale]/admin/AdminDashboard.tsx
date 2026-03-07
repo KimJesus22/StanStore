@@ -6,12 +6,12 @@ import { supabase } from '@/lib/supabaseClient';
 import dynamic from 'next/dynamic';
 
 const SalesChart = dynamic(() => import('@/components/admin/SalesChart'), {
-  loading: () => <div style={{ height: 300, background: '#f5f5f5', borderRadius: 8 }} />,
+  loading: () => <div style={{ height: 300, background: 'var(--bg-secondary)', borderRadius: 8 }} />,
   ssr: false
 });
 
 const CategoryChart = dynamic(() => import('@/components/admin/CategoryChart'), {
-  loading: () => <div style={{ height: 300, background: '#f5f5f5', borderRadius: 8 }} />,
+  loading: () => <div style={{ height: 300, background: 'var(--bg-secondary)', borderRadius: 8 }} />,
   ssr: false
 });
 
@@ -21,7 +21,7 @@ const AdminContent = dynamic(() => import('./AdminContent'), {
 });
 
 const IpBanManager = dynamic(() => import('@/components/admin/IpBanManager'), {
-  loading: () => <div style={{ height: 200, background: '#f5f5f5', borderRadius: 8, marginTop: '2rem' }} />,
+  loading: () => <div style={{ height: 200, background: 'var(--bg-secondary)', borderRadius: 8, marginTop: '2rem' }} />,
   ssr: false
 });
 
@@ -40,12 +40,12 @@ const Header = styled.header`
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
-  color: #111;
+  color: ${({ theme }) => theme.colors.text};
   margin-bottom: 0.5rem;
 `;
 
 const Subtitle = styled.p`
-  color: #666;
+  color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
 const Grid = styled.div`
@@ -56,7 +56,7 @@ const Grid = styled.div`
 `;
 
 const StatCard = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.colors.backgroundSecondary};
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -70,7 +70,7 @@ const StatValue = styled.div`
   `;
 
 const StatLabel = styled.div`
-  color: #666;
+  color: ${({ theme }) => theme.colors.textSecondary};
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 1px;
