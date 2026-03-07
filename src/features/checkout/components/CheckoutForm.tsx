@@ -51,14 +51,14 @@ const BackLink = styled(Link)`
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: #666;
+    color: ${({ theme }) => theme.colors.textSecondary};
     text-decoration: none;
     font-size: 0.9rem;
     margin-bottom: 1.5rem;
     transition: color 0.2s;
 
     &:hover {
-        color: #111;
+        color: ${({ theme }) => theme.colors.text};
     }
 `;
 
@@ -67,7 +67,7 @@ const FormSection = styled.form``;
 const SectionTitle = styled.h2`
     font-size: 1.35rem;
     font-weight: 700;
-    color: #111;
+    color: ${({ theme }) => theme.colors.text};
     margin-bottom: 1.5rem;
 `;
 
@@ -75,17 +75,17 @@ const NoteBox = styled.div`
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    background: #fafafa;
-    border: 1px solid #e5e5e5;
+    background: ${({ theme }) => theme.colors.backgroundSecondary};
+    border: 1px solid ${({ theme }) => theme.colors.border};
     border-radius: 10px;
     padding: 0.85rem 1rem;
     margin-bottom: 1.5rem;
     font-size: 0.85rem;
-    color: #555;
+    color: ${({ theme }) => theme.colors.textSecondary};
 
     svg {
         flex-shrink: 0;
-        color: #888;
+        color: ${({ theme }) => theme.colors.textMuted};
     }
 `;
 
@@ -110,7 +110,7 @@ const FloatingLabel = styled.label<{ $hasValue: boolean }>`
     top: ${({ $hasValue }) => ($hasValue ? '6px' : '50%')};
     transform: ${({ $hasValue }) => ($hasValue ? 'none' : 'translateY(-50%)')};
     font-size: ${({ $hasValue }) => ($hasValue ? '0.7rem' : '0.9rem')};
-    color: ${({ $hasValue }) => ($hasValue ? '#888' : '#999')};
+    color: ${({ theme }) => theme.colors.textMuted};
     pointer-events: none;
     transition: all 0.15s ease;
     z-index: 1;
@@ -119,35 +119,35 @@ const FloatingLabel = styled.label<{ $hasValue: boolean }>`
 const Input = styled.input<{ $error?: boolean }>`
     width: 100%;
     padding: 1.15rem 14px 0.55rem;
-    border: 1px solid ${({ $error }) => ($error ? '#e53935' : '#ddd')};
+    border: 1px solid ${({ $error, theme }) => ($error ? '#e53935' : theme.colors.border)};
     border-radius: 8px;
     font-size: 0.95rem;
-    color: #111;
-    background: #fff;
+    color: ${({ theme }) => theme.colors.text};
+    background: ${({ theme }) => theme.colors.background};
     outline: none;
     transition: border-color 0.2s;
     box-sizing: border-box;
 
     &:focus {
-        border-color: #111;
+        border-color: ${({ theme }) => theme.colors.text};
     }
 
     &:focus + ${FloatingLabel} {
         top: 6px;
         transform: none;
         font-size: 0.7rem;
-        color: #888;
+        color: ${({ theme }) => theme.colors.textMuted};
     }
 `;
 
 const Select = styled.select<{ $error?: boolean }>`
     width: 100%;
     padding: 1.15rem 14px 0.55rem;
-    border: 1px solid ${({ $error }) => ($error ? '#e53935' : '#ddd')};
+    border: 1px solid ${({ $error, theme }) => ($error ? '#e53935' : theme.colors.border)};
     border-radius: 8px;
     font-size: 0.95rem;
-    color: #111;
-    background: #fff;
+    color: ${({ theme }) => theme.colors.text};
+    background: ${({ theme }) => theme.colors.background};
     outline: none;
     appearance: none;
     cursor: pointer;
@@ -158,7 +158,7 @@ const Select = styled.select<{ $error?: boolean }>`
     background-position: right 14px center;
 
     &:focus {
-        border-color: #111;
+        border-color: ${({ theme }) => theme.colors.text};
     }
 `;
 
@@ -175,12 +175,12 @@ const CheckboxRow = styled.label`
     align-items: center;
     gap: 0.6rem;
     font-size: 0.85rem;
-    color: #555;
+    color: ${({ theme }) => theme.colors.textSecondary};
     cursor: pointer;
     margin: 1rem 0 0;
 
     input {
-        accent-color: #111;
+        accent-color: ${({ theme }) => theme.colors.text};
         width: 16px;
         height: 16px;
         cursor: pointer;
@@ -190,8 +190,8 @@ const CheckboxRow = styled.label`
 /* ─── Order Summary ─── */
 
 const SummaryPanel = styled.div`
-    background: #fafafa;
-    border-left: 1px solid #eee;
+    background: ${({ theme }) => theme.colors.backgroundSecondary};
+    border-left: 1px solid ${({ theme }) => theme.colors.border};
     padding: 2rem;
     border-radius: 0;
     position: sticky;
@@ -200,7 +200,7 @@ const SummaryPanel = styled.div`
 
     @media (max-width: 768px) {
         border-left: none;
-        border-top: 1px solid #eee;
+        border-top: 1px solid ${({ theme }) => theme.colors.border};
         padding: 1.5rem 0 0;
         position: static;
         background: transparent;
@@ -211,7 +211,7 @@ const SummaryTitle = styled.h3`
     font-size: 1.1rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
-    color: #111;
+    color: ${({ theme }) => theme.colors.text};
 `;
 
 const SummaryItem = styled.div`
@@ -220,7 +220,7 @@ const SummaryItem = styled.div`
     align-items: center;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 
     &:last-of-type {
         border-bottom: none;
@@ -234,16 +234,16 @@ const ItemThumb = styled.div`
     overflow: hidden;
     flex-shrink: 0;
     position: relative;
-    border: 1px solid #eee;
-    background: #f5f5f5;
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    background: ${({ theme }) => theme.colors.backgroundSecondary};
 `;
 
 const ItemBadge = styled.span`
     position: absolute;
     top: -6px;
     right: -6px;
-    background: #555;
-    color: #fff;
+    background: ${({ theme }) => theme.colors.textSecondary};
+    color: ${({ theme }) => theme.colors.background};
     font-size: 0.65rem;
     width: 20px;
     height: 20px;
@@ -262,18 +262,18 @@ const ItemInfo = styled.div`
 const ItemName = styled.div`
     font-size: 0.85rem;
     font-weight: 600;
-    color: #111;
+    color: ${({ theme }) => theme.colors.text};
 `;
 
 const ItemArtist = styled.div`
     font-size: 0.75rem;
-    color: #888;
+    color: ${({ theme }) => theme.colors.textMuted};
 `;
 
 const ItemPrice = styled.div`
     font-size: 0.9rem;
     font-weight: 600;
-    color: #111;
+    color: ${({ theme }) => theme.colors.text};
 `;
 
 const TotalRow = styled.div`
@@ -282,18 +282,18 @@ const TotalRow = styled.div`
     align-items: center;
     font-size: 1.15rem;
     font-weight: 700;
-    color: #111;
+    color: ${({ theme }) => theme.colors.text};
     margin-top: 1.5rem;
     padding-top: 1rem;
-    border-top: 2px solid #ddd;
+    border-top: 2px solid ${({ theme }) => theme.colors.border};
 `;
 
 const PayButton = styled.button`
     width: 100%;
     margin-top: 1.5rem;
     padding: 1rem;
-    background: #111;
-    color: #fff;
+    background: ${({ theme }) => theme.colors.text};
+    color: ${({ theme }) => theme.colors.background};
     border: none;
     border-radius: 50px;
     font-size: 1rem;
@@ -306,24 +306,24 @@ const PayButton = styled.button`
     gap: 0.5rem;
 
     &:hover {
-        background: #000;
+        opacity: 0.85;
         transform: translateY(-1px);
     }
 
     &:disabled {
-        background: #ccc;
+        background: ${({ theme }) => theme.colors.border};
         cursor: not-allowed;
         transform: none;
     }
 `;
 
 const ShippingMethodBox = styled.div`
-    background: #f9f9f9;
-    border: 1px solid #e5e5e5;
+    background: ${({ theme }) => theme.colors.backgroundSecondary};
+    border: 1px solid ${({ theme }) => theme.colors.border};
     border-radius: 10px;
     padding: 1rem 1.25rem;
     margin-top: 1.5rem;
-    color: #888;
+    color: ${({ theme }) => theme.colors.textMuted};
     font-size: 0.9rem;
 `;
 
@@ -332,13 +332,13 @@ const ShippingOption = styled.div<{ $selected: boolean }>`
     align-items: center;
     justify-content: space-between;
     padding: 0.875rem 1rem;
-    border: 1px solid ${({ $selected }) => ($selected ? '#111' : '#e5e5e5')};
+    border: 1px solid ${({ $selected, theme }) => ($selected ? theme.colors.text : theme.colors.border)};
     border-radius: 8px;
     margin-bottom: 0.5rem;
     cursor: pointer;
-    background: ${({ $selected }) => ($selected ? '#fafafa' : '#fff')};
+    background: ${({ $selected, theme }) => ($selected ? theme.colors.backgroundSecondary : theme.colors.background)};
     transition: border-color 0.15s;
-    &:hover { border-color: #111; }
+    &:hover { border-color: ${({ theme }) => theme.colors.text}; }
 `;
 
 const ShippingOptionLeft = styled.div`
@@ -351,7 +351,7 @@ const RadioDot = styled.div<{ $selected: boolean }>`
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    border: 2px solid ${({ $selected }) => ($selected ? '#111' : '#ccc')};
+    border: 2px solid ${({ $selected, theme }) => ($selected ? theme.colors.text : theme.colors.border)};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -361,26 +361,26 @@ const RadioDot = styled.div<{ $selected: boolean }>`
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: ${({ $selected }) => ($selected ? '#111' : 'transparent')};
+        background: ${({ $selected, theme }) => ($selected ? theme.colors.text : 'transparent')};
     }
 `;
 
 const ShippingOptionLabel = styled.div`
     font-size: 0.9rem;
     font-weight: 600;
-    color: #111;
+    color: ${({ theme }) => theme.colors.text};
 `;
 
 const ShippingOptionTime = styled.div`
     font-size: 0.8rem;
-    color: #888;
+    color: ${({ theme }) => theme.colors.textMuted};
     margin-top: 0.1rem;
 `;
 
 const ShippingOptionPrice = styled.div`
     font-size: 0.9rem;
     font-weight: 600;
-    color: #111;
+    color: ${({ theme }) => theme.colors.text};
 `;
 
 const TermsCheckbox = styled.div`
@@ -392,12 +392,12 @@ const TermsLabel = styled.label<{ $error?: boolean }>`
     align-items: flex-start;
     gap: 0.6rem;
     font-size: 0.85rem;
-    color: ${({ $error }) => ($error ? '#e53935' : '#555')};
+    color: ${({ $error }) => ($error ? '#e53935' : 'inherit')};
     cursor: pointer;
 
     input {
         margin-top: 2px;
-        accent-color: #111;
+        accent-color: ${({ theme }) => theme.colors.text};
         width: 16px;
         height: 16px;
         cursor: pointer;
@@ -411,7 +411,7 @@ const TermsLabel = styled.label<{ $error?: boolean }>`
 `;
 
 const PointsRedeemCard = styled.div<{ $active: boolean }>`
-    background: ${({ $active }) => ($active ? 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' : '#fafafa')};
+    background: ${({ $active }) => ($active ? 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' : 'transparent')};
     border: 2px solid ${({ $active }) => ($active ? '#22c55e' : '#e5e7eb')};
     border-radius: 14px;
     padding: 1.25rem;
@@ -438,7 +438,7 @@ const PointsInfo = styled.div`
 const PointsTitle = styled.div`
     font-weight: 700;
     font-size: 0.95rem;
-    color: #111;
+    color: ${({ theme }) => theme.colors.text};
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -446,7 +446,7 @@ const PointsTitle = styled.div`
 
 const PointsSubtext = styled.div`
     font-size: 0.8rem;
-    color: #666;
+    color: ${({ theme }) => theme.colors.textSecondary};
     margin-top: 0.25rem;
 `;
 
@@ -496,23 +496,23 @@ const PromoRow = styled.div`
 const PromoInput = styled.input`
     flex: 1;
     padding: 0.65rem 0.875rem;
-    border: 1px solid #ddd;
+    border: 1px solid ${({ theme }) => theme.colors.border};
     border-radius: 8px;
     font-size: 0.9rem;
-    color: #111;
-    background: #fff;
+    color: ${({ theme }) => theme.colors.text};
+    background: ${({ theme }) => theme.colors.background};
     outline: none;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    &:focus { border-color: #111; }
-    &::placeholder { text-transform: none; letter-spacing: normal; color: #aaa; }
-    &:disabled { background: #f5f5f5; }
+    &:focus { border-color: ${({ theme }) => theme.colors.text}; }
+    &::placeholder { text-transform: none; letter-spacing: normal; color: ${({ theme }) => theme.colors.textMuted}; }
+    &:disabled { background: ${({ theme }) => theme.colors.backgroundSecondary}; }
 `;
 
 const PromoApplyButton = styled.button`
     padding: 0.65rem 1rem;
-    background: #111;
-    color: #fff;
+    background: ${({ theme }) => theme.colors.text};
+    color: ${({ theme }) => theme.colors.background};
     border: none;
     border-radius: 8px;
     font-size: 0.85rem;
@@ -522,9 +522,9 @@ const PromoApplyButton = styled.button`
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    transition: background 0.2s;
-    &:disabled { background: #ccc; cursor: not-allowed; }
-    &:hover:not(:disabled) { background: #000; }
+    transition: opacity 0.2s;
+    &:disabled { background: ${({ theme }) => theme.colors.border}; cursor: not-allowed; }
+    &:hover:not(:disabled) { opacity: 0.85; }
 `;
 
 const PromoSuccess = styled.div`
@@ -566,7 +566,7 @@ const PaymentMethodSection = styled.div`
 const PaymentMethodLabel = styled.div`
     font-size: 0.8rem;
     font-weight: 600;
-    color: #888;
+    color: ${({ theme }) => theme.colors.textMuted};
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.5rem;
@@ -584,16 +584,16 @@ const PaymentMethodCard = styled.button<{ $active: boolean }>`
     justify-content: center;
     gap: 0.5rem;
     padding: 0.65rem 0.75rem;
-    border: 2px solid ${({ $active }) => ($active ? '#111' : '#e5e5e5')};
+    border: 2px solid ${({ $active, theme }) => ($active ? theme.colors.text : theme.colors.border)};
     border-radius: 10px;
-    background: ${({ $active }) => ($active ? '#111' : '#fff')};
-    color: ${({ $active }) => ($active ? '#fff' : '#444')};
+    background: ${({ $active, theme }) => ($active ? theme.colors.text : theme.colors.background)};
+    color: ${({ $active, theme }) => ($active ? theme.colors.background : theme.colors.textSecondary)};
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.15s;
     &:hover {
-        border-color: #111;
+        border-color: ${({ theme }) => theme.colors.text};
     }
 `;
 
@@ -818,7 +818,7 @@ export default function CheckoutForm() {
     if (items.length === 0) {
         return (
             <PageWrapper style={{ display: 'block', textAlign: 'center', padding: '4rem 2rem' }}>
-                <p style={{ color: '#888', fontSize: '1.1rem', marginBottom: '1.5rem' }}>Tu carrito está vacío</p>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '1.5rem' }}>Tu carrito está vacío</p>
                 <BackLink href={`/${locale}`}>
                     <ArrowLeft size={16} /> Volver a la tienda
                 </BackLink>
@@ -1115,15 +1115,15 @@ export default function CheckoutForm() {
                 )}
 
                 {addressComplete && (
-                    <TotalRow style={{ fontSize: '0.9rem', fontWeight: 400, borderTop: '1px solid #eee', marginTop: '0.5rem', paddingTop: '0.75rem' }}>
-                        <span style={{ color: '#555' }}>Envío ({shippingMethod.label})</span>
-                        <span style={{ color: shippingCost === 0 ? '#16a34a' : '#111', fontWeight: 600 }}>
+                    <TotalRow style={{ fontSize: '0.9rem', fontWeight: 400, borderTop: '1px solid var(--border-color)', marginTop: '0.5rem', paddingTop: '0.75rem' }}>
+                        <span style={{ color: 'var(--text-secondary)' }}>Envío ({shippingMethod.label})</span>
+                        <span style={{ color: shippingCost === 0 ? '#16a34a' : 'var(--text-primary)', fontWeight: 600 }}>
                             {shippingCost === 0 ? 'Gratis' : formatPrice(shippingCost)}
                         </span>
                     </TotalRow>
                 )}
 
-                <TotalRow style={{ borderTop: '2px solid #111', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                <TotalRow style={{ borderTop: '2px solid var(--border-color)', paddingTop: '1rem', marginTop: '0.5rem' }}>
                     <span style={{ fontWeight: 800 }}>Total</span>
                     <span style={{ fontWeight: 800 }}>{formatPrice(finalTotal)}</span>
                 </TotalRow>
