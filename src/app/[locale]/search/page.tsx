@@ -11,7 +11,7 @@ import { SearchResults } from '@/features/product';
 const PageContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 3rem 2rem 2rem;
   min-height: 80vh;
 `;
 
