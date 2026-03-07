@@ -327,6 +327,62 @@ const ShippingMethodBox = styled.div`
     font-size: 0.9rem;
 `;
 
+const ShippingOption = styled.div<{ $selected: boolean }>`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    border: 1px solid ${({ $selected }) => ($selected ? '#111' : '#e5e5e5')};
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    background: ${({ $selected }) => ($selected ? '#fafafa' : '#fff')};
+    transition: border-color 0.15s;
+    &:hover { border-color: #111; }
+`;
+
+const ShippingOptionLeft = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+`;
+
+const RadioDot = styled.div<{ $selected: boolean }>`
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid ${({ $selected }) => ($selected ? '#111' : '#ccc')};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    &::after {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: ${({ $selected }) => ($selected ? '#111' : 'transparent')};
+    }
+`;
+
+const ShippingOptionLabel = styled.div`
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #111;
+`;
+
+const ShippingOptionTime = styled.div`
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.1rem;
+`;
+
+const ShippingOptionPrice = styled.div`
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #111;
+`;
+
 const TermsCheckbox = styled.div`
     margin-top: 1rem;
 `;
@@ -541,6 +597,17 @@ const PaymentMethodCard = styled.button<{ $active: boolean }>`
     }
 `;
 
+/* ─── Shipping methods ─── */
+
+const BASE_SHIPPING_METHODS = [
+    { id: 'standard', label: 'Envío Estándar',  time: '3–7 días hábiles',         price: 0   },
+    { id: 'express',  label: 'Envío Express',   time: '1–2 días hábiles',         price: 149 },
+] as const;
+
+const SAMEDAY_METHOD = { id: 'sameday', label: 'Mismo Día', time: 'Hoy en tu domicilio (CDMX)', price: 249 } as const;
+
+type ShippingMethodId = typeof BASE_SHIPPING_METHODS[number]['id'] | 'sameday';
+
 /* ─── Component ─── */
 
 export default function CheckoutForm() {
@@ -573,6 +640,9 @@ export default function CheckoutForm() {
 
     // Payment method
     const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'mercadopago'>('stripe');
+
+    // Shipping method
+    const [selectedShipping, setSelectedShipping] = useState<ShippingMethodId>('standard');
 
     // Fetch user's loyalty points
     useEffect(() => {
@@ -654,7 +724,17 @@ export default function CheckoutForm() {
             : (appliedPromo.amountOff || 0)
         : 0;
     const pointsDiscount = usePoints ? POINTS_DISCOUNT_MXN : 0;
-    const finalTotal = Math.max(0, total - pointsDiscount - promoDiscount);
+
+    // Shipping derived state
+    const addressComplete = !!(watchedFields.address && watchedFields.city && watchedFields.state);
+    const isCDMX = watchedFields.state === 'Ciudad de México';
+    const availableShippingMethods = isCDMX
+        ? [...BASE_SHIPPING_METHODS, SAMEDAY_METHOD]
+        : BASE_SHIPPING_METHODS;
+    const shippingMethod = availableShippingMethods.find(m => m.id === selectedShipping) ?? BASE_SHIPPING_METHODS[0];
+    const shippingCost = addressComplete ? shippingMethod.price : 0;
+
+    const finalTotal = Math.max(0, total - pointsDiscount - promoDiscount + shippingCost);
 
     const onSubmit = async (data: CheckoutSchema) => {
         if (items.length === 0) {
@@ -880,9 +960,32 @@ export default function CheckoutForm() {
 
                 {/* Métodos de envío */}
                 <SectionTitle style={{ marginTop: '2rem' }}>Métodos de envío</SectionTitle>
-                <ShippingMethodBox>
-                    Ingresa tu dirección de envío para ver los métodos disponibles.
-                </ShippingMethodBox>
+                {!addressComplete ? (
+                    <ShippingMethodBox>
+                        Ingresa tu dirección de envío para ver los métodos disponibles.
+                    </ShippingMethodBox>
+                ) : (
+                    <div>
+                        {availableShippingMethods.map(method => (
+                            <ShippingOption
+                                key={method.id}
+                                $selected={selectedShipping === method.id}
+                                onClick={() => setSelectedShipping(method.id)}
+                            >
+                                <ShippingOptionLeft>
+                                    <RadioDot $selected={selectedShipping === method.id} />
+                                    <div>
+                                        <ShippingOptionLabel>{method.label}</ShippingOptionLabel>
+                                        <ShippingOptionTime>{method.time}</ShippingOptionTime>
+                                    </div>
+                                </ShippingOptionLeft>
+                                <ShippingOptionPrice>
+                                    {method.price === 0 ? 'Gratis' : formatPrice(method.price)}
+                                </ShippingOptionPrice>
+                            </ShippingOption>
+                        ))}
+                    </div>
+                )}
 
                 {/* Términos */}
                 <TermsCheckbox>
@@ -1009,6 +1112,15 @@ export default function CheckoutForm() {
                         <span>Descuento Lealtad (-{POINTS_REQUIRED} pts)</span>
                         <span>-{formatPrice(pointsDiscount)}</span>
                     </DiscountRow>
+                )}
+
+                {addressComplete && (
+                    <TotalRow style={{ fontSize: '0.9rem', fontWeight: 400, borderTop: '1px solid #eee', marginTop: '0.5rem', paddingTop: '0.75rem' }}>
+                        <span style={{ color: '#555' }}>Envío ({shippingMethod.label})</span>
+                        <span style={{ color: shippingCost === 0 ? '#16a34a' : '#111', fontWeight: 600 }}>
+                            {shippingCost === 0 ? 'Gratis' : formatPrice(shippingCost)}
+                        </span>
+                    </TotalRow>
                 )}
 
                 <TotalRow style={{ borderTop: '2px solid #111', paddingTop: '1rem', marginTop: '0.5rem' }}>
