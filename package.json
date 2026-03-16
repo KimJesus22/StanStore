@@ -58,7 +58,7 @@
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "resend": "^6.9.3",
-    "serwist": "^9.5.6",
+    "serwist": "^9.5.7",
     "stripe": "^20.4.1",
     "styled-components": "^6.3.11",
     "swagger-ui-react": "^5.32.0",
