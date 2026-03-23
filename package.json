@@ -69,7 +69,7 @@
   "devDependencies": {
     "@axe-core/react": "^4.11.1",
     "@chromatic-com/storybook": "^5.0.1",
-    "@next/bundle-analyzer": "^16.1.6",
+    "@next/bundle-analyzer": "^16.2.1",
     "@playwright/test": "^1.58.2",
     "@storybook/addon-a11y": "^10.3.2",
     "@storybook/addon-docs": "^10.2.16",
