@@ -24,7 +24,14 @@
       "Bash(git pull:*)",
       "Bash(git stash push:*)",
       "Bash(git stash:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx lint-staged --verbose)",
+      "Bash(npx lint-staged --version)",
+      "Bash(npx lint-staged:*)",
+      "Bash(git --version:*)",
+      "Bash(git reset:*)",
+      "Bash(./node_modules/.bin/lint-staged:*)"
     ]
   }
 }
