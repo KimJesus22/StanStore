@@ -17,6 +17,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createCheckoutSchema, CheckoutSchema } from '@/schemas/checkout';
 import TermsSummaryAlert from './TermsSummaryAlert';
+import ExpressPaymentButton from './ExpressPaymentButton';
 
 const BLUR_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
@@ -1148,6 +1149,8 @@ export default function CheckoutForm() {
                         </PaymentMethodCard>
                     </PaymentMethodGrid>
                 </PaymentMethodSection>
+
+                <ExpressPaymentButton />
 
                 <PayButton
                     onClick={handleSubmit(onSubmit)}

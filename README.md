@@ -29,7 +29,7 @@ A diferencia de las búsquedas tradicionales por texto exacto, StanStore utiliza
 ### Pagos Express (Google Pay / Apple Pay)
 Integración nativa de wallets digitales sin redireccionamiento:
 - **`StripeElementsProvider`**: Crea un `PaymentIntent` al cargar el checkout y provee el `clientSecret` a hijos vía React Context, envolviendo con `<Elements>` de Stripe.
-- **`ExpressPaymentButton`**: Usa `stripe.paymentRequest()` + `canMakePayment()` para mostrar el botón solo si el dispositivo tiene un wallet configurado (Google Pay en Android/Chrome, Apple Pay en Safari/iOS). Invisible en PC sin wallets registradas.
+- **`ExpressPaymentButton`**: Integrado en `CheckoutForm`, justo encima del botón principal. Usa `stripe.paymentRequest()` + `canMakePayment()` para mostrar el botón solo si el dispositivo tiene un wallet configurado (Google Pay en Android/Chrome, Apple Pay en Safari/iOS). Invisible en PC sin wallets registradas.
 - **Confirmación segura**: Maneja 3D Secure con doble llamada a `confirmCardPayment()` (`handleActions: false` → acción adicional si `requires_action`).
 - **Webhook `payment_intent.succeeded`**: Actualiza `orders.status = 'paid'` en Supabase usando el `order_id` almacenado en los `metadata` del PaymentIntent. Devuelve 500 si falla para activar el reintento automático de Stripe.
 
