@@ -82,5 +82,42 @@ export async function POST(req: Request) {
         }
     }
 
-    return new NextResponse('Received', { status: 200 });
+    // ── Flujo Google Pay / Apple Pay (PaymentIntent directo) ─────────────────
+    if (event.type === 'payment_intent.succeeded') {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        const orderId = paymentIntent.metadata?.order_id;
+
+        if (!orderId) {
+            // PaymentIntent sin orden asociada (ej: test desde Stripe Dashboard)
+            console.warn(`[webhook] payment_intent.succeeded sin order_id en metadata. PI: ${paymentIntent.id}`);
+            return NextResponse.json({ received: true });
+        }
+
+        const { error } = await supabase
+            .from('orders')
+            .update({ status: 'paid' })
+            .eq('id', orderId);
+
+        if (error) {
+            console.error(`[webhook] Error actualizando orden ${orderId}:`, error);
+            await logAuditAction('ORDER_PAYMENT_SYNC_FAILED', {
+                paymentIntentId: paymentIntent.id,
+                orderId,
+                error: error.message,
+            });
+            // Devolver 500 para que Stripe reintente el webhook automáticamente
+            return new NextResponse('Error actualizando la orden', { status: 500 });
+        }
+
+        await logAuditAction('ORDER_PAID', {
+            paymentIntentId: paymentIntent.id,
+            orderId,
+            amount: paymentIntent.amount,
+            currency: paymentIntent.currency,
+        });
+
+        console.log(`[webhook] Orden ${orderId} marcada como pagada (PI: ${paymentIntent.id})`);
+    }
+
+    return NextResponse.json({ received: true });
 }
