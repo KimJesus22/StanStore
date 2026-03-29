@@ -270,3 +270,74 @@ ON CONFLICT (id) DO UPDATE SET
     image_url = EXCLUDED.image_url,
     artist = EXCLUDED.artist,
     youtube_video_id = EXCLUDED.youtube_video_id;
+
+-- Nuevos Productos (Lote 2 — (G)I-DLE, EXO, MAMAMOO, NMIXX, Kep1er)
+INSERT INTO products (id, name, price, image_url, category, artist, is_new, description, stock, youtube_video_id)
+VALUES
+    (
+        'f0b1c2d3-e4f5-47a8-9b0c-1d2e3f4a5b56',
+        'I feel',
+        460,
+        '/images/gidle-i-feel.jpg',
+        'album',
+        '(G)I-DLE',
+        true,
+        'El segundo álbum de estudio de (G)I-DLE. Liderado por Soyeon, explora la autoconfianza y la feminidad con el éxito "Queencard". Incluye photocard aleatoria y minipóster.',
+        45,
+        'tiKBmqf7FxI'
+    ),
+    (
+        'a1c2d3e4-f5a6-48b9-8c0d-2e3f4a5b6c67',
+        'EXO LIGHTSTICK VER.3',
+        1050,
+        '/images/exo-lightstick-v3.jpg',
+        'lightstick',
+        'EXO',
+        false,
+        'El lightstick oficial Ver.3 de EXO con diseño en forma de planeta. Compatible con la app oficial para sincronización en conciertos. Un ícono coleccionable para cada EXO-L.',
+        10,
+        'yWfsla_Yd6k'
+    ),
+    (
+        'b2d3e4f5-a6b7-49ca-9d0e-3f4a5b6c7d78',
+        'I SAY MAMAMOO: THE BEST',
+        520,
+        '/images/mamamoo-the-best.jpg',
+        'album',
+        'MAMAMOO',
+        false,
+        'Compilación especial de los mayores éxitos de MAMAMOO. Incluye "Hip", "Gogobebe", "AYA" y más clásicos del cuarteto. Edición premium con fotolibro de 80 páginas.',
+        30,
+        'KPsrBihJ0fA'
+    ),
+    (
+        'c3e4f5a6-b7c8-4adb-8e0f-4a5b6c7d8e89',
+        'expérgo',
+        440,
+        '/images/nmixx-expergo.jpg',
+        'album',
+        'NMIXX',
+        true,
+        'El primer álbum de estudio de NMIXX. Con "Roller Coaster" como tema principal, el grupo define su sonido único mezclando pop, R&B y dance con su sello característico de Mix-Pop.',
+        40,
+        'MUaFtBPnNSs'
+    ),
+    (
+        'd4f5a6b7-c8d9-4bec-9f0a-5b6c7d8e9fa0',
+        'KEP1GOING',
+        450,
+        '/images/kep1er-kep1going.jpg',
+        'album',
+        'Kep1er',
+        true,
+        'El primer álbum completo de Kep1er. Con "Shooting Star" como sencillo principal, consolida la identidad del grupo con un sonido maduro y energético que muestra su evolución artística.',
+        35,
+        'sLzIpR5R39w'
+    )
+ON CONFLICT (id) DO UPDATE SET
+    stock = EXCLUDED.stock,
+    price = EXCLUDED.price,
+    description = EXCLUDED.description,
+    image_url = EXCLUDED.image_url,
+    artist = EXCLUDED.artist,
+    youtube_video_id = EXCLUDED.youtube_video_id;
