@@ -12,11 +12,13 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 interface StripePaymentContextValue {
     clientSecret: string | null;
     amountInCents: number;
+    isLoading: boolean;
 }
 
 export const StripePaymentContext = createContext<StripePaymentContextValue>({
     clientSecret: null,
     amountInCents: 0,
+    isLoading: true,
 });
 
 export const useStripePayment = () => useContext(StripePaymentContext);
@@ -29,11 +31,16 @@ export default function StripeElementsProvider({ children }: StripeElementsProvi
     const items = useCartStore((s) => s.items);
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [amountInCents, setAmountInCents] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (items.length === 0) return;
+        if (items.length === 0) {
+            setIsLoading(false);
+            return;
+        }
 
-        const { total } = calculateCartTotals(items, true); // incluir envío estimado
+        setIsLoading(true);
+        const { total } = calculateCartTotals(items, true);
         const cents = Math.round(total * 100);
         setAmountInCents(cents);
 
@@ -46,29 +53,24 @@ export default function StripeElementsProvider({ children }: StripeElementsProvi
             .then((data) => {
                 if (data.client_secret) setClientSecret(data.client_secret);
             })
-            .catch((err) => console.error('[StripeElementsProvider] Error creando PaymentIntent:', err));
+            .catch((err) => console.error('[StripeElementsProvider] Error creando PaymentIntent:', err))
+            .finally(() => setIsLoading(false));
     }, [items]);
 
-    const contextValue: StripePaymentContextValue = { clientSecret, amountInCents };
+    const contextValue: StripePaymentContextValue = { clientSecret, amountInCents, isLoading };
 
-    if (!clientSecret) {
-        // Antes de tener clientSecret, los hijos funcionan normalmente
-        // (CheckoutForm clásico sigue operativo; botones express aparecerán al cargar)
-        return (
-            <StripePaymentContext.Provider value={contextValue}>
-                {children}
-            </StripePaymentContext.Provider>
-        );
-    }
-
+    // SIEMPRE envolver en <Elements> para que useStripe() no crashee.
+    // Cuando no hay clientSecret, usar mode 'payment' (sin clientSecret) como fallback.
+    // Esto permite que los hijos llamen a useStripe() sin error.
     return (
         <StripePaymentContext.Provider value={contextValue}>
             <Elements
                 stripe={stripePromise}
-                options={{
-                    clientSecret,
-                    appearance: { theme: 'stripe' },
-                }}
+                options={
+                    clientSecret
+                        ? { clientSecret, appearance: { theme: 'stripe' } }
+                        : { mode: 'payment', amount: amountInCents || 100, currency: 'mxn', appearance: { theme: 'stripe' } }
+                }
             >
                 {children}
             </Elements>

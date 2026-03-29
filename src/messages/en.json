@@ -22,7 +22,9 @@
         "passwordMin": "Your password must be at least {min} characters for security",
         "passwordUppercase": "Add at least one uppercase letter to your password",
         "passwordNumber": "Add at least one number to your password",
-        "searchMax": "Search query cannot exceed {max} characters"
+        "searchMax": "Search query cannot exceed {max} characters",
+        "acceptTerms": "You must accept the terms and conditions to participate in the group order",
+        "phoneMin": "Phone number must be at least 10 digits"
     },
     "Validation": {
         "required": "This field is required",

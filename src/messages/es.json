@@ -22,7 +22,9 @@
         "passwordMin": "La contraseña debe tener al menos {min} caracteres por seguridad",
         "passwordUppercase": "Agrega al menos una letra mayúscula a tu contraseña",
         "passwordNumber": "Agrega al menos un número a tu contraseña",
-        "searchMax": "La búsqueda no puede superar los {max} caracteres"
+        "searchMax": "La búsqueda no puede superar los {max} caracteres",
+        "acceptTerms": "Debes aceptar los términos y condiciones para participar en el pedido grupal",
+        "phoneMin": "El teléfono debe tener al menos 10 dígitos"
     },
     "Validation": {
         "required": "Este campo es requerido",

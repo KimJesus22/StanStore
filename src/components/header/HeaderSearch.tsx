@@ -227,12 +227,19 @@ export default function HeaderSearch() {
     if (!debouncedQuery) return;
     router.push({ pathname: '/search', query: { q: debouncedQuery } });
     supabase.rpc('log_search_query', { search_term: debouncedQuery }).then(() => null);
+    // Limpiar sugerencias tras navegar para cerrar el dropdown
+    setSuggestions([]);
+    setProducts([]);
   }, [debouncedQuery, router]);
 
   const handleSuggestionSelect = useCallback((s: string) => {
     setQuery(s);
     router.push({ pathname: '/search', query: { q: s } });
     supabase.rpc('log_search_query', { search_term: s }).then(() => null);
+    // Limpiar estado del dropdown completamente
+    setSuggestions([]);
+    setProducts([]);
+    setActiveIndex(-1);
     setIsSearchOpen(false);
   }, [router]);
 

@@ -14,17 +14,19 @@ interface ExpressPaymentButtonProps {
 
 /**
  * Renderiza el botón de Google Pay / Apple Pay si el dispositivo lo soporta.
- * Devuelve null si canMakePayment() retorna falso (PC sin wallet configurada, etc.).
+ * Devuelve null si canMakePayment() retorna falso (PC sin wallet configurada, etc.)
+ * o si Stripe aún no está inicializado.
  *
  * Debe estar dentro de <Elements> (montado por StripeElementsProvider).
  */
 export default function ExpressPaymentButton({ onSuccess, onError }: ExpressPaymentButtonProps) {
     const stripe = useStripe();
-    const { clientSecret, amountInCents } = useStripePayment();
+    const { clientSecret, amountInCents, isLoading } = useStripePayment();
     const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
 
     useEffect(() => {
-        if (!stripe || !clientSecret || amountInCents <= 0) return;
+        // Esperar a que Stripe, clientSecret y amount estén listos
+        if (!stripe || !clientSecret || amountInCents <= 0 || isLoading) return;
 
         const pr = stripe.paymentRequest({
             country: 'MX',
@@ -76,7 +78,7 @@ export default function ExpressPaymentButton({ onSuccess, onError }: ExpressPaym
         return () => {
             pr.off('paymentmethod');
         };
-    }, [stripe, clientSecret, amountInCents, onSuccess, onError]);
+    }, [stripe, clientSecret, amountInCents, isLoading, onSuccess, onError]);
 
     if (!paymentRequest) return null;
 
@@ -95,3 +97,4 @@ export default function ExpressPaymentButton({ onSuccess, onError }: ExpressPaym
         />
     );
 }
+

@@ -22,7 +22,9 @@
         "passwordMin": "Votre mot de passe doit comporter au moins {min} caractères pour la sécurité",
         "passwordUppercase": "Ajoutez au moins une lettre majuscule à votre mot de passe",
         "passwordNumber": "Ajoutez au moins un chiffre à votre mot de passe",
-        "searchMax": "La recherche ne peut pas dépasser {max} caractères"
+        "searchMax": "La recherche ne peut pas dépasser {max} caractères",
+        "acceptTerms": "Vous devez accepter les termes et conditions pour participer à la commande groupée",
+        "phoneMin": "Le numéro de téléphone doit comporter au moins 10 chiffres"
     },
     "Validation": {
         "required": "Ce champ est obligatoire",
