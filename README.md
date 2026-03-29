@@ -52,6 +52,8 @@ Potenciando la retención y el alcance orgánico en la página de éxito (`/succ
 - **Home sin fetch del cliente**: El servidor pre-carga todos los productos con `getProducts()` (cacheada 1h via `unstable_cache`) y los pasa como `initialProducts` a `HomeContent`. Los filtros se aplican en memoria en el cliente — **cero peticiones a Supabase desde el navegador** en la carga inicial, eliminando el spinner de LCP.
 - **Cache-Control en rutas API públicas**: `GET /api/artists` y `GET /api/products/similar` incluyen `s-maxage=3600, stale-while-revalidate=86400` para ser cacheadas por el CDN de Vercel entre peticiones.
 - **Invalidación por evento**: Los webhooks de Stripe y las Server Actions de admin llaman `revalidateTag('products')` para invalidar el caché inmediatamente al actualizar stock o crear un producto nuevo.
+- **Charts sin dependencias**: `SalesChart` y `CategoryChart` del admin implementados con SVG puro (eliminando `recharts` ~400 KB del chunk de admin). Soportan tema claro/oscuro y tooltip nativo en cada punto.
+- **jsPDF lazy**: `generateContractPDF` usa `import('jspdf')` dinámico — la librería (~500 KB) se descarga solo cuando el usuario hace clic en "Descargar contrato", no al cargar `/success`.
 - **Priorización de Carga**: Uso de `priority={true}` en imágenes LCP y `sizes` dinámicos.
 - **Componentes Diferidos**: Carga bajo demanda de reproductores externos (Spotify, YouTube).
 

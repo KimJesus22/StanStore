@@ -1,4 +1,3 @@
-import jsPDF from 'jspdf';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -21,7 +20,8 @@ interface ContractData {
     };
 }
 
-export const generateContractPDF = (data: ContractData) => {
+export const generateContractPDF = async (data: ContractData) => {
+    const { default: jsPDF } = await import('jspdf');
     const doc = new jsPDF();
     let y = 20;
 
