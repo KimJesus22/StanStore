@@ -41,6 +41,7 @@ export default function ExpressPaymentButton({ onSuccess, onError }: ExpressPaym
 
         // Solo mostrar el botón si el dispositivo tiene un wallet configurado
         pr.canMakePayment().then((result) => {
+            console.log('[ExpressPaymentButton] canMakePayment:', result);
             if (result) setPaymentRequest(pr);
         });
 

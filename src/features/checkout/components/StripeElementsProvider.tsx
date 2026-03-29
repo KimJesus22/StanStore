@@ -62,9 +62,12 @@ export default function StripeElementsProvider({ children }: StripeElementsProvi
     // SIEMPRE envolver en <Elements> para que useStripe() no crashee.
     // Cuando no hay clientSecret, usar mode 'payment' (sin clientSecret) como fallback.
     // Esto permite que los hijos llamen a useStripe() sin error.
+    // key fuerza remount limpio de <Elements> cuando llega clientSecret,
+    // evitando el bug de Stripe donde cambiar options corrompe el contexto.
     return (
         <StripePaymentContext.Provider value={contextValue}>
             <Elements
+                key={clientSecret ?? 'loading'}
                 stripe={stripePromise}
                 options={
                     clientSecret
