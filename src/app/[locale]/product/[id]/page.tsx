@@ -4,6 +4,7 @@ import { cache } from 'react';
 import {
   ProductDetails,
   getProductById,
+  getProducts,
   ProductReviewsList,
   ReviewsSkeleton
 } from '@/features/product';
@@ -12,11 +13,14 @@ import { mockProducts } from '@/data/mockData';
 import { locales } from '@/navigation';
 import { Suspense } from 'react';
 
+export const revalidate = 3600;
 export const dynamicParams = true; // Permitir productos nuevos bajo demanda
 
 export async function generateStaticParams() {
-  // Desactivado temporalmente para build, permitir renderizado bajo demanda
-  return [];
+  const products = await getProducts();
+  return locales.flatMap((locale) =>
+    products.map((p) => ({ locale, id: p.id }))
+  );
 }
 
 type Props = {

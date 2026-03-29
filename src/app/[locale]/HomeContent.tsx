@@ -13,6 +13,7 @@ import {
     useProducts,
     useArtists
 } from '@/features/product';
+import { Product } from '@/types';
 
 // ssr: false — lee localStorage, invisible hasta que el cliente hidrata
 const PersonalizedRecommendations = dynamic(
@@ -153,14 +154,18 @@ const DesktopSidebarWrapper = styled.div`
   }
 `;
 
-export default function Home() {
+interface HomeContentProps {
+    initialProducts?: Product[];
+}
+
+export default function Home({ initialProducts }: HomeContentProps) {
     const t = useTranslations('Home');
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     // Hooks from Feature
     const { filters, handlers } = useProductFilters();
-    const { products, loading } = useProducts(filters);
-    const { artists } = useArtists();
+    const { products, loading } = useProducts({ ...filters, initialProducts });
+    const { artists } = useArtists(initialProducts);
 
     // Close drawer on resize to desktop
     useEffect(() => {

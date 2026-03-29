@@ -10,5 +10,7 @@ export async function GET(request: NextRequest) {
     const sort = (searchParams.get('sort') ?? 'name') as OrderByField;
 
     const artists = await getArtists(locale, { genre, orderBy: sort });
-    return NextResponse.json(artists);
+    return NextResponse.json(artists, {
+        headers: { 'Cache-Control': 's-maxage=3600, stale-while-revalidate=86400' },
+    });
 }

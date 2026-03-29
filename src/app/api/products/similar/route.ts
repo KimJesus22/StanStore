@@ -116,7 +116,9 @@ export async function GET(request: NextRequest) {
             similar = fallbackData || [];
         }
 
-        return NextResponse.json({ similar });
+        return NextResponse.json({ similar }, {
+            headers: { 'Cache-Control': 's-maxage=3600, stale-while-revalidate=86400' },
+        });
     } catch (error) {
         console.error('Error en /api/products/similar:', error);
 

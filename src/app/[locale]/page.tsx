@@ -1,8 +1,9 @@
 import HomeContent from './HomeContent';
 
 import { getTranslations } from 'next-intl/server';
+import { getProducts } from '@/features/product';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params
@@ -20,6 +21,7 @@ export async function generateMetadata({
   };
 }
 
-export default function HomePage() {
-  return <HomeContent />;
+export default async function HomePage() {
+  const products = await getProducts();
+  return <HomeContent initialProducts={products} />;
 }

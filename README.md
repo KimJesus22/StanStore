@@ -48,7 +48,10 @@ Potenciando la retención y el alcance orgánico en la página de éxito (`/succ
 
 ## ⚡ Rendimiento y Experiencia de Usuario (Optimización LCP/CLS)
 
-- **ISR (Incremental Static Regeneration)**: Las páginas de catálogo y productos populares se pre-renderizan cada hora (`revalidate = 3600`), asegurando carga instantánea y SEO óptimo.
+- **ISR (Incremental Static Regeneration)**: Todas las páginas de producto (`/[locale]/product/[id]`) se pre-generan en build con `generateStaticParams` (~63 páginas × 3 locales) y se revalidan cada hora (`revalidate = 3600`). Nuevos productos se renderizan on-demand gracias a `dynamicParams = true`. Las páginas expiradas son regeneradas en background sin bloquear al usuario (`stale-while-revalidate`).
+- **Home sin fetch del cliente**: El servidor pre-carga todos los productos con `getProducts()` (cacheada 1h via `unstable_cache`) y los pasa como `initialProducts` a `HomeContent`. Los filtros se aplican en memoria en el cliente — **cero peticiones a Supabase desde el navegador** en la carga inicial, eliminando el spinner de LCP.
+- **Cache-Control en rutas API públicas**: `GET /api/artists` y `GET /api/products/similar` incluyen `s-maxage=3600, stale-while-revalidate=86400` para ser cacheadas por el CDN de Vercel entre peticiones.
+- **Invalidación por evento**: Los webhooks de Stripe y las Server Actions de admin llaman `revalidateTag('products')` para invalidar el caché inmediatamente al actualizar stock o crear un producto nuevo.
 - **Priorización de Carga**: Uso de `priority={true}` en imágenes LCP y `sizes` dinámicos.
 - **Componentes Diferidos**: Carga bajo demanda de reproductores externos (Spotify, YouTube).
 
