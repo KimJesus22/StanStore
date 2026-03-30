@@ -163,7 +163,7 @@ const Select = styled.select<{ $error?: boolean }>`
     }
 `;
 
-const ErrorMessage = styled.span`
+const ErrorMessage = styled.span.attrs({ role: 'alert' })`
     display: block;
     color: #e53935;
     font-size: 0.75rem;
@@ -821,7 +821,7 @@ export default function CheckoutForm() {
             <PageWrapper style={{ display: 'block', textAlign: 'center', padding: '4rem 2rem' }}>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '1.5rem' }}>Tu carrito está vacío</p>
                 <BackLink href={`/${locale}`}>
-                    <ArrowLeft size={16} /> Volver a la tienda
+                    <ArrowLeft size={16} aria-hidden="true" /> Volver a la tienda
                 </BackLink>
             </PageWrapper>
         );
@@ -831,7 +831,7 @@ export default function CheckoutForm() {
         <PageWrapper>
             <FormSection onSubmit={handleSubmit(onSubmit)}>
                 <BackLink href={`/${locale}`}>
-                    <ArrowLeft size={16} /> Volver a la tienda
+                    <ArrowLeft size={16} aria-hidden="true" /> Volver a la tienda
                 </BackLink>
 
                 <TermsSummaryAlert />
@@ -839,7 +839,7 @@ export default function CheckoutForm() {
                 <SectionTitle>Entrega</SectionTitle>
 
                 <NoteBox>
-                    <Info size={18} />
+                    <Info size={18} aria-hidden="true" />
                     <span>La dirección debe escribirse en <strong>ESPAÑOL</strong> para entrega en México.</span>
                 </NoteBox>
 
@@ -966,12 +966,16 @@ export default function CheckoutForm() {
                         Ingresa tu dirección de envío para ver los métodos disponibles.
                     </ShippingMethodBox>
                 ) : (
-                    <div>
+                    <div role="radiogroup" aria-label="Método de envío">
                         {availableShippingMethods.map(method => (
                             <ShippingOption
                                 key={method.id}
                                 $selected={selectedShipping === method.id}
                                 onClick={() => setSelectedShipping(method.id)}
+                                role="radio"
+                                aria-checked={selectedShipping === method.id}
+                                tabIndex={0}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedShipping(method.id); } }}
                             >
                                 <ShippingOptionLeft>
                                     <RadioDot $selected={selectedShipping === method.id} />
@@ -1070,6 +1074,7 @@ export default function CheckoutForm() {
                             <PromoRemove
                                 type="button"
                                 onClick={() => { setAppliedPromo(null); setPromoInput(''); }}
+                                aria-label="Quitar código de descuento"
                             >
                                 ✕
                             </PromoRemove>
@@ -1096,6 +1101,8 @@ export default function CheckoutForm() {
                                 $active={usePoints}
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); setUsePoints(!usePoints); }}
+                                aria-label="Canjear puntos de lealtad"
+                                aria-pressed={usePoints}
                             />
                         </PointsToggle>
                     </PointsRedeemCard>

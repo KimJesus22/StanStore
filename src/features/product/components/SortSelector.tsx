@@ -28,8 +28,9 @@ const Select = styled.select`
   outline: none;
   transition: border-color 0.2s;
 
-  &:focus {
+  &:focus-visible {
     border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.primary}40;
   }
 `;
 

@@ -95,7 +95,7 @@ const SubmitButton = styled.button`
   &:disabled { opacity: 0.7; cursor: not-allowed; }
 `;
 
-const ErrorMsg = styled.span`
+const ErrorMsg = styled.span.attrs({ role: 'alert' })`
   color: #ef4444;
   font-size: 0.8rem;
 `;
@@ -478,18 +478,19 @@ export default function AdminPage() {
           <h2 style={{ marginBottom: '1rem' }}>Agregar Nuevo Producto</h2>
 
           <FormGroup>
-            <Label><Tag size={16} /> Nombre del Producto</Label>
-            <Input name="name" placeholder="Ej: Lightstick Ver. 2" required />
+            <Label htmlFor="admin-name"><Tag size={16} aria-hidden="true" /> Nombre del Producto</Label>
+            <Input id="admin-name" name="name" placeholder="Ej: Lightstick Ver. 2" required />
             {errors.name && <ErrorMsg>{errors.name[0]}</ErrorMsg>}
           </FormGroup>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <FormGroup>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <Label style={{ marginBottom: 0 }}><DollarSign size={16} /> Precio</Label>
+                <Label htmlFor="admin-price" style={{ marginBottom: 0 }}><DollarSign size={16} aria-hidden="true" /> Precio</Label>
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value as 'USD' | 'MXN')}
+                  aria-label="Moneda del precio"
                   style={{
                     padding: '0.25rem 0.5rem',
                     borderRadius: '6px',
@@ -506,6 +507,7 @@ export default function AdminPage() {
               </div>
               <div style={{ position: 'relative' }}>
                 <Input
+                  id="admin-price"
                   name="price"
                   type="number"
                   step="0.01"
@@ -529,9 +531,10 @@ export default function AdminPage() {
             </FormGroup>
 
             <FormGroup>
-              <Label><User size={16} /> Artista / Grupo</Label>
+              <Label htmlFor="admin-artist"><User size={16} aria-hidden="true" /> Artista / Grupo</Label>
               <div style={{ position: 'relative' }}>
                 <Input
+                  id="admin-artist"
                   name="artist"
                   placeholder="Buscar en Spotify..."
                   value={artistQuery}
@@ -556,7 +559,7 @@ export default function AdminPage() {
                   <Dropdown>
                     {artistResults.map(artist => (
                       <DropdownItem key={artist.id} type="button" onClick={() => handleSelectArtist(artist)}>
-                        {artist.image ? <DropdownThumb src={artist.image} alt={artist.name} /> : <Search size={20} />}
+                        {artist.image ? <DropdownThumb src={artist.image} alt={artist.name} /> : <Search size={20} aria-hidden="true" />}
                         <DropdownText>
                           <DropdownName>{artist.name}</DropdownName>
                           <DropdownSub>{artist.genres.join(', ') || 'Artista'}</DropdownSub>
@@ -581,7 +584,7 @@ export default function AdminPage() {
           {/* Spotify Album Selector */}
           {selectedArtist && (
             <FormGroup>
-              <Label><Music size={16} /> Álbum de Spotify (opcional)</Label>
+              <Label htmlFor="admin-album"><Music size={16} aria-hidden="true" /> Álbum de Spotify (opcional)</Label>
               {searchingAlbum ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#888', fontSize: '0.85rem' }}>
                   <Loader2 size={14} className="animate-spin" /> Buscando álbumes...
@@ -597,6 +600,7 @@ export default function AdminPage() {
               ) : (
                 <div style={{ position: 'relative' }}>
                   <Input
+                    id="admin-album"
                     placeholder="Seleccionar álbum..."
                     onFocus={() => setShowAlbumDropdown(true)}
                     readOnly
@@ -621,8 +625,8 @@ export default function AdminPage() {
           )}
 
           <FormGroup>
-            <Label>Categoría</Label>
-            <Select name="category" required>
+            <Label htmlFor="admin-category">Categoría</Label>
+            <Select id="admin-category" name="category" required>
               <option value="albums">Álbumes</option>
               <option value="merch">Merch</option>
               <option value="photocards">Photocards</option>
@@ -632,8 +636,9 @@ export default function AdminPage() {
           </FormGroup>
 
           <FormGroup>
-            <Label><ImageIcon size={16} /> Imagen del Producto</Label>
+            <Label htmlFor="admin-image"><ImageIcon size={16} aria-hidden="true" /> Imagen del Producto</Label>
             <Input
+              id="admin-image"
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={handleImageChange}
@@ -645,8 +650,8 @@ export default function AdminPage() {
           </FormGroup>
 
           <FormGroup>
-            <Label><FileText size={16} /> Descripción</Label>
-            <TextArea name="description" placeholder="Detalles del producto..." required />
+            <Label htmlFor="admin-description"><FileText size={16} aria-hidden="true" /> Descripción</Label>
+            <TextArea id="admin-description" name="description" placeholder="Detalles del producto..." required />
             {errors.description && <ErrorMsg>{errors.description[0]}</ErrorMsg>}
           </FormGroup>
 
@@ -678,7 +683,7 @@ export default function AdminPage() {
                 <DeleteButton
                   onClick={() => handleDelete(product.id, product.name)}
                   disabled={deletingId === product.id}
-                  title="Eliminar producto"
+                  aria-label={`Eliminar ${product.name}`}
                 >
                   {deletingId === product.id ? (
                     <Loader2 size={18} className="animate-spin" />

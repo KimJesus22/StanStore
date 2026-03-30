@@ -71,10 +71,11 @@ Implementada con un enfoque de tipado seguro y optimizada para SEO:
 ## ♿ Accesibilidad (A11y - WCAG 2.1 AA)
 
 Diseñada para ser inclusiva y navegable por todos:
-- **Navegación por Teclado**: Componente **Enlace de Salto** para saltar al contenido y anillos de foco de alto contraste (`:focus-visible`) globales.
-- **Lectores de Pantalla**: **Anunciador de Rutas** para anunciar cambios de página en navegación SPA y etiquetas ARIA optimizadas.
-- **Contraste de Color**: Auditoría de paleta (Ratio 4.5:1) con variables `textMuted` ajustadas para modo claro y oscuro.
-- **Imágenes**: Componente `ProductImage` inteligente que exige `alt` o genera fallbacks automáticos basados en metadatos del producto.
+- **Navegación por Teclado**: Componente **Enlace de Salto** para saltar al contenido y anillos de foco de alto contraste (`:focus-visible`) globales. Todos los inputs, selects y botones exponen indicador de foco visible; se eliminaron overrides `outline: none` sin reemplazo (`HeaderSearch`, `CurrencySelector`, `SortSelector`).
+- **Formularios Accesibles**: Todos los campos de `CheckoutForm` y del panel de administración tienen `<label htmlFor>` asociado al `id` del input correspondiente. Los mensajes de error usan `role="alert"` via `styled.span.attrs({ role: 'alert' })`. Iconos decorativos llevan `aria-hidden="true"`.
+- **Controles Interactivos**: Opciones de envío implementadas con patrón ARIA radio (`role="radiogroup"` + `role="radio"` + `aria-checked` + navegación por teclado Enter/Space). Botones con estado usan `aria-pressed`. Botones de acción tienen `aria-label` descriptivo con el nombre específico del recurso.
+- **Contraste de Color**: Paleta auditada — todos los pares pasan WCAG AA. Los más ajustados: `#D13639` sobre blanco ~4.9:1 (light), `#EF5350` sobre `#121212` ~5.4:1 (dark). Variables `textMuted` ajustadas para ambos modos.
+- **Imágenes**: Componente `ProductImage` inteligente que exige `alt` o genera fallbacks automáticos basados en metadatos del producto (`"{nombre} - {categoría} merchandise"`).
 - **QA Automatizado**: Integración de `eslint-plugin-jsx-a11y` y diagnósticos en consola con **Axe Core** en entorno de desarrollo.
 
 ## 🛡️ Ingeniería de Seguridad (Fortalecimiento del Sistema)
@@ -84,10 +85,14 @@ Diseñada para ser inclusiva y navegable por todos:
 3. **Validación de Integraciones**: El endpoint de Stripe valida que la versión del evento coincida con la configuración de la app (`STRIPE_API_VERSION`), alertando sobre discrepancias.
 4. **Protección de Secretos**: Tests automatizados (`env.security.test.ts`) que bloquean el build si se detectan fugas de claves administrativas (`SERVICE_ROLE_KEY`) hacia el cliente.
 
-### Modelo de Seguridad Supabase (RLS vs Bypass)
+### Modelo de Seguridad Supabase (RLS)
 
-*   **Cliente/Servidor (`lib/supabase/{client,server}.ts`)**: Respetan RLS.
-*   **Admin (`lib/supabase/admin.ts`)**: Usa `SERVICE_ROLE_KEY`. Omite RLS.
+- **RLS habilitado en las 14 tablas** públicas. La clave `anon` solo puede leer datos públicos (productos, artistas, reseñas) o insertar en tablas con política explícita.
+- **`orders` INSERT restringido a `service_role`**: Las órdenes solo se crean desde Server Actions; se eliminó la política `TO public` para evitar inserciones anónimas directas.
+- **`group_orders` con política de creador**: El organizador (`organizer_id = auth.uid()`) puede crear y editar sus propios GOs directamente. El borrado permanece exclusivo de `service_role` para proteger GOs con participantes pagados.
+- **`user_rewards` y `group_order_participants`**: Solo el propietario puede leer su propia fila; escritura via `service_role` para garantizar integridad de pagos y puntos.
+- **`audit_logs`**: Inserción pública (vía `SECURITY DEFINER`), lectura solo para admins.
+- **Admin (`lib/supabase/admin.ts`)**: Usa `SERVICE_ROLE_KEY`. Omite RLS — exclusivo de Server Actions en entorno servidor.
 
 ## 🧪 Estrategia de Calidad & Automatización
 

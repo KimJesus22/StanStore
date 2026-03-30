@@ -14,6 +14,11 @@ const Select = styled.select`
   outline: none;
   margin-right: 0.5rem;
 
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.primary};
+    outline-offset: 2px;
+  }
+
   option {
     background: ${({ theme }) => theme.colors.background};
     color: ${({ theme }) => theme.colors.text};
