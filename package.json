@@ -72,7 +72,7 @@
     "@next/bundle-analyzer": "^16.2.1",
     "@playwright/test": "^1.58.2",
     "@storybook/addon-a11y": "^10.3.2",
-    "@storybook/addon-docs": "^10.2.16",
+    "@storybook/addon-docs": "^10.3.3",
     "@storybook/addon-onboarding": "^10.3.2",
     "@storybook/addon-vitest": "^10.3.2",
     "@storybook/nextjs-vite": "^10.2.19",
