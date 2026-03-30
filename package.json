@@ -86,7 +86,7 @@
     "@types/react-dom": "^19",
     "@types/styled-components": "^5.1.36",
     "@vitejs/plugin-react": "^5.1.4",
-    "@vitest/browser-playwright": "^4.1.0",
+    "@vitest/browser-playwright": "^4.1.2",
     "@vitest/coverage-v8": "^4.0.18",
     "cross-env": "^10.1.0",
     "eslint": "^9",
