@@ -1,16 +1,40 @@
 'use server';
 
-import { createClient, PostgrestSingleResponse } from '@supabase/supabase-js';
+import { PostgrestSingleResponse } from '@supabase/supabase-js';
 import { ProductSchema } from '@/lib/validations';
 import { Product } from '@/types';
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { logAuditAction } from '@/app/actions/audit';
+import { createClient as createServerClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
-// Use Service Role to ensure we can create products even if auth context is lost
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
-);
+// ---------------------------------------------------------------------------
+// Server-side admin guard
+// Verifies the caller is an authenticated admin before any write operation.
+// Uses cookie-based session (not service_role) so it reads auth.uid() from
+// the actual HTTP request — bypassing the AdminGuard client-side check is
+// not enough to defeat this.
+// ---------------------------------------------------------------------------
+async function verifyAdmin(): Promise<{ error: string } | null> {
+    const supabase = await createServerClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return { error: 'No autorizado: sesión inválida' };
+    }
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single();
+
+    if (!profile?.is_admin) {
+        return { error: 'No autorizado: se requiere rol de administrador' };
+    }
+
+    return null;
+}
 
 export async function createProduct(formData: {
     name: string;
@@ -21,8 +45,10 @@ export async function createProduct(formData: {
     image_url: string;
     spotify_album_id?: string;
 }) {
+    const adminErr = await verifyAdmin();
+    if (adminErr) return { success: false, error: adminErr.error };
+
     try {
-        // 1. Validate Input
         const validatedFields = ProductSchema.safeParse(formData);
 
         if (!validatedFields.success) {
@@ -32,14 +58,14 @@ export async function createProduct(formData: {
             };
         }
 
-        const { data, error } = await supabaseAdmin
+        const db = createAdminClient();
+        const { data, error } = await db
             .from('products')
             .insert({
                 ...validatedFields.data,
                 is_new: true
             })
             .select()
-             
             .single() as PostgrestSingleResponse<Product>;
 
         if (error) {
@@ -77,8 +103,10 @@ export async function updateProduct(formData: {
     spotify_album_id?: string;
     is_new?: boolean;
 }) {
+    const adminErr = await verifyAdmin();
+    if (adminErr) return { success: false, error: adminErr.error };
+
     try {
-        // 1. Validate Input (Partial validation since it's an update, but we have full object here)
         const validatedFields = ProductSchema.safeParse(formData);
 
         if (!validatedFields.success) {
@@ -88,15 +116,14 @@ export async function updateProduct(formData: {
             };
         }
 
-        const { data, error } = await supabaseAdmin
+        const db = createAdminClient();
+        const { data, error } = await db
             .from('products')
             .update({
                 ...validatedFields.data,
-                // Ensure we don't accidentally unset fields if not provided, though validation handles required ones
             })
             .eq('id', formData.id)
             .select()
-             
             .single() as PostgrestSingleResponse<Product>;
 
         if (error) {
@@ -111,10 +138,8 @@ export async function updateProduct(formData: {
                 productId: data.id
             });
 
-            // Cache Invalidation
-            revalidatePath(`/product/${data.id}`); // Invalidate specific product page
-            // revalidateTag('products'); // Invalidate product lists using this tag (Commented out due to build error: Expected 2 arguments)
-            revalidatePath('/', 'layout'); // Fallback: Invalidate everything to ensure lists are updated
+            revalidatePath(`/product/${data.id}`);
+            revalidatePath('/', 'layout');
 
             return { success: true, product: data };
         }
@@ -127,8 +152,12 @@ export async function updateProduct(formData: {
 }
 
 export async function deleteProduct(productId: string) {
+    const adminErr = await verifyAdmin();
+    if (adminErr) return { success: false, error: adminErr.error };
+
     try {
-        const { error } = await supabaseAdmin
+        const db = createAdminClient();
+        const { error } = await db
             .from('products')
             .delete()
             .eq('id', productId);

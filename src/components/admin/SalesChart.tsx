@@ -2,6 +2,7 @@
 
 import styled from 'styled-components';
 import { useTheme } from '@/context/ThemeContext';
+import { TrendingUp } from 'lucide-react';
 
 const ChartContainer = styled.div`
   width: 100%;
@@ -21,10 +22,21 @@ const Title = styled.h3`
 const EmptyState = styled.div`
   height: 220px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.75rem;
   color: ${({ theme }) => theme.colors.textSecondary};
   font-size: 0.9rem;
+  text-align: center;
+`;
+
+const EmptyHint = styled.p`
+  font-size: 0.8rem;
+  opacity: 0.6;
+  max-width: 240px;
+  margin: 0;
+  line-height: 1.4;
 `;
 
 interface SalesData {
@@ -45,11 +57,15 @@ export default function SalesChart({ data }: { data: SalesData[] }) {
     const gridColor = isDark ? '#333333' : '#e0e0e0';
     const axisColor = isDark ? '#B0B0B0' : '#616161';
 
-    if (data.length === 0) {
+    if (data.length === 0 || data.every(d => d.total === 0)) {
         return (
             <ChartContainer>
                 <Title>Ventas por Día</Title>
-                <EmptyState>Sin datos de ventas disponibles.</EmptyState>
+                <EmptyState>
+                    <TrendingUp size={40} strokeWidth={1.5} style={{ opacity: 0.25 }} />
+                    <span>No hay ventas aún</span>
+                    <EmptyHint>Las ventas aparecerán aquí una vez que se procesen pedidos.</EmptyHint>
+                </EmptyState>
             </ChartContainer>
         );
     }

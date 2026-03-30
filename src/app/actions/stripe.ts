@@ -134,7 +134,7 @@ export async function createCheckoutSession(
             line_items: lineItems,
             mode: 'payment',
             success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/`,
+            cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/cancel`,
             metadata: {
                 items: JSON.stringify(cartItems.map(item => ({ id: item.id, quantity: item.quantity }))),
                 agreedAt: legalMetadata?.agreedAt || '',

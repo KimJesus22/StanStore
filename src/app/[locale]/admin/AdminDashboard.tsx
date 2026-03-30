@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { supabase } from '@/lib/supabaseClient';
 import dynamic from 'next/dynamic';
+import { Loader2 } from 'lucide-react';
 
 const SalesChart = dynamic(() => import('@/components/admin/SalesChart'), {
   loading: () => <div style={{ height: 300, background: 'var(--bg-secondary)', borderRadius: 8 }} />,
@@ -76,6 +77,27 @@ const StatLabel = styled.div`
   letter-spacing: 1px;
 `;
 
+const StatEmpty = styled.div`
+  font-size: 0.75rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  opacity: 0.55;
+  margin-top: 0.25rem;
+`;
+
+const LoadingContainer = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  gap: 1rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  font-size: 0.95rem;
+`;
+
 export default function AdminDashboard() {
   // const t = useTranslations('Admin'); // Ensure you have translations or use fallback
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -115,7 +137,12 @@ export default function AdminDashboard() {
   }, []);
 
   if (loading) {
-    return <Container>Cargando dashboard...</Container>;
+    return (
+      <LoadingContainer>
+        <Loader2 size={32} className="animate-spin" style={{ opacity: 0.4 }} />
+        <span>Cargando dashboard...</span>
+      </LoadingContainer>
+    );
   }
 
   return (
@@ -127,12 +154,14 @@ export default function AdminDashboard() {
 
       <Grid>
         <StatCard>
-          <StatValue>${totalRevenue.toFixed(2)}</StatValue>
+          <StatValue>{totalRevenue > 0 ? `$${totalRevenue.toFixed(2)}` : '—'}</StatValue>
           <StatLabel>Ingresos Totales (Est.)</StatLabel>
+          {totalRevenue === 0 && <StatEmpty>Sin pedidos registrados aún</StatEmpty>}
         </StatCard>
         <StatCard>
-          <StatValue>{totalOrders}</StatValue>
+          <StatValue>{totalOrders > 0 ? totalOrders : '—'}</StatValue>
           <StatLabel>Productos Vendidos</StatLabel>
+          {totalOrders === 0 && <StatEmpty>Sin ventas registradas aún</StatEmpty>}
         </StatCard>
       </Grid>
 

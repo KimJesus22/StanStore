@@ -186,6 +186,29 @@ src/
 3. **Desarrollo**: `npm run dev`
 4. **Pruebas**: `npm test` o `npm run test:coverage` para ver el reporte detallado.
 
+## 🔧 Correcciones de Bugs Críticos
+
+### Crash de Checkout (Stripe `Elements` Context)
+- **Problema**: La página `/checkout` crasheaba con `"Could not find Elements context"` porque `ExpressPaymentButton` llamaba a `useStripe()` antes de que el `clientSecret` estuviera disponible, renderizándose fuera del wrapper `<Elements>`.
+- **Solución**: `StripeElementsProvider` ahora **siempre** envuelve a los hijos en `<Elements>`. Cuando no hay `clientSecret`, usa `mode: 'payment'` como fallback. Se añadió `key={clientSecret ?? 'loading'}` para forzar un remount limpio al recibir el `clientSecret`, evitando corrupción del contexto Stripe.
+- **`ExpressPaymentButton`**: Añadido guard `isLoading` desde el contexto para evitar inicializar `paymentRequest` prematuramente.
+
+### Dropdown de Búsqueda Persistente
+- **Problema**: Al buscar y navegar a la página de resultados, el dropdown de sugerencias permanecía visible superpuesto sobre los resultados.
+- **Solución**: Se limpian los arrays `suggestions[]` y `products[]` tanto al navegar vía `debouncedQuery` como al seleccionar una sugerencia en `handleSuggestionSelect`.
+
+### Claves de Traducción Faltantes (`MISSING_MESSAGE`)
+- **Problema**: El namespace `Validations` (con "s") no contenía las claves `acceptTerms` ni `phoneMin`, usadas por el schema Zod del checkout. Existían solo en el namespace `Validation` (sin "s").
+- **Solución**: Añadidas las claves faltantes al namespace `Validations` en los 4 locales (`es`, `en`, `fr-CA`, `pt-BR`).
+
+## 📊 Gestión de Estados Vacíos (Admin Dashboard)
+
+Mejora de la percepción de la aplicación cuando no hay datos de ventas:
+
+- **KPI Cards**: Muestran `—` con texto explicativo ("Sin pedidos registrados aún") cuando `totalRevenue === 0` o `totalOrders === 0`, en lugar de mostrar `$0.00` o conteos confusos.
+- **`SalesChart`**: Condición mejorada `data.length === 0 || data.every(d => d.total === 0)` con icono `TrendingUp` semitransparente, mensaje principal y hint contextual.
+- **`CategoryChart`**: Condición mejorada `data.length === 0 || totalCount === 0` que cubre el caso donde la RPC devuelve categorías con `count: 0` (antes mostraba solo la leyenda sin gráfico ni mensaje).
+
 ---
 ## 📄 Licencia
 Este proyecto es de código abierto bajo la [Licencia MIT](LICENSE).

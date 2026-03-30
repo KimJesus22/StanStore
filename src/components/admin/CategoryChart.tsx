@@ -2,6 +2,7 @@
 
 import styled from 'styled-components';
 import { useTheme } from '@/context/ThemeContext';
+import { PieChart } from 'lucide-react';
 
 const ChartContainer = styled.div`
   width: 100%;
@@ -21,10 +22,21 @@ const Title = styled.h3`
 const EmptyState = styled.div`
   height: 220px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.75rem;
   color: ${({ theme }) => theme.colors.textSecondary};
   font-size: 0.9rem;
+  text-align: center;
+`;
+
+const EmptyHint = styled.p`
+  font-size: 0.8rem;
+  opacity: 0.6;
+  max-width: 240px;
+  margin: 0;
+  line-height: 1.4;
 `;
 
 interface CategoryData {
@@ -86,11 +98,17 @@ export default function CategoryChart({ data }: { data: CategoryData[] }) {
     const isDark = theme === 'dark';
     const legendColor = isDark ? '#B0B0B0' : '#616161';
 
-    if (data.length === 0) {
+    // Mostrar estado vacío si no hay datos O si todos los conteos son 0
+    const totalCount = data.reduce((sum, d) => sum + d.count, 0);
+    if (data.length === 0 || totalCount === 0) {
         return (
             <ChartContainer>
                 <Title>Ventas por Categoría</Title>
-                <EmptyState>Sin datos de categorías disponibles.</EmptyState>
+                <EmptyState>
+                    <PieChart size={40} strokeWidth={1.5} style={{ opacity: 0.25 }} />
+                    <span>Sin ventas por categoría</span>
+                    <EmptyHint>La distribución aparecerá aquí cuando haya pedidos completados.</EmptyHint>
+                </EmptyState>
             </ChartContainer>
         );
     }

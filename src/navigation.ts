@@ -22,6 +22,7 @@ export const pathnames = {
     '/product/[id]': '/product/[id]',
     '/checkout': '/checkout',
     '/success': '/success',
+    '/cancel': '/cancel',
     '/proof': '/proof',
     '/security': '/security',
 } as const;

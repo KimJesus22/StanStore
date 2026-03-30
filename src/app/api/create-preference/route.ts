@@ -89,8 +89,8 @@ export async function POST(req: NextRequest) {
                 items: preferenceItems,
                 back_urls: {
                     success: `${baseUrl}/${locale}/success`,
-                    failure: `${baseUrl}/${locale}/checkout`,
-                    pending: `${baseUrl}/${locale}/checkout`,
+                    failure: `${baseUrl}/${locale}/cancel?reason=failed`,
+                    pending: `${baseUrl}/${locale}/success`,
                 },
                 auto_return: 'approved',
                 notification_url: `${baseUrl}/api/webhooks/mercadopago`,

@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import styled from 'styled-components';
 import { CheckCircle, Loader2, FileText } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/navigation';
 import { useCartStore } from '@/features/cart';
 import { useAuth } from '@/features/auth';
 import { useSearchParams } from 'next/navigation';
@@ -85,7 +85,6 @@ function SuccessContent() {
     if (paymentKey && items.length > 0 && user && !isSaving && !saved) {
       const processOrder = async () => {
         setIsSaving(true);
-        console.log('Processing order for user:', user.email);
 
         try {
           const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
