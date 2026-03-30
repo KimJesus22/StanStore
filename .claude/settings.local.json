@@ -31,7 +31,9 @@
       "Bash(npx lint-staged:*)",
       "Bash(git --version:*)",
       "Bash(git reset:*)",
-      "Bash(./node_modules/.bin/lint-staged:*)"
+      "Bash(./node_modules/.bin/lint-staged:*)",
+      "WebFetch(domain:docs.stripe.com)",
+      "Bash(npm ls:*)"
     ]
   }
 }
