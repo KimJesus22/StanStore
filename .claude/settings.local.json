@@ -34,7 +34,8 @@
       "Bash(./node_modules/.bin/lint-staged:*)",
       "WebFetch(domain:docs.stripe.com)",
       "Bash(npm ls:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(npx vitest:*)"
     ]
   }
 }
