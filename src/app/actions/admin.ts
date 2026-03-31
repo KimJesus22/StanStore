@@ -71,7 +71,7 @@ export async function createProduct(formData: {
         if (error) {
             console.error('Supabase Error:', error);
             await logAuditAction('PRODUCT_CREATION_FAILED', { error: error.message, data: validatedFields.data });
-            return { success: false, error: 'Error al guardar en base de datos: ' + error.message };
+            return { success: false, error: 'Error al guardar el producto. Inténtalo de nuevo.' };
         }
 
         if (data) {
@@ -129,7 +129,7 @@ export async function updateProduct(formData: {
         if (error) {
             console.error('Update Product Error:', error);
             await logAuditAction('PRODUCT_UPDATE_FAILED', { error: error.message, productId: formData.id });
-            return { success: false, error: 'Error al actualizar: ' + error.message };
+            return { success: false, error: 'Error al actualizar el producto. Inténtalo de nuevo.' };
         }
 
         if (data) {
@@ -165,7 +165,7 @@ export async function deleteProduct(productId: string) {
         if (error) {
             console.error('Supabase Delete Error:', error);
             await logAuditAction('PRODUCT_DELETION_FAILED', { error: error.message, productId });
-            return { success: false, error: 'Error al eliminar: ' + error.message };
+            return { success: false, error: 'Error al eliminar el producto. Inténtalo de nuevo.' };
         }
 
         await logAuditAction('PRODUCT_DELETED', { productId });

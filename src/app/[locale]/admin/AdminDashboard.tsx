@@ -26,7 +26,8 @@ const IpBanManager = dynamic(() => import('@/components/admin/IpBanManager'), {
   ssr: false
 });
 
-// import { useTranslations } from 'next-intl';
+interface SalesData     { date: string;     total: number; }
+interface CategoryData  { category: string; count: number; }
 
 const Container = styled.div`
   max-width: 1200px;
@@ -100,10 +101,8 @@ const LoadingContainer = styled.div`
 
 export default function AdminDashboard() {
   // const t = useTranslations('Admin'); // Ensure you have translations or use fallback
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [salesData, setSalesData] = useState<any[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [salesData, setSalesData]       = useState<SalesData[]>([]);
+  const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -116,13 +115,13 @@ export default function AdminDashboard() {
 
         if (sales && Array.isArray(sales)) {
           setSalesData(sales);
-          const revenue = sales.reduce((acc: number, curr: { total: number }) => acc + (curr.total || 0), 0);
+          const revenue = sales.reduce((acc: number, curr: SalesData) => acc + (curr.total || 0), 0);
           setTotalRevenue(revenue);
         }
 
         if (categories && Array.isArray(categories)) {
           setCategoryData(categories);
-          const orders = categories.reduce((acc: number, curr: { total: number }) => acc + (curr.total || 0), 0);
+          const orders = categories.reduce((acc: number, curr: CategoryData) => acc + (curr.count || 0), 0);
           setTotalOrders(orders);
         }
 

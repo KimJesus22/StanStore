@@ -223,6 +223,26 @@ Mejora de la percepción de la aplicación cuando no hay datos de ventas:
 - **`SalesChart`**: Condición mejorada `data.length === 0 || data.every(d => d.total === 0)` con icono `TrendingUp` semitransparente, mensaje principal y hint contextual.
 - **`CategoryChart`**: Condición mejorada `data.length === 0 || totalCount === 0` que cubre el caso donde la RPC devuelve categorías con `count: 0` (antes mostraba solo la leyenda sin gráfico ni mensaje).
 
+## 🔐 Hardening de Seguridad (Ronda 2)
+
+Correcciones aplicadas tras auditoría de código:
+
+### Políticas RLS en `fix_all_rls.sql`
+- **Problema**: El script de emergencia contenía `UPDATE public.profiles SET is_admin = true` (promovía a todos los usuarios a administrador) y políticas INSERT `TO public` en `orders` y `audit_logs` (cualquier cliente podía insertar órdenes o logs directamente).
+- **Solución**: Eliminada la línea de promoción masiva; políticas INSERT de `orders` y `audit_logs` cambiadas de `TO public` a `TO service_role`. El script ahora incluye advertencia explícita de no ejecutar en producción sin revisión.
+
+### Tipado estricto en AdminDashboard
+- **Problema**: `salesData` y `categoryData` tenían tipo `any[]`, anulando las garantías de TypeScript. El `reduce` de categorías accedía a `.total` (campo inexistente en `CategoryData`) produciendo siempre `totalOrders = 0`.
+- **Solución**: Añadidas interfaces `SalesData { date: string; total: number }` y `CategoryData { category: string; count: number }`. Corregido el `reduce` para usar `.count`. Eliminados los comentarios `eslint-disable`.
+
+### Sanitización de mensajes de error en Server Actions
+- **Problema**: `createProduct`, `updateProduct` y `deleteProduct` concatenaban `error.message` de Supabase directamente en la respuesta al cliente, filtrando posibles detalles internos (nombres de tablas, constraints).
+- **Solución**: Los mensajes al cliente son ahora genéricos (`'Error al guardar el producto. Inténtalo de nuevo.'`). El `error.message` real se preserva únicamente en `console.error` y `logAuditAction` para trazabilidad servidor.
+
+### Fail-fast en clientes Supabase
+- **Problema**: `supabaseClient.ts` usaba `|| 'placeholder-key'` y `|| 'https://placeholder.supabase.co'` como fallback, permitiendo que la app arrancara silenciosamente con credenciales inválidas. `client.ts` y `server.ts` usaban el operador `!` (solo compilador, sin protección en runtime).
+- **Solución**: Los cuatro clientes (`supabaseClient.ts`, `client.ts`, `server.ts`, `admin.ts`) extraen las variables de entorno en constantes y lanzan `throw new Error('FATAL: ...')` inmediatamente si alguna está ausente. `admin.ts` ya tenía este patrón; los demás fueron alineados.
+
 ---
 ## 📄 Licencia
 Este proyecto es de código abierto bajo la [Licencia MIT](LICENSE).
