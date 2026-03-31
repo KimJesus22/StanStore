@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/features/auth';
 import { supabase } from '@/lib/supabaseClient';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/navigation';
 
 export function useAdmin() {
     const { user, isLoading: isAuthLoading } = useAuth();

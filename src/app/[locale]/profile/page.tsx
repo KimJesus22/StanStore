@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth';
 import { supabase } from '@/lib/supabaseClient';
 import styled from 'styled-components';
@@ -14,7 +13,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 import { useTranslations } from 'next-intl';
 import EmptyState from '@/components/ui/EmptyState';
 import { NoOrders } from '@/components/illustrations';
-import { Link } from '@/navigation';
+import { Link, useRouter } from '@/navigation';
 
 
 const LoyaltyCard = dynamic(() => import('@/features/loyalty/components/LoyaltyCard'), {

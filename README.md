@@ -84,6 +84,7 @@ Diseñada para ser inclusiva y navegable por todos:
 2. **Cifrado de Alta Seguridad**: Implementación de AES-256-CBC con **rotación de claves** y versionado de secretos.
 3. **Validación de Integraciones**: El endpoint de Stripe valida que la versión del evento coincida con la configuración de la app (`STRIPE_API_VERSION`), alertando sobre discrepancias.
 4. **Protección de Secretos**: Tests automatizados (`env.security.test.ts`) que bloquean el build si se detectan fugas de claves administrativas (`SERVICE_ROLE_KEY`) hacia el cliente.
+5. **Validación Backend en Acciones de Admin**: Las Server Actions (`createProduct`, `updateProduct`, `deleteProduct`) incluyen verificación de sesión y rol admin en servidor (`verifyAdmin()`) mediante cookie Supabase SSR — independiente del `AdminGuard` del cliente. `ProductSchema` (Zod) reforzado: `category` restringido a enum `['albums','merch','photocards','clothing']`, `price` con límite superior `999999.99` y `.finite()`, campos de texto con `.trim()` y longitudes máximas. El cliente admin usa `createAdminClient()` que lanza excepción si `SERVICE_ROLE_KEY` está ausente (sin fallback a anon key).
 
 ### Modelo de Seguridad Supabase (RLS)
 
@@ -193,6 +194,10 @@ src/
 - **Solución**: `StripeElementsProvider` ahora **siempre** envuelve a los hijos en `<Elements>`. Cuando no hay `clientSecret`, usa `mode: 'payment'` como fallback. Se añadió `key={clientSecret ?? 'loading'}` para forzar un remount limpio al recibir el `clientSecret`, evitando corrupción del contexto Stripe.
 - **`ExpressPaymentButton`**: Añadido guard `isLoading` desde el contexto para evitar inicializar `paymentRequest` prematuramente.
 
+### Páginas de Redirección Post-Pago (`/success` y `/cancel`)
+- **Problema**: Stripe redirigía a `/{locale}/success` (404) y a `/{locale}/` al cancelar (sin feedback). MercadoPago enviaba fallos y pagos pendientes a `/checkout`.
+- **Solución**: Creada página `/cancel` con mensaje contextual (`?reason=failed` diferencia pago rechazado de cancelación voluntaria) y dos CTAs. Página `/success` corregida: `Link` de `next/link` → `@/navigation` (locale-aware). `cancel_url` de Stripe apunta a `/{locale}/cancel`; `failure` de MercadoPago a `/{locale}/cancel?reason=failed`; `pending` a `/{locale}/success`. Ruta `/cancel` registrada en `navigation.ts`.
+
 ### Dropdown de Búsqueda Persistente
 - **Problema**: Al buscar y navegar a la página de resultados, el dropdown de sugerencias permanecía visible superpuesto sobre los resultados.
 - **Solución**: Se limpian los arrays `suggestions[]` y `products[]` tanto al navegar vía `debouncedQuery` como al seleccionar una sugerencia en `handleSuggestionSelect`.
@@ -200,6 +205,15 @@ src/
 ### Claves de Traducción Faltantes (`MISSING_MESSAGE`)
 - **Problema**: El namespace `Validations` (con "s") no contenía las claves `acceptTerms` ni `phoneMin`, usadas por el schema Zod del checkout. Existían solo en el namespace `Validation` (sin "s").
 - **Solución**: Añadidas las claves faltantes al namespace `Validations` en los 4 locales (`es`, `en`, `fr-CA`, `pt-BR`).
+
+## 🌍 Corrección de Uniformidad de Rutas (i18n)
+
+Con `localePrefix: 'always'`, todas las rutas deben incluir prefijo de locale. Se identificaron y corrigieron componentes que usaban `useRouter` de `next/navigation` en lugar de `@/navigation`, lo que provocaba redirecciones sin prefijo (p. ej. `/` en vez de `/es/`):
+
+- **`useAdmin.tsx` (`AdminGuard`)**: `router.push('/')` al detectar no-admin ahora usa `useRouter` de `@/navigation`.
+- **`profile/page.tsx`**: `router.push('/')` en logout y redirección por sesión inválida ahora preserva el locale del usuario.
+
+Componentes correctos que no requirieron cambio: `HeaderNav`, `HeaderSearch` (ya importaban de `@/navigation`); `useProductFilters` (usa `usePathname` de `next/navigation` que devuelve el path con locale ya embebido, correcto para actualizar query params en la misma página).
 
 ## 📊 Gestión de Estados Vacíos (Admin Dashboard)
 
