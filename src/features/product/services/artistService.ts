@@ -38,7 +38,7 @@ async function fetchArtists(
 
         const [{ data, error }, { data: productRows }] = await Promise.all([
             query,
-            supabase.from('products').select('artist'),
+            supabase.from('products').select('artist').limit(500),
         ]);
 
         if (error) {
