@@ -243,6 +243,37 @@ Correcciones aplicadas tras auditoría de código:
 - **Problema**: `supabaseClient.ts` usaba `|| 'placeholder-key'` y `|| 'https://placeholder.supabase.co'` como fallback, permitiendo que la app arrancara silenciosamente con credenciales inválidas. `client.ts` y `server.ts` usaban el operador `!` (solo compilador, sin protección en runtime).
 - **Solución**: Los cuatro clientes (`supabaseClient.ts`, `client.ts`, `server.ts`, `admin.ts`) extraen las variables de entorno en constantes y lanzan `throw new Error('FATAL: ...')` inmediatamente si alguna está ausente. `admin.ts` ya tenía este patrón; los demás fueron alineados.
 
+## 🔐 Hardening de Seguridad (Ronda 3)
+
+Correcciones aplicadas tras segunda auditoría de rutas API:
+
+### `POST /api/create-payment-intent` — Autenticación y límites de monto
+- **Problema**: Cualquier visitante podía crear PaymentIntents de Stripe sin autenticación, sin tope de monto y con cualquier moneda, permitiendo abusar del saldo de la cuenta.
+- **Solución**: Verificación de sesión con `supabase.auth.getUser()` → 401. Validación estricta: `Number.isInteger(amount)`, `MIN_AMOUNT = 100`, `MAX_AMOUNT = 1_000_000`. Lista blanca de monedas `VALID_CURRENCIES = new Set(['mxn', 'usd'])`. UUID regex en `orderId`. `user_id` añadido a `metadata` del PaymentIntent.
+
+### `POST /api/create-preference` — Descuento manipulable desde el cliente
+- **Problema**: El campo `discountAmount` llegaba directamente desde el body del cliente sin verificación; un atacante podía aplicar cualquier descuento arbitrario. Sin autenticación y sin validación de ítems.
+- **Solución**: Autenticación obligatoria → 401. Reemplazado `discountAmount` (client-supplied) por `promoCodeId` + `usePoints`: el descuento se calcula completamente en el servidor mediante `stripe.promotionCodes.retrieve()` y consulta a `users.loyalty_points`. Agregados `VALID_LOCALES`, `MAX_ITEMS = 50`, `MAX_QUANTITY = 99` y UUID regex por ítem. Se reemplazó el cliente browser de Supabase por `createClient()` de `@/lib/supabase/server`.
+
+### `POST /api/csp-reports` — Inyección de logs
+- **Problema**: El endpoint registraba el cuerpo crudo del reporte sin sanitizar, permitiendo inyección de caracteres de control/saltos de línea en los logs del servidor. Sin límite de tamaño de payload.
+- **Solución**: Límite `MAX_BODY_BYTES = 8 192`. Lista blanca `CSP_FIELDS` con los 11 campos estándar de CSP. Función `sanitize()` que elimina caracteres de control `\x00-\x1f\x7f` y trunca a 500 caracteres por campo. El log solo incluye campos conocidos y saneados.
+
+### `GET /api/doc` — Spec OpenAPI sin autenticación
+- **Problema**: El handler devolvía la especificación OpenAPI completa (endpoints, esquemas, parámetros) a cualquier visitante sin ningún control de acceso.
+- **Solución**: Agregado `requireAdmin()` antes de servir el spec; devuelve 401/403 según el motivo del rechazo.
+
+### Helper compartido `requireAdmin()`
+- **Creado** `src/lib/supabase/requireAdmin.ts`: verifica sesión, dominio de email (`NEXT_PUBLIC_ADMIN_DOMAIN`) y `profiles.is_admin` en ese orden. Patrón fail-closed — cualquier error de BD niega el acceso. Reutilizado en `GET /api/doc` y `GET /api/docs`, eliminando lógica duplicada.
+
+### `GET /api/products/similar` — Service role key y validación de parámetros
+- **Problema**: El handler instanciaba `createClient` de `@supabase/supabase-js` directamente con `SUPABASE_SERVICE_ROLE_KEY`, bypassando todas las políticas RLS. El parámetro `limit` usaba `parseInt` sin verificar `NaN` (podía devolver todas las filas). `productId` sin validación UUID.
+- **Solución**: Reemplazado por `createClient` compartido de `@/lib/supabase/server` (usa `anon key` + RLS). UUID regex en `productId` → 400. Límite seguro: `Number.isInteger(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 10) : 4`.
+
+### `GET /api/rewards/download` — Cliente Supabase inline con `!` non-null
+- **Problema**: El handler instanciaba `createServerClient` de `@supabase/ssr` directamente usando `NEXT_PUBLIC_SUPABASE_URL!` y `NEXT_PUBLIC_SUPABASE_ANON_KEY!` (operadores `!` sin protección en runtime). Sin validación UUID en el parámetro `id`.
+- **Solución**: Reemplazado por `createClient` de `@/lib/supabase/server` (centraliza cookies y fail-fast de env vars). UUID regex en `rewardId` → 400 si inválido o ausente. El uso de `createAdminClient()` para generar signed URLs permanece correcto (requiere service role, y la auth se verifica primero con anon client).
+
 ---
 ## 📄 Licencia
 Este proyecto es de código abierto bajo la [Licencia MIT](LICENSE).
