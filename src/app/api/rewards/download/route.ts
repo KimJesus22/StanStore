@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Tier hierarchy for comparison
 const TIER_RANK: Record<string, number> = {
@@ -23,35 +24,15 @@ export async function GET(request: NextRequest) {
     try {
         const rewardId = request.nextUrl.searchParams.get('id');
 
-        if (!rewardId) {
+        if (!rewardId || !UUID_REGEX.test(rewardId)) {
             return NextResponse.json(
-                { error: 'Se requiere el parámetro "id" del reward.' },
+                { error: 'Se requiere el parámetro "id" del reward y debe ser un UUID válido.' },
                 { status: 400 }
             );
         }
 
         // ─── 1. Authenticate User ───────────────────────────────────────────
-        const cookieStore = await cookies();
-        const supabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            {
-                cookies: {
-                    getAll() {
-                        return cookieStore.getAll();
-                    },
-                    setAll(cookiesToSet) {
-                        try {
-                            cookiesToSet.forEach(({ name, value, options }) =>
-                                cookieStore.set(name, value, options)
-                            );
-                        } catch {
-                            // Called from Server Component, can be ignored
-                        }
-                    },
-                },
-            }
-        );
+        const supabase = await createClient();
 
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
