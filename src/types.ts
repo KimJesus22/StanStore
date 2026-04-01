@@ -19,6 +19,7 @@ export interface Product {
     youtube_video_id?: string;
     release_date?: string; // ISO Date string
     related_artists?: string[];
+    created_at?: string;
 }
 
 export interface ShippingInfo {
