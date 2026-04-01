@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import * as Sentry from "@sentry/nextjs";
 import { Product } from '@/types';
+import { createClient } from '@/lib/supabase/server';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * @swagger
@@ -45,19 +47,19 @@ import { Product } from '@/types';
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('productId');
-    const limit = Math.min(parseInt(searchParams.get('limit') || '4', 10), 10);
 
-    if (!productId) {
+    if (!productId || !UUID_REGEX.test(productId)) {
         return NextResponse.json(
-            { error: 'Falta el parámetro "productId"' },
+            { error: 'Falta el parámetro "productId" o no es un UUID válido' },
             { status: 400 }
         );
     }
 
+    const rawLimit = parseInt(searchParams.get('limit') ?? '4', 10);
+    const limit = Number.isInteger(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 10) : 4;
+
     try {
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        const supabase = await createClient();
 
         // 1. Obtener el embedding del producto actual
         const { data: product, error: productError } = await supabase
