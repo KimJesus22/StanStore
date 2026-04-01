@@ -754,7 +754,8 @@ export default function CheckoutForm() {
                     body: JSON.stringify({
                         items: items.map(item => ({ id: item.id, quantity: item.quantity })),
                         locale,
-                        discountAmount: totalDiscount,
+                        promoCodeId: appliedPromo?.id,
+                        usePoints,
                     }),
                 });
                 const prefData = await res.json();
