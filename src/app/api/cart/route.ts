@@ -1,40 +1,12 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server'; // Assumes server client helper exists or we use standard createServerClient
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 
-// Helper to create client if standard path doesn't exist
-const createSupabaseServerClient = async () => {
-    const { createServerClient } = await import('@supabase/ssr');
-    const cookieStore = await cookies();
-
-    return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                getAll() {
-                    return cookieStore.getAll();
-                },
-                setAll(cookiesToSet) {
-                    try {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
-                        )
-                    } catch {
-                        // The `setAll` method was called from a Server Component.
-                        // This can be ignored if you have middleware refreshing
-                        // user sessions.
-                    }
-                },
-            },
-        }
-    );
-};
-
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_QUANTITY = 99;
 
 export async function GET() {
     try {
-        const supabase = await createSupabaseServerClient();
+        const supabase = await createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError || !user) {
@@ -48,95 +20,119 @@ export async function GET() {
 
         if (error) {
             console.error('Error fetching cart:', error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: 'Error al obtener el carrito' }, { status: 500 });
         }
 
-        const formattedItems = data.map((item: { products: { id: string;[key: string]: unknown }; quantity: number; id: string }) => ({
+        const formattedItems = data.map((item: { products: { id: string; [key: string]: unknown }; quantity: number; id: string }) => ({
             ...item.products,
             quantity: item.quantity,
             id: item.products.id,
-            cart_item_id: item.id
+            cart_item_id: item.id,
         }));
 
         return NextResponse.json(formattedItems);
     } catch (error) {
-        console.error('Unexpected error in /api/cart:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('Unexpected error in GET /api/cart:', error);
+        return NextResponse.json({ error: 'Error al obtener el carrito' }, { status: 500 });
     }
 }
 
 export async function POST(request: Request) {
     try {
-        const supabase = await createSupabaseServerClient();
+        const supabase = await createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError || !user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
         }
 
         const body = await request.json();
         const { productId, quantity = 1 } = body;
 
-        if (!productId) {
-            return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
+        if (!productId || !UUID_REGEX.test(String(productId))) {
+            return NextResponse.json({ error: 'ID de producto no válido' }, { status: 400 });
         }
 
-        // Check if item already exists in cart
-        const { data: existingItem } = await supabase
-            .from('cart_items')
-            .select('id, quantity')
-            .eq('user_id', user.id)
-            .eq('product_id', productId)
+        const qty = Number(quantity);
+        if (!Number.isInteger(qty) || qty < 1 || qty > MAX_QUANTITY) {
+            return NextResponse.json(
+                { error: `La cantidad debe ser un entero entre 1 y ${MAX_QUANTITY}` },
+                { status: 400 }
+            );
+        }
+
+        // Validate product exists and has stock before touching the cart
+        const { data: product, error: productError } = await supabase
+            .from('products')
+            .select('id, stock')
+            .eq('id', productId)
             .single();
 
-        let error;
-
-        if (existingItem) {
-            // Update quantity
-            const { error: updateError } = await supabase
-                .from('cart_items')
-                .update({ quantity: existingItem.quantity + quantity })
-                .eq('id', existingItem.id);
-            error = updateError;
-        } else {
-            // Insert new item
-            const { error: insertError } = await supabase
-                .from('cart_items')
-                .insert({
-                    user_id: user.id,
-                    product_id: productId,
-                    quantity: quantity
-                });
-            error = insertError;
+        if (productError || !product) {
+            return NextResponse.json({ error: 'Producto no encontrado' }, { status: 404 });
         }
 
-        if (error) {
-            console.error('Error adding to cart:', error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+        if (product.stock !== null && product.stock <= 0) {
+            return NextResponse.json({ error: 'Producto sin stock disponible' }, { status: 409 });
+        }
+
+        // Insert-first approach: avoids TOCTOU race condition.
+        // On unique constraint violation (23505) the item already exists — increment instead.
+        const { error: insertError } = await supabase
+            .from('cart_items')
+            .insert({ user_id: user.id, product_id: productId, quantity: qty });
+
+        if (insertError) {
+            if (insertError.code === '23505') {
+                const { data: existing, error: fetchError } = await supabase
+                    .from('cart_items')
+                    .select('id, quantity')
+                    .eq('user_id', user.id)
+                    .eq('product_id', productId)
+                    .single();
+
+                if (fetchError || !existing) {
+                    console.error('Error fetching existing cart item:', fetchError);
+                    return NextResponse.json({ error: 'Error al actualizar el carrito' }, { status: 500 });
+                }
+
+                const newQty = Math.min(existing.quantity + qty, MAX_QUANTITY);
+                const { error: updateError } = await supabase
+                    .from('cart_items')
+                    .update({ quantity: newQty })
+                    .eq('id', existing.id);
+
+                if (updateError) {
+                    console.error('Error updating cart item:', updateError);
+                    return NextResponse.json({ error: 'Error al actualizar el carrito' }, { status: 500 });
+                }
+            } else {
+                console.error('Error inserting cart item:', insertError);
+                return NextResponse.json({ error: 'Error al añadir al carrito' }, { status: 500 });
+            }
         }
 
         return NextResponse.json({ success: true });
-
     } catch (error) {
         console.error('Unexpected error in POST /api/cart:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: 'Error al añadir al carrito' }, { status: 500 });
     }
 }
 
 export async function DELETE(request: Request) {
     try {
-        const supabase = await createSupabaseServerClient();
+        const supabase = await createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError || !user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
         }
 
         const body = await request.json();
         const { productId } = body;
 
-        if (!productId) {
-            return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
+        if (!productId || !UUID_REGEX.test(String(productId))) {
+            return NextResponse.json({ error: 'ID de producto no válido' }, { status: 400 });
         }
 
         const { error } = await supabase
@@ -147,13 +143,12 @@ export async function DELETE(request: Request) {
 
         if (error) {
             console.error('Error removing from cart:', error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: 'Error al eliminar del carrito' }, { status: 500 });
         }
 
         return NextResponse.json({ success: true });
-
     } catch (error) {
         console.error('Unexpected error in DELETE /api/cart:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: 'Error al eliminar del carrito' }, { status: 500 });
     }
 }
