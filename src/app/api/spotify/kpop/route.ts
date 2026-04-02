@@ -48,7 +48,10 @@ export async function GET() {
             }))
             .sort((a: { popularity: number }, b: { popularity: number }) => b.popularity - a.popularity);
 
-        return NextResponse.json({ artists });
+        return NextResponse.json({ artists }, {
+            // Hardcoded list — very stable; CDN can cache for 24h and revalidate up to 7 days
+            headers: { 'Cache-Control': 's-maxage=86400, stale-while-revalidate=604800' },
+        });
     } catch (error) {
         console.error('Error fetching K-Pop artists:', error);
         return NextResponse.json({ error: 'Error fetching artists' }, { status: 500 });

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchVideos, searchMusicVideo } from '@/lib/youtube';
 
+const MAX_QUERY_LENGTH = 100;
+
 /**
  * @swagger
  * /api/youtube/search:
@@ -39,10 +41,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q');
     const artist = searchParams.get('artist');
-    const maxResults = Math.min(
-        Math.max(parseInt(searchParams.get('maxResults') || '5', 10), 1),
-        10
-    );
 
     if (!query) {
         return NextResponse.json(
@@ -51,18 +49,32 @@ export async function GET(request: NextRequest) {
         );
     }
 
+    if (query.length > MAX_QUERY_LENGTH) {
+        return NextResponse.json(
+            { error: 'El parámetro "q" supera la longitud máxima permitida.' },
+            { status: 400 }
+        );
+    }
+
+    if (artist && artist.length > MAX_QUERY_LENGTH) {
+        return NextResponse.json(
+            { error: 'El parámetro "artist" supera la longitud máxima permitida.' },
+            { status: 400 }
+        );
+    }
+
+    // Fix: parseInt('abc') returns NaN; Math.min/max(NaN, n) === NaN — use Number.isInteger
+    const rawMax = parseInt(searchParams.get('maxResults') ?? '5', 10);
+    const maxResults = Number.isInteger(rawMax) && rawMax >= 1 ? Math.min(rawMax, 10) : 5;
+
     try {
-        let results;
+        const results = artist
+            ? await searchMusicVideo(artist, query)
+            : await searchVideos(query, maxResults);
 
-        if (artist) {
-            // Buscar MV oficial del artista
-            results = await searchMusicVideo(artist, query);
-        } else {
-            // Búsqueda general de videos
-            results = await searchVideos(query, maxResults);
-        }
-
-        return NextResponse.json({ results });
+        return NextResponse.json({ results }, {
+            headers: { 'Cache-Control': 's-maxage=300, stale-while-revalidate=3600' },
+        });
     } catch (error) {
         console.error('YouTube search error:', error);
         return NextResponse.json(

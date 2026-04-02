@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchArtists, searchAlbums, getArtistAlbums } from '@/lib/spotify';
 
+// Spotify IDs are exactly 22 alphanumeric characters (base62)
+const SPOTIFY_ID_REGEX = /^[a-zA-Z0-9]{22}$/;
+const VALID_TYPES = new Set(['artist', 'album']);
+const MAX_QUERY_LENGTH = 100;
+
 /**
  * @swagger
  * /api/spotify/search:
@@ -62,25 +67,38 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Missing query parameter' }, { status: 400 });
     }
 
+    if (query && query.length > MAX_QUERY_LENGTH) {
+        return NextResponse.json({ error: 'El parámetro "q" supera la longitud máxima permitida.' }, { status: 400 });
+    }
+
+    if (artistId && !SPOTIFY_ID_REGEX.test(artistId)) {
+        return NextResponse.json({ error: 'El parámetro "artistId" no es un ID de Spotify válido.' }, { status: 400 });
+    }
+
+    if (query && !VALID_TYPES.has(type)) {
+        return NextResponse.json({ error: 'El parámetro "type" debe ser "artist" o "album".' }, { status: 400 });
+    }
+
     try {
+        const headers = { 'Cache-Control': 's-maxage=300, stale-while-revalidate=3600' };
+
         if (artistId) {
-            // Get albums by artist ID
             const albums = await getArtistAlbums(artistId);
-            return NextResponse.json({ results: albums });
+            return NextResponse.json({ results: albums }, { headers });
         }
 
         if (type === 'artist') {
             const artists = await searchArtists(query!);
-            return NextResponse.json({ results: artists });
+            return NextResponse.json({ results: artists }, { headers });
         }
 
-        if (type === 'album') {
-            const artistName = searchParams.get('artist') || undefined;
-            const albums = await searchAlbums(query!, artistName);
-            return NextResponse.json({ results: albums });
+        // type === 'album'
+        const artistName = searchParams.get('artist') || undefined;
+        if (artistName && artistName.length > MAX_QUERY_LENGTH) {
+            return NextResponse.json({ error: 'El parámetro "artist" supera la longitud máxima permitida.' }, { status: 400 });
         }
-
-        return NextResponse.json({ error: 'Invalid type. Use "artist" or "album"' }, { status: 400 });
+        const albums = await searchAlbums(query!, artistName);
+        return NextResponse.json({ results: albums }, { headers });
     } catch (error) {
         console.error('Spotify search error:', error);
         return NextResponse.json({ error: 'Error searching Spotify' }, { status: 500 });
