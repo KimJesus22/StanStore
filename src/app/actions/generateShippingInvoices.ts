@@ -1,12 +1,15 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/supabase/requireAdmin';
 import { stripe } from '@/lib/stripe';
 import { logAuditAction } from '@/app/actions/audit';
 import {
     calculateGoShipping,
     type GoSplitStrategy,
 } from '@/lib/calculateGoShipping';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /* ─── Types ─── */
 
@@ -26,6 +29,13 @@ interface Participant {
     email: string | null;
 }
 
+interface EmailTask {
+    to: string;
+    shippingCost: number;
+    proportion: number;
+    paymentLinkUrl: string;
+}
+
 /* ─── Action ─── */
 
 /**
@@ -36,9 +46,9 @@ interface Participant {
  * action:
  *   1. Reads the final EMS cost from the group_orders row.
  *   2. Splits the cost among participants with calculateGoShipping().
- *   3. Creates an individual Stripe Payment Link for each participant.
+ *   3. Creates individual Stripe Payment Links in parallel.
  *   4. Persists the link + amount to group_order_participants.
- *   5. (Optional) Sends a notification email via Resend if configured.
+ *   5. (Optional) Sends notification emails via Resend in parallel.
  *
  * Idempotent: participants who already have a payment link are skipped.
  *
@@ -47,6 +57,16 @@ interface Participant {
 export async function generateShippingInvoices(
     groupOrderId: string
 ): Promise<GenerateResult> {
+    // ── 0. Admin guard ────────────────────────────────────────────────────────
+
+    const denial = await requireAdmin();
+    if (denial === 'unauthenticated') throw new Error('No autorizado.');
+    if (denial === 'forbidden') throw new Error('Se requiere rol de administrador.');
+
+    if (!groupOrderId || !UUID_REGEX.test(groupOrderId)) {
+        throw new Error('ID de grupo inválido.');
+    }
+
     const supabase = await createClient();
     const errors: Record<string, string> = {};
     let generated = 0;
@@ -60,12 +80,12 @@ export async function generateShippingInvoices(
         .single();
 
     if (goError || !go) {
-        throw new Error(`Group Order not found: ${groupOrderId}`);
+        throw new Error('Group order no encontrado.');
     }
 
     if (!go.actual_ems_cost || go.actual_ems_cost <= 0) {
         throw new Error(
-            'actual_ems_cost must be set on the group_orders row before generating invoices.'
+            'Ingresa el costo EMS real antes de generar facturas.'
         );
     }
 
@@ -85,7 +105,7 @@ export async function generateShippingInvoices(
         .eq('payment_1_status', 'PAID');
 
     if (rowsError) {
-        throw new Error(`Failed to fetch participants: ${rowsError.message}`);
+        throw new Error('Error al obtener los participantes.');
     }
 
     if (!rows || rows.length === 0) {
@@ -103,7 +123,6 @@ export async function generateShippingInvoices(
     }));
 
     if (participants.length === 0) {
-        // All participants already have links
         return { success: true, generated: 0, errors: {} };
     }
 
@@ -119,21 +138,19 @@ export async function generateShippingInvoices(
         (go.split_strategy as GoSplitStrategy) ?? 'per-item'
     );
 
-    // Map userId → { share, participant }
-    const shareMap = new Map(
-        shares.map(s => [s.userId, s])
-    );
+    const shareMap = new Map(shares.map(s => [s.userId, s]));
 
-    // ── 4. Create Stripe Payment Links ───────────────────────────────────────
+    // ── 4. Create Stripe Payment Links in parallel ───────────────────────────
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
+    const emailQueue: EmailTask[] = [];
 
-    for (const participant of participants) {
-        const share = shareMap.get(participant.user_id);
-        if (!share || share.shippingCost <= 0) continue;
+    const settled = await Promise.allSettled(
+        participants.map(async (participant) => {
+            const share = shareMap.get(participant.user_id);
+            if (!share || share.shippingCost <= 0) return null;
 
-        try {
-            // Create a one-off Stripe Product + Price for this participant's invoice
+            // Sequential within one participant (product → price → link)
             const product = await stripe.products.create({
                 name: `Envío EMS – ${go.title}`,
                 metadata: {
@@ -176,31 +193,51 @@ export async function generateShippingInvoices(
                 })
                 .eq('id', participant.id);
 
-            // ── 6. (Optional) Send email via Resend ─────────────────────────
-
-            if (participant.email && process.env.RESEND_API_KEY) {
-                await sendShippingEmail({
+            if (participant.email) {
+                emailQueue.push({
                     to: participant.email,
-                    goTitle: go.title as string,
                     shippingCost: share.shippingCost,
                     proportion: share.proportion,
                     paymentLinkUrl: paymentLink.url,
                 });
             }
 
+            return participant.user_id;
+        })
+    );
+
+    // ── 6. Collect results ───────────────────────────────────────────────────
+
+    for (let i = 0; i < settled.length; i++) {
+        const result = settled[i];
+        const participant = participants[i];
+
+        if (result.status === 'fulfilled' && result.value !== null) {
             generated++;
-        } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            console.error(`Failed to generate invoice for ${participant.user_id}:`, msg);
-            errors[participant.user_id] = msg;
+        } else if (result.status === 'rejected') {
+            errors[participant.user_id] = 'Error al generar la factura de envío.';
+            console.error(`Failed for participant ${participant.id}:`, result.reason);
 
             await logAuditAction('GO_SHIPPING_INVOICE_FAILED', {
                 groupOrderId,
                 participantId: participant.id,
                 userId: participant.user_id,
-                error: msg,
+                error: result.reason instanceof Error ? result.reason.message : String(result.reason),
             });
         }
+    }
+
+    // ── 7. Send all emails in parallel (failures don't affect the result) ───
+
+    if (emailQueue.length > 0 && process.env.RESEND_API_KEY) {
+        const { Resend } = await import('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+
+        await Promise.allSettled(
+            emailQueue.map(task =>
+                sendShippingEmail({ ...task, goTitle: go.title as string, resend })
+            )
+        );
     }
 
     await logAuditAction('GO_SHIPPING_INVOICES_GENERATED', {
@@ -225,17 +262,15 @@ async function sendShippingEmail({
     shippingCost,
     proportion,
     paymentLinkUrl,
+    resend,
 }: {
     to: string;
     goTitle: string;
     shippingCost: number;
     proportion: number;
     paymentLinkUrl: string;
+    resend: InstanceType<typeof import('resend').Resend>;
 }) {
-    // Lazy import — only runs if RESEND_API_KEY is present
-    const { Resend } = await import('resend');
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
     const pctLabel = `${(proportion * 100).toFixed(1)}%`;
     const amountLabel = `$${shippingCost.toFixed(2)} MXN`;
 
