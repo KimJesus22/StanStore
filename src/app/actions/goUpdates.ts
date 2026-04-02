@@ -1,8 +1,13 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/supabase/requireAdmin';
 import { logAuditAction } from '@/app/actions/audit';
 import type { GoUpdateStatusType } from '@/features/group-orders';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_TITLE_LENGTH = 255;
+const MAX_CONTENT_LENGTH = 10_000;
 
 /* ─── publishGoUpdate ─── */
 
@@ -27,7 +32,23 @@ interface PublishResult {
  * Must be called from an admin-authenticated context.
  */
 export async function publishGoUpdate(params: PublishParams): Promise<PublishResult> {
+  const denial = await requireAdmin();
+  if (denial === 'unauthenticated') return { error: 'No autorizado.' };
+  if (denial === 'forbidden') return { error: 'Se requiere rol de administrador.' };
+
   const { groupOrderId, title, content, statusType, imageUrl, notifyAll } = params;
+
+  if (!groupOrderId || !UUID_REGEX.test(groupOrderId)) {
+    return { error: 'ID de grupo inválido.' };
+  }
+
+  if (!title || title.length > MAX_TITLE_LENGTH) {
+    return { error: `El título debe tener entre 1 y ${MAX_TITLE_LENGTH} caracteres.` };
+  }
+
+  if (!content || content.length > MAX_CONTENT_LENGTH) {
+    return { error: `El contenido debe tener entre 1 y ${MAX_CONTENT_LENGTH} caracteres.` };
+  }
 
   const supabase = await createClient();
 
@@ -87,7 +108,11 @@ interface NotifyResult {
  * function returns successfully with notified = 0 so the rest of the
  * flow isn't blocked in development.
  */
-export async function notifyParticipants(updateId: string): Promise<NotifyResult> {
+async function notifyParticipants(updateId: string): Promise<NotifyResult> {
+  if (!UUID_REGEX.test(updateId)) {
+    return { notified: 0, error: 'ID de actualización inválido.' };
+  }
+
   if (!process.env.RESEND_API_KEY) {
     console.warn('notifyParticipants: RESEND_API_KEY not set — skipping emails.');
     return { notified: 0 };
