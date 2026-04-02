@@ -8,6 +8,16 @@ import { logAuditAction } from '@/app/actions/audit';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+async function tryAudit(action: string, metadata: Record<string, unknown>): Promise<void> {
+    try {
+        await logAuditAction(action, metadata);
+    } catch (err) {
+        console.error(`Audit log failed [${action}]:`, err);
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Server-side admin guard
 // Verifies the caller is an authenticated admin before any write operation.
@@ -70,12 +80,12 @@ export async function createProduct(formData: {
 
         if (error) {
             console.error('Supabase Error:', error);
-            await logAuditAction('PRODUCT_CREATION_FAILED', { error: error.message, data: validatedFields.data });
+            await tryAudit('PRODUCT_CREATION_FAILED', { error: error.message, data: validatedFields.data });
             return { success: false, error: 'Error al guardar el producto. Inténtalo de nuevo.' };
         }
 
         if (data) {
-            await logAuditAction('PRODUCT_CREATED', {
+            await tryAudit('PRODUCT_CREATED', {
                 name: data.name,
                 price: data.price,
                 productId: data.id
@@ -87,7 +97,7 @@ export async function createProduct(formData: {
 
     } catch (error: unknown) {
         console.error('Create Product Error:', error);
-        await logAuditAction('PRODUCT_CREATION_ERROR', { error: error instanceof Error ? error.message : String(error) });
+        await tryAudit('PRODUCT_CREATION_ERROR', { error: error instanceof Error ? error.message : String(error) });
         return { success: false, error: 'Error inesperado al crear el producto' };
     }
 }
@@ -105,6 +115,10 @@ export async function updateProduct(formData: {
 }) {
     const adminErr = await verifyAdmin();
     if (adminErr) return { success: false, error: adminErr.error };
+
+    if (!formData.id || !UUID_REGEX.test(formData.id)) {
+        return { success: false, error: 'ID de producto inválido.' };
+    }
 
     try {
         const validatedFields = ProductSchema.safeParse(formData);
@@ -128,12 +142,12 @@ export async function updateProduct(formData: {
 
         if (error) {
             console.error('Update Product Error:', error);
-            await logAuditAction('PRODUCT_UPDATE_FAILED', { error: error.message, productId: formData.id });
+            await tryAudit('PRODUCT_UPDATE_FAILED', { error: error.message, productId: formData.id });
             return { success: false, error: 'Error al actualizar el producto. Inténtalo de nuevo.' };
         }
 
         if (data) {
-            await logAuditAction('PRODUCT_UPDATED', {
+            await tryAudit('PRODUCT_UPDATED', {
                 name: data.name,
                 productId: data.id
             });
@@ -155,6 +169,10 @@ export async function deleteProduct(productId: string) {
     const adminErr = await verifyAdmin();
     if (adminErr) return { success: false, error: adminErr.error };
 
+    if (!productId || !UUID_REGEX.test(productId)) {
+        return { success: false, error: 'ID de producto inválido.' };
+    }
+
     try {
         const db = createAdminClient();
         const { error } = await db
@@ -164,11 +182,11 @@ export async function deleteProduct(productId: string) {
 
         if (error) {
             console.error('Supabase Delete Error:', error);
-            await logAuditAction('PRODUCT_DELETION_FAILED', { error: error.message, productId });
+            await tryAudit('PRODUCT_DELETION_FAILED', { error: error.message, productId });
             return { success: false, error: 'Error al eliminar el producto. Inténtalo de nuevo.' };
         }
 
-        await logAuditAction('PRODUCT_DELETED', { productId });
+        await tryAudit('PRODUCT_DELETED', { productId });
         revalidatePath('/');
         return { success: true };
 
