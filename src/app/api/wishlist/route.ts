@@ -1,60 +1,40 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 
-// Helper to create client if standard path doesn't exist (Duplicated for simplicity, ideally shared)
-const createSupabaseServerClient = async () => {
-    const { createServerClient } = await import('@supabase/ssr');
-    const cookieStore = await cookies();
+export const dynamic = 'force-dynamic';
 
-    return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                getAll() {
-                    return cookieStore.getAll();
-                },
-                setAll(cookiesToSet) {
-                    try {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
-                        )
-                    } catch {
-                        // Ignored
-                    }
-                },
-            },
-        }
-    );
-};
+const WISHLIST_LIMIT = 100;
 
 export async function GET() {
     try {
-        const supabase = await createSupabaseServerClient();
+        const supabase = await createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError || !user) {
-            return NextResponse.json({ items: [] });
+            return NextResponse.json({ error: 'No autorizado.' }, { status: 401 });
         }
 
         const { data, error } = await supabase
             .from('wishlist_items')
-            .select('*, products(*)')
-            .eq('user_id', user.id);
+            .select('id, products(*)')
+            .eq('user_id', user.id)
+            .limit(WISHLIST_LIMIT);
 
         if (error) {
             console.error('Error fetching wishlist:', error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: 'Error al obtener la lista de deseos.' }, { status: 500 });
         }
 
-        const formattedItems = data.map((item: { products: { [key: string]: unknown }; id: string }) => ({
+        const formattedItems = (data as unknown as { products: Record<string, unknown>; id: string }[]).map((item) => ({
             ...item.products,
             wishlist_item_id: item.id
         }));
 
-        return NextResponse.json(formattedItems);
+        return NextResponse.json(formattedItems, {
+            headers: { 'Cache-Control': 'private, no-store' },
+        });
     } catch (error) {
         console.error('Unexpected error in /api/wishlist:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: 'Error interno del servidor.' }, { status: 500 });
     }
 }
