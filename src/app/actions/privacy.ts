@@ -1,24 +1,34 @@
 'use server';
 
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@/lib/supabase/server';
 
-export async function getUserData(userId: string) {
+// No acepta userId como parámetro — siempre se deriva de la sesión del servidor
+// para evitar IDOR (un usuario autenticado accediendo a datos de otro usuario).
+export async function getUserData() {
     try {
-        // 1. Fetch Auth User Info (Simulated by verifying session, usually we get strict data from auth.users via admin but RLS allows accessing own data)
-        // Actually we can just query simulated profile data if we had a profiles table.
-        // For now we will fetch related relational data.
+        const supabase = await createClient();
+
+        // 1. Verificar sesión — el usuario solo puede exportar sus propios datos
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return { success: false, error: 'No autorizado.' };
+
+        const userId = user.id;
 
         // 2. Fetch Orders
-        const { data: orders } = await supabase
+        const { data: orders, error: ordersError } = await supabase
             .from('orders')
             .select('*')
             .eq('user_id', userId);
 
+        if (ordersError) console.error('Error fetching orders:', ordersError);
+
         // 3. Fetch Reviews
-        const { data: reviews } = await supabase
+        const { data: reviews, error: reviewsError } = await supabase
             .from('reviews')
             .select('*')
             .eq('user_id', userId);
+
+        if (reviewsError) console.error('Error fetching reviews:', reviewsError);
 
         // 4. Construct Export Object
         const exportData = {
@@ -35,6 +45,6 @@ export async function getUserData(userId: string) {
 
     } catch (error) {
         console.error('Export Error:', error);
-        return { success: false, error: 'Failed to export data' };
+        return { success: false, error: 'Error al exportar los datos.' };
     }
 }

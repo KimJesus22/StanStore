@@ -306,7 +306,7 @@ export default function ProfilePage() {
           <ExportButton onClick={async () => {
             const toastId = toast.loading('Generando reporte...');
             try {
-              const result = await getUserData(user.id);
+              const result = await getUserData();
               if (result.success && result.data) {
                 const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' });
                 const url = window.URL.createObjectURL(blob);
