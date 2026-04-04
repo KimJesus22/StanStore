@@ -230,12 +230,11 @@ export default function ProfilePage() {
   // Load profile data (decrypted)
   useEffect(() => {
     async function loadProfile() {
-      const session = useAuth.getState().session;
-      if (!user || !session?.access_token) return;
+      if (!user) return;
       try {
         // Dynamically import server action to avoid build issues if mixed
         const { getProfile } = await import('@/app/actions/profile');
-        const data = await getProfile(session.access_token);
+        const data = await getProfile();
         if (data) {
           setPhone(data.phone || '');
           setAddress(data.address || '');
@@ -251,8 +250,7 @@ export default function ProfilePage() {
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    const session = useAuth.getState().session;
-    if (!session?.access_token) {
+    if (!user) {
       toast.error('Sesión no válida');
       return;
     }
@@ -266,7 +264,7 @@ export default function ProfilePage() {
       formData.append('address', address);
 
       const { updateProfile } = await import('@/app/actions/profile');
-      const result = await updateProfile(session.access_token, formData);
+      const result = await updateProfile(formData);
 
       if (result.error) {
         toast.error(result.error, { id: toastId });

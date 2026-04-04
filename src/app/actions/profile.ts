@@ -1,40 +1,41 @@
 'use server';
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/server';
 import { encrypt, decrypt } from '@/lib/encryption';
 import { revalidatePath } from 'next/cache';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+const MAX_PHONE_LENGTH = 20;
+const MAX_ADDRESS_LENGTH = 500;
 
-function createAuthenticatedClient(token: string) {
-    return createClient(supabaseUrl, supabaseAnonKey, {
-        global: { headers: { Authorization: `Bearer ${token}` } },
-    });
-}
-
-export async function updateProfile(token: string, formData: FormData) {
-    if (!token) return { error: 'No autorizado' };
-
-    const supabase = createAuthenticatedClient(token);
+export async function updateProfile(formData: FormData) {
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
         return { error: 'No autorizado' };
     }
 
-    const phone = formData.get('phone') as string;
-    const address = formData.get('address') as string;
+    // formData.get() devuelve null si el campo no fue enviado, string si fue enviado
+    const phone = formData.get('phone') as string | null;
+    const address = formData.get('address') as string | null;
+
+    if (phone !== null && phone.length > MAX_PHONE_LENGTH) {
+        return { error: 'Teléfono demasiado largo.' };
+    }
+    if (address !== null && address.length > MAX_ADDRESS_LENGTH) {
+        return { error: 'Dirección demasiado larga.' };
+    }
 
     const updates: Record<string, string | null> = {
         updated_at: new Date().toISOString(),
     };
 
-    if (phone !== undefined) {
+    // Solo actualizar campos explícitamente enviados (null = no enviado, '' = borrado)
+    if (phone !== null) {
         updates.encrypted_phone = phone ? encrypt(phone) : null;
     }
 
-    if (address !== undefined) {
+    if (address !== null) {
         updates.encrypted_address = address ? encrypt(address) : null;
     }
 
@@ -52,10 +53,8 @@ export async function updateProfile(token: string, formData: FormData) {
     return { success: true };
 }
 
-export async function getProfile(token: string) {
-    if (!token) return null;
-
-    const supabase = createAuthenticatedClient(token);
+export async function getProfile() {
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
