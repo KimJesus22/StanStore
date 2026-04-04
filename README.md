@@ -274,6 +274,54 @@ Correcciones aplicadas tras segunda auditoría de rutas API:
 - **Problema**: El handler instanciaba `createServerClient` de `@supabase/ssr` directamente usando `NEXT_PUBLIC_SUPABASE_URL!` y `NEXT_PUBLIC_SUPABASE_ANON_KEY!` (operadores `!` sin protección en runtime). Sin validación UUID en el parámetro `id`.
 - **Solución**: Reemplazado por `createClient` de `@/lib/supabase/server` (centraliza cookies y fail-fast de env vars). UUID regex en `rewardId` → 400 si inválido o ausente. El uso de `createAdminClient()` para generar signed URLs permanece correcto (requiere service role, y la auth se verifica primero con anon client).
 
+## 🔐 Hardening de Seguridad (Ronda 4)
+
+Correcciones aplicadas tras auditoría de Server Actions:
+
+### `src/app/actions/admin.ts` — UUID y tryAudit wrapper
+- **Problema**: `updateProduct` y `deleteProduct` usaban `formData.id` / `productId` directamente en `.eq()` sin validar formato UUID. Si `logAuditAction` lanzaba excepción, una operación DB exitosa devolvía `{ success: false }`.
+- **Solución**: Agregado `UUID_REGEX` con validación previa al bloque `try` en ambas funciones. Creado wrapper `tryAudit(action, metadata)` que captura excepciones de `logAuditAction` con `console.error` sin propagarlas, garantizando que el resultado de la acción refleje el estado real de la BD.
+
+### `src/app/actions/audit.ts` — Eliminación de fallback silencioso a anon key
+- **Problema**: El cliente Supabase se inicializaba a nivel de módulo con `|| process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'`. En ausencia de `SUPABASE_SERVICE_ROLE_KEY`, todos los inserts a `audit_logs` fallaban bajo RLS sin ningún aviso en arranque.
+- **Solución**: Eliminado el cliente a nivel de módulo y la importación de `@supabase/supabase-js`. Reemplazado por `createAdminClient()` inicializado perezosamente dentro de `logAuditAction()` — fail-fast si la service role key está ausente, error capturado por el try/catch existente.
+
+### `src/app/actions/generateShippingInvoices.ts` — Guard admin, paralelismo y sanitización
+- **Problema**: La función carecía de verificación de rol de administrador, por lo que cualquier usuario autenticado podía invocarla. El procesamiento de participantes era secuencial (`for...of`), saturando el servidor con GOs grandes. La instancia de `Resend` se creaba dentro del loop de emails.
+- **Solución**: Agregado `requireAdmin()` al inicio — lanza excepción en unauthenticated/forbidden. Agregado `UUID_REGEX` en `groupOrderId`. Reemplazado el loop por `Promise.allSettled` sobre todos los participantes (las 3 llamadas Stripe de cada uno siguen siendo secuenciales internamente: product → price → paymentLink). La instancia `new Resend()` se crea una sola vez fuera del map, y los emails se envían en paralelo con `Promise.allSettled`. Los errores por participante se reducen a mensaje genérico para el caller; el error real va solo a `console.error` y audit log.
+
+### `src/app/actions/getReviewsAction.ts` — Cambio a cliente servidor y error explícito
+- **Problema**: La acción usaba `supabase` de `@/lib/supabaseClient` (cliente browser con anon key), y devolvía `[]` silenciosamente en caso de error de BD, ocultando problemas al caller.
+- **Solución**: Reemplazado por `createClient()` de `@/lib/supabase/server`. Agregado `UUID_REGEX` en `productId` → throw. Parámetros `page` y `limit` saneados con `Math.max`/`Math.min` (límite `MAX_LIMIT = 50`). Eliminado el `return []` en error; ahora lanza `new Error('Error al obtener las reseñas.')` para que el caller pueda reaccionar.
+
+### `src/app/actions/goUpdates.ts` — Auth, validación de inputs y contención de notifyParticipants
+- **Problema**: `publishGoUpdate` no verificaba que el actor fuera admin ni validaba longitud de inputs. `notifyParticipants` estaba exportada como Server Action independiente, permitiendo que cualquier usuario autenticado enviase correos masivos a participantes con un `updateId` conocido.
+- **Solución**: Agregado `requireAdmin()` en `publishGoUpdate` (retorna `{ error }` en lugar de lanzar, para preservar el flujo UI). UUID regex en `groupOrderId`. Constantes `MAX_TITLE_LENGTH = 255` y `MAX_CONTENT_LENGTH = 10 000` validadas antes del insert. Eliminado `export` de `notifyParticipants` — ahora es función interna invocable solo desde `publishGoUpdate`. Agregada verificación UUID dentro de `notifyParticipants` como defensa en profundidad.
+
+## 🔐 Hardening de Seguridad (Ronda 5)
+
+Correcciones aplicadas tras auditoría de Server Actions (segunda tanda):
+
+### `src/app/actions/health.ts` — Guard admin y cliente inline
+- **Problema**: `checkSystemHealth` era una Server Action exportada sin autenticación; cualquier cliente podía invocarla para confirmar disponibilidad del sistema y obtener latencia, memoria y uptime. Usaba `createClient` de `@supabase/supabase-js` con `|| placeholder-key` fallback.
+- **Solución**: Agregado `requireAdmin()` al inicio — lanza excepción en unauthenticated/forbidden. Reemplazado cliente inline por `createAdminClient()`. Eliminado import de `@supabase/supabase-js`.
+
+### `src/app/actions/loyalty.ts` — Race condition y falta de auth
+- **Problema**: El guard `.gte('loyalty_points', POINTS_COST)` en el UPDATE era correcto a nivel PostgreSQL, pero Supabase devuelve `error: null` aunque 0 filas sean afectadas — el código no verificaba el resultado, por lo que requests concurrentes recibían `{ success: true }` sin haber deducido puntos. Además, `userId` llegaba del caller sin verificar que el actor fuera ese mismo usuario.
+- **Solución**: Agregado `.select('loyalty_points')` al UPDATE y verificación `updated.length === 0` → error en vez de success. Agregado `createClient().auth.getUser()` con `user.id !== userId` → `{ error: 'No autorizado.' }`. Agregado `UUID_REGEX` en `userId`.
+
+### `src/app/actions/orders.ts` — Sin auth, Stripe no bloqueaba y inputs del cliente
+- **Problema**: Cualquier script podía llamar `saveOrder(anyUserId, 0, [...])` y crear una orden con `status: 'paid'`. La verificación de Stripe solo condicionaba la extracción de metadata (`agreedAt`, `userAgent`) pero no bloqueaba el insert si `payment_status !== 'paid'`. `total` e `items` venían del cliente sin validar. Cliente módulo-nivel con `|| placeholder`. `revalidateTag` llamado con 2 argumentos (solo acepta uno). Errores internos concatenados al caller.
+- **Solución**: `auth.getUser()` + `user.id !== userId` → error. Si `sessionId` presente y `payment_status !== 'paid'` o error Stripe → return error (bloquea insert). Bounds: `MAX_ITEMS = 50`, `MAX_TOTAL = 1_000_000`, `total > 0`. `UUID_REGEX` en `userId` e `item.product_id`. Reemplazado cliente módulo-nivel por `createAdminClient()` lazy. Corregido `revalidateTag`. Sanitizados mensajes de error al caller.
+
+### `src/app/actions/privacy.ts` — IDOR y cliente browser
+- **Problema**: `getUserData(userId)` aceptaba el `userId` como parámetro sin verificar que el caller fuera ese usuario — IDOR completo: cualquier usuario autenticado podía exportar órdenes y reseñas de otra persona con solo conocer su UUID. Usaba `supabase` de `@/lib/supabaseClient` (cliente browser con anon key) en un Server Action.
+- **Solución**: Eliminado el parámetro `userId` — ahora siempre se deriva de `auth.getUser()` en el servidor. Reemplazado cliente browser por `createClient()` de `@/lib/supabase/server`. Actualizado `profile/page.tsx`: `getUserData(user.id)` → `getUserData()`.
+
+### `src/app/actions/profile.ts` — Token en parámetro, fallback silencioso y bug null-check
+- **Problema**: `updateProfile(token, formData)` y `getProfile(token)` recibían el `session.access_token` del cliente como argumento, enviando JWTs en cada llamada. Variables módulo-nivel con `|| 'placeholder-key'`. Bug: `phone !== undefined` siempre era `true` porque `formData.get()` retorna `null` (no `undefined`) cuando el campo no existe — sobreescribía phone/address en cada submit aunque no se enviaran. Sin límites de longitud en campos sensibles.
+- **Solución**: Eliminados parámetros `token` de ambas funciones; auth verificada vía cookies SSR con `createClient()` de `@/lib/supabase/server`. Eliminados `createAuthenticatedClient`, variables módulo-nivel y import de `@supabase/supabase-js`. Corregido `!== undefined` → `!== null`. Agregados `MAX_PHONE_LENGTH = 20` y `MAX_ADDRESS_LENGTH = 500`. Actualizado `profile/page.tsx`: eliminados guards de `session.access_token` y llamadas con token.
+
 ---
 ## 📄 Licencia
 Este proyecto es de código abierto bajo la [Licencia MIT](LICENSE).
