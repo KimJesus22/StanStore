@@ -1,10 +1,7 @@
 'use server';
 
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase Client
-// Initialize Supabase Client moved inside function
-// const supabase = createClient(...)
+import { createAdminClient } from '@/lib/supabase/admin';
+import { requireAdmin } from '@/lib/supabase/requireAdmin';
 
 export interface HealthMetrics {
     latency: number; // ms
@@ -15,14 +12,15 @@ export interface HealthMetrics {
 }
 
 export async function checkSystemHealth(): Promise<HealthMetrics> {
+    const denial = await requireAdmin();
+    if (denial === 'unauthenticated') throw new Error('No autorizado.');
+    if (denial === 'forbidden') throw new Error('Se requiere rol de administrador.');
+
     const start = performance.now();
     let error = null;
 
     try {
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-            process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
-        );
+        const supabase = createAdminClient();
         // Measure Supabase Latency: Simple lightweight query
         await supabase.from('products').select('count', { count: 'exact', head: true }).single();
     } catch (e) {
