@@ -1,5 +1,6 @@
 'use server';
 
+import { createClient } from '@/lib/supabase/server';
 import { registerSchema, RegisterInput } from '@/schemas/auth';
 
 type ActionResponse = {
@@ -15,7 +16,6 @@ export async function registerUser(data: RegisterInput): Promise<ActionResponse>
     const result = registerSchema.safeParse(data);
 
     if (!result.success) {
-        // Si la validación falla, devolvemos los errores formateados
         return {
             success: false,
             message: 'Validación fallida en el servidor',
@@ -23,23 +23,24 @@ export async function registerUser(data: RegisterInput): Promise<ActionResponse>
         };
     }
 
-    // 2. Simulación de registro (o llamada real a Supabase Admin si fuera necesario)
-    // Aquí podríamos usar supabaseAdmin para crear el usuario sin exponer la key pública si quisiéramos
-    // Por ahora, simulamos un éxito o un error de duplicado (ejemplo)
+    // confirmPassword solo se usa para validación en cliente/servidor — no se envía a Supabase
+    const { email, password } = result.data;
 
-    const { email } = result.data;
+    // 2. Crear usuario en Supabase Auth
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signUp({ email, password });
 
-    // Simulación: si el email es "error@test.com", fallamos
-    if (email === 'error@test.com') {
+    if (error) {
+        console.error('Error registering user:', error);
+        // Mensaje genérico para evitar enumeración de usuarios
         return {
             success: false,
-            message: 'El usuario ya existe (simulado)',
+            message: 'No fue posible completar el registro. Verifica tus datos e intenta de nuevo.',
         };
     }
 
-    // Éxito
     return {
         success: true,
-        message: 'Usuario registrado correctamente',
+        message: 'Registro exitoso. Revisa tu correo para confirmar tu cuenta.',
     };
 }
