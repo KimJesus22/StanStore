@@ -1,11 +1,18 @@
 'use server';
 
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 
-// We need SERVICE_ROLE key to select/admin, but ANON key is enough to INSERT with our RLS policy.
-// However, creating a client inside action is standard.
-// Client creation moved inside action to avoid build-time side effects
-// const supabase = createClient(supabaseUrl, supabaseKey);
+// ── Constantes ────────────────────────────────────────────────────────────────
+
+const SEVERITY_VALUES = ['low', 'medium', 'high', 'critical'] as const;
+const MAX_TITLE        = 200;
+const MAX_DESCRIPTION  = 5_000;
+const MAX_STEPS        = 5_000;
+const MAX_EMAIL        = 254;
+const MAX_REPORTS_PER_HOUR = 3;
+
+// ── Tipos de retorno ──────────────────────────────────────────────────────────
 
 export interface SecurityReport {
     title: string;
@@ -15,24 +22,60 @@ export interface SecurityReport {
     submitter_email?: string;
 }
 
+// ── Server Action ─────────────────────────────────────────────────────────────
+
 export async function submitSecurityReport(report: SecurityReport) {
-    try {
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
-        const supabase = createClient(supabaseUrl, supabaseKey);
+    // 1. Autenticación obligatoria — previene spam anónimo
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        return { success: false, message: 'Debes iniciar sesión para enviar un reporte.' };
+    }
 
-        const { error } = await supabase
-            .from('security_reports')
-            .insert([report]);
+    // 2. Validación de campos
+    if (!SEVERITY_VALUES.includes(report.severity)) {
+        return { success: false, message: 'Severidad no válida.' };
+    }
 
-        if (error) {
-            console.error('Security Report Error:', error);
-            throw new Error('Failed to submit report');
-        }
+    const title               = report.title?.trim().slice(0, MAX_TITLE) ?? '';
+    const description         = report.description?.trim().slice(0, MAX_DESCRIPTION) ?? '';
+    const reproduction_steps  = report.reproduction_steps?.trim().slice(0, MAX_STEPS) ?? null;
+    const submitter_email     = report.submitter_email?.trim().slice(0, MAX_EMAIL) ?? null;
 
-        return { success: true, message: 'Reporte enviado segura y confidencialmente.' };
-    } catch (error) {
-        console.error('Submission Error:', error);
+    if (!title || !description) {
+        return { success: false, message: 'Título y descripción son requeridos.' };
+    }
+
+    const admin = createAdminClient();
+
+    // 3. Rate limit: máx 3 reportes por usuario por hora
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count } = await admin
+        .from('security_reports')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .gte('created_at', oneHourAgo);
+
+    if ((count ?? 0) >= MAX_REPORTS_PER_HOUR) {
+        return { success: false, message: 'Has alcanzado el límite de reportes por hora. Intenta más tarde.' };
+    }
+
+    // 4. Inserción con service role (sin depender de RLS de la clave anónima)
+    const { error } = await admin
+        .from('security_reports')
+        .insert([{
+            user_id: user.id,
+            title,
+            severity: report.severity,
+            description,
+            reproduction_steps,
+            submitter_email,
+        }]);
+
+    if (error) {
+        console.error('Security Report Error:', error);
         return { success: false, message: 'Error al enviar el reporte. Inténtalo de nuevo.' };
     }
+
+    return { success: true, message: 'Reporte enviado segura y confidencialmente.' };
 }
