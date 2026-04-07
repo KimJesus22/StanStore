@@ -35,7 +35,8 @@
       "WebFetch(domain:docs.stripe.com)",
       "Bash(npm ls:*)",
       "Bash(tree:*)",
-      "Bash(npx vitest:*)"
+      "Bash(npx vitest:*)",
+      "Bash(git fetch:*)"
     ]
   }
 }
