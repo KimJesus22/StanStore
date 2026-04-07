@@ -25,13 +25,17 @@ BEGIN
 END
 $$;
 
--- Policy: Service role (and authenticated users via Server Action) can insert orders
+-- Policy: Solo service_role puede insertar órdenes (createAdminClient en Server Actions)
+-- TO public con CHECK (true) permitiría INSERT anónimo vía REST — no usar.
 DO $$
 BEGIN
+    -- Eliminar política insegura si existe de una versión anterior
+    DROP POLICY IF EXISTS "Enable insert for all users" ON public.orders;
+
     IF NOT EXISTS (
-        SELECT 1 FROM pg_policies WHERE tablename = 'orders' AND policyname = 'Enable insert for all users'
+        SELECT 1 FROM pg_policies WHERE tablename = 'orders' AND policyname = 'Service role inserts orders'
     ) THEN
-        CREATE POLICY "Enable insert for all users" ON public.orders FOR INSERT TO public WITH CHECK (true);
+        CREATE POLICY "Service role inserts orders" ON public.orders FOR INSERT TO service_role WITH CHECK (true);
     END IF;
 END
 $$;
