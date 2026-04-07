@@ -796,7 +796,6 @@ export default function CheckoutForm() {
                 },
                 referrerId || undefined,
                 usePoints,
-                user?.id,
                 appliedPromo?.id
             );
 

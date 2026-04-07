@@ -2,10 +2,19 @@
 
 import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logAuditAction } from '@/app/actions/audit';
 import { ShippingInfo } from '@/types';
 import { POINTS_DISCOUNT_MXN } from '@/features/cart';
+
+// ── Constantes ────────────────────────────────────────────────────────────────
+
+const UUID_REGEX  = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_ITEMS   = 50;
+const MAX_QTY     = 99;
+
+// ── validatePromoCode ─────────────────────────────────────────────────────────
 
 export async function validatePromoCode(code: string) {
     try {
@@ -37,6 +46,8 @@ export async function validatePromoCode(code: string) {
     }
 }
 
+// ── createCheckoutSession ─────────────────────────────────────────────────────
+
 export async function createCheckoutSession(
     cartItems: { id: string; quantity: number }[],
     legalMetadata?: { agreedAt: string; userAgent: string },
@@ -44,56 +55,58 @@ export async function createCheckoutSession(
     shippingInfo?: ShippingInfo,
     referrerId?: string,
     usePoints?: boolean,
-    userId?: string,
     promoCodeId?: string
+    // userId eliminado — se deriva de la sesión del servidor
 ) {
     try {
-        // Stripe instance comes from lib/stripe with version checks
+        // 1. Autenticación — userId siempre del servidor
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return { error: 'No autorizado.' };
+        const userId = user.id;
 
-        // 1. Validate items and fetch real prices from DB
+        // 2. Validar cartItems
+        if (!Array.isArray(cartItems) || cartItems.length === 0 || cartItems.length > MAX_ITEMS) {
+            return { error: 'Carrito inválido.' };
+        }
+        for (const item of cartItems) {
+            if (!UUID_REGEX.test(item.id) || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > MAX_QTY) {
+                return { error: 'Producto inválido en el carrito.' };
+            }
+        }
+        if (referrerId && !UUID_REGEX.test(referrerId)) {
+            return { error: 'Referido inválido.' };
+        }
+
+        // 3. Validar productos contra DB y construir lineItems
+        const admin = createAdminClient();
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
         const lineItems = [];
 
         for (const item of cartItems) {
-            const { data: product, error } = await supabase
+            const { data: product, error } = await admin
                 .from('products')
                 .select('name, price, image_url')
                 .eq('id', item.id)
                 .single();
 
             if (error || !product) {
-                console.error(`Product not found: ${item.id}`);
-                continue; // Skip invalid items
+                return { error: 'Uno o más productos no están disponibles.' };
             }
 
-            // Stripe requires absolute URLs. 
-            // Also, Stripe cannot access localhost images, so we only send images if they are from a public URL.
-            // For now, we'll try to constructs a valid URL, but if it's localhost, Stripe might warn or fail to display it.
-            // To be safe, let's only send images if they start with http/https and NOT localhost, 
-            // OR if we are in production.
-
-            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
             let imageUrl = product.image_url;
-
             if (imageUrl && !imageUrl.startsWith('http')) {
                 imageUrl = `${baseUrl}${imageUrl}`;
             }
-
-            // Filter out localhost images to prevent Stripe errors if it tries to validate reachability
-            // (Stripe sometimes errors on unreachable URLs)
-            const validImages = [];
+            const validImages: string[] = [];
             if (imageUrl && !imageUrl.includes('localhost') && !imageUrl.includes('127.0.0.1')) {
                 validImages.push(imageUrl);
             }
 
-            // Base price is already in MXN, no exchange needed.
-
             lineItems.push({
                 price_data: {
                     currency: 'mxn',
-                    product_data: {
-                        name: product.name,
-                        images: validImages,
-                    },
+                    product_data: { name: product.name, images: validImages },
                     unit_amount: Math.round(product.price * 100), // MXN → centavos
                 },
                 quantity: item.quantity,
@@ -101,19 +114,13 @@ export async function createCheckoutSession(
         }
 
         if (lineItems.length === 0) {
-            throw new Error('No valid items in cart');
+            return { error: 'No hay productos válidos en el carrito.' };
         }
 
-        // 2. Build discounts array
+        // 4. Construir descuentos — cupón de puntos creado en Stripe ANTES de descontar en DB
         const discounts: { coupon?: string; promotion_code?: string }[] = [];
 
-        // Points discount: deduct atomically before creating session
-        if (usePoints && userId) {
-            const { redeemLoyaltyPoints } = await import('@/app/actions/loyalty');
-            const redemption = await redeemLoyaltyPoints(userId);
-            if (!redemption.success) {
-                return { error: redemption.error || 'Error al canjear puntos' };
-            }
+        if (usePoints) {
             const coupon = await stripe.coupons.create({
                 amount_off: POINTS_DISCOUNT_MXN * 100,
                 currency: 'mxn',
@@ -124,17 +131,16 @@ export async function createCheckoutSession(
             discounts.push({ coupon: coupon.id });
         }
 
-        // Promo code discount
         if (promoCodeId) {
             discounts.push({ promotion_code: promoCodeId });
         }
 
-        // 3. Create Stripe Session (single session with all discounts)
+        // 5. Crear sesión de Stripe ANTES de descontar puntos
         const sessionParams: Stripe.Checkout.SessionCreateParams = {
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/${locale}/cancel`,
+            success_url: `${baseUrl}/${locale}/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${baseUrl}/${locale}/cancel`,
             metadata: {
                 items: JSON.stringify(cartItems.map(item => ({ id: item.id, quantity: item.quantity }))),
                 agreedAt: legalMetadata?.agreedAt || '',
@@ -142,7 +148,7 @@ export async function createCheckoutSession(
                 shippingInfo: shippingInfo ? JSON.stringify(shippingInfo) : '',
                 referrerId: referrerId || '',
                 pointsRedeemed: usePoints ? 'true' : '',
-                redeemerUserId: userId || '',
+                redeemerUserId: userId,
             },
         };
 
@@ -152,19 +158,34 @@ export async function createCheckoutSession(
 
         const session = await stripe.checkout.sessions.create(sessionParams);
 
-        // Audit Log
+        // 6. Descontar puntos DESPUÉS de confirmar la sesión
+        //    Si falla, expiramos la sesión para evitar descuento gratis
+        if (usePoints) {
+            const { redeemLoyaltyPoints } = await import('@/app/actions/loyalty');
+            const redemption = await redeemLoyaltyPoints(userId);
+            if (!redemption.success) {
+                try {
+                    await stripe.checkout.sessions.expire(session.id);
+                } catch (expireErr) {
+                    console.error('Error expirando sesión de Stripe tras fallo de puntos:', expireErr);
+                }
+                return { error: redemption.error || 'Error al canjear puntos. El proceso fue cancelado.' };
+            }
+        }
+
+        // 7. Audit log
         await logAuditAction('CHECKOUT_SESSION_CREATED', {
             amountTotal: lineItems.reduce((acc, item) => acc + (item.price_data.unit_amount * item.quantity), 0) / 100,
             itemCount: cartItems.length,
             legalAgreement: !!legalMetadata,
             pointsRedeemed: !!usePoints,
-            promoCode: promoCodeId ? true : false,
+            promoCode: !!promoCodeId,
         });
 
         return { url: session.url };
     } catch (error: unknown) {
         console.error('Stripe Error:', error);
         await logAuditAction('CHECKOUT_SESSION_FAILED', { error: error instanceof Error ? error.message : String(error) });
-        return { error: 'Error creating checkout session' };
+        return { error: 'Error al crear la sesión de pago.' };
     }
 }
