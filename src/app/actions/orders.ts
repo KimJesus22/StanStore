@@ -85,10 +85,10 @@ export async function saveOrder(orderData: {
 
         // 5. Revalidate cache — revalidateTag accepts a single string argument
         try {
-            revalidateTag('products');
+            revalidateTag('products', 'default');
             for (const item of items) {
                 if (item.product_id && UUID_REGEX.test(item.product_id)) {
-                    revalidateTag(`product-${item.product_id}`);
+                    revalidateTag(`product-${item.product_id}`, 'default');
                 }
             }
         } catch (revalidateError) {
