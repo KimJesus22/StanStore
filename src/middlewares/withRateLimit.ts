@@ -43,9 +43,11 @@ export const withRateLimit: MiddlewareFactory = (next: NextMiddleware) => {
                 isBlocked = cached.blocked;
             } else {
                 try {
+                    // SERVICE_ROLE bypasa RLS — permite verificar la IP
+                    // sin exponer la tabla blocked_ips públicamente.
                     const supabase = createClient(
                         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+                        process.env.SUPABASE_SERVICE_ROLE_KEY!
                     );
 
                     const { data, error } = await supabase

@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/supabase/requireAdmin';
 import { logAuditAction } from '@/app/actions/audit';
 import type { GoUpdateStatusType } from '@/features/group-orders';
@@ -50,7 +51,8 @@ export async function publishGoUpdate(params: PublishParams): Promise<PublishRes
     return { error: `El contenido debe tener entre 1 y ${MAX_CONTENT_LENGTH} caracteres.` };
   }
 
-  const supabase = await createClient();
+  // INSERT requiere service_role (RLS restringe escritura a service_role)
+  const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from('go_updates')

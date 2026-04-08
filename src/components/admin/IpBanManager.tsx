@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { supabase } from '@/lib/supabaseClient'; // Ensure this path is correct
+import { getBlockedIps, addBlockedIp, removeBlockedIp } from '@/app/actions/blockedIps';
 import { Trash2, ShieldAlert, Plus, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -163,13 +163,9 @@ export default function IpBanManager() {
     const fetchIps = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase
-                .from('blocked_ips')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (error) throw error;
-            setIps(data || []);
+            const result = await getBlockedIps();
+            if (result.error) throw new Error(result.error);
+            setIps(result.data || []);
         } catch (error) {
             console.error('Error fetching IPs:', error);
             toast.error('Error al cargar IPs bloqueadas');
@@ -178,39 +174,21 @@ export default function IpBanManager() {
         }
     };
 
-    const validateIp = (ip: string) => {
-        // Simple regex for IPv4 and IPv6
-        const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
-        const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
-        return ipv4Regex.test(ip) || ipv6Regex.test(ip);
-    };
-
     const handleAddIp = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newIp) return;
 
-        if (!validateIp(newIp)) {
-            toast.error('Dirección IP inválida');
-            return;
-        }
-
         try {
             setSubmitting(true);
-            const { error } = await supabase
-                .from('blocked_ips')
-                .insert([{ ip_address: newIp, reason: reason || 'Bloqueo Manual' }]);
+            const result = await addBlockedIp(newIp, reason);
 
-            if (error) {
-                if (error.code === '23505') { // Unique violation
-                    toast.error('Esta IP ya está bloqueada');
-                } else {
-                    throw error;
-                }
+            if (result.error) {
+                toast.error(result.error);
             } else {
                 toast.success('IP bloqueada correctamente');
                 setNewIp('');
                 setReason('');
-                fetchIps(); // Refresh list
+                fetchIps();
             }
         } catch (error) {
             console.error('Error adding IP:', error);
@@ -224,14 +202,10 @@ export default function IpBanManager() {
         if (!confirm(`¿Estás seguro de desbloquear la IP ${ip}?`)) return;
 
         try {
-            const { error } = await supabase
-                .from('blocked_ips')
-                .delete()
-                .eq('id', id);
-
-            if (error) throw error;
+            const result = await removeBlockedIp(id);
+            if (result.error) throw new Error(result.error);
             toast.success('IP desbloqueada');
-            fetchIps(); // Refresh list
+            fetchIps();
         } catch (error) {
             console.error('Error deleting IP:', error);
             toast.error('Error al desbloquear IP');
