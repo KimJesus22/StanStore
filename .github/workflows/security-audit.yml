@@ -46,7 +46,7 @@ jobs:
       # updates only (usually < 5 MB). Caching this folder cuts cold-start time from
       # ~10 min down to ~1 min on cache hits.
       - name: Cache OWASP NVD database
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.gradle/dependency-check-data
           # Key rotates weekly so the cache never grows stale longer than 7 days.
