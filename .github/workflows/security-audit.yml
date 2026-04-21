@@ -34,7 +34,7 @@ jobs:
         run: npm audit --audit-level=high --json > npm-audit.json || true
 
       - name: Upload npm audit results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: npm-audit-report
           path: npm-audit.json
@@ -91,7 +91,7 @@ jobs:
       # would skip every subsequent step the moment --failOnCVSS triggers,
       # leaving you with a broken build and zero evidence of what caused it.
       - name: Upload OWASP security report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: owasp-security-report
