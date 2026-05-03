@@ -1,327 +1,537 @@
-# StanStore 🎵 | E-commerce Seguro, Moderno y Potenciado con IA
+<p align="center">
+  <img src="https://img.shields.io/badge/Group_Order_Manager-Plataforma_E--commerce-8B5CF6?style=for-the-badge&labelColor=1a1a2e" alt="Group Order Manager" />
+</p>
 
-![Estado del Despliegue](https://img.shields.io/badge/deploy-vercel-black?style=for-the-badge&logo=vercel)
-![Licencia](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
-![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
-![Vitest](https://img.shields.io/badge/Coverage-86%25-brightgreen?style=for-the-badge&logo=vitest)
+<h1 align="center">Group Order Manager</h1>
+<p align="center">
+  <strong>Plataforma E-commerce de Alto Tráfico para Pedidos Grupales Internacionales</strong>
+</p>
 
-**StanStore** es una plataforma de comercio electrónico de vanguardia para mercancía exclusiva. Diseñada con un enfoque de **defensa en profundidad**, combina una arquitectura de micro-interacciones fluida con rigurosos estándares de ciberseguridad y capacidades modernas de Inteligencia Artificial.
+<p align="center">
+  <a href="#descripción-general">Descripción General</a> •
+  <a href="#stack-tecnológico">Stack Tecnológico</a> •
+  <a href="#características-clave">Características Clave</a> •
+  <a href="#architecture--system-design">System Design</a> •
+  <a href="#arquitectura-del-proyecto">Arquitectura</a> •
+  <a href="#getting-started-local-development">Getting Started</a> •
+  <a href="#licencia">Licencia</a>
+</p>
 
-## 🚀 Tecnologías
+<p align="center">
+  <img src="https://img.shields.io/badge/deploy-vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Desplegado en Vercel" />
+  <img src="https://img.shields.io/badge/licencia-MIT-22c55e?style=flat-square" alt="Licencia MIT" />
+  <img src="https://img.shields.io/badge/cobertura-86%25-34d399?style=flat-square&logo=vitest&logoColor=white" alt="Cobertura de Tests 86%" />
+  <img src="https://img.shields.io/badge/i18n-4_idiomas-f59e0b?style=flat-square" alt="4 Idiomas" />
+  <img src="https://img.shields.io/badge/a11y-WCAG_2.1_AA-3b82f6?style=flat-square" alt="WCAG 2.1 AA" />
+</p>
 
--   **Frontend**: [Next.js 16 (App Router)](https://nextjs.org/) - Rendimiento extremo con Server Actions, SSR e **ISR**.
--   **Internacionalización**: [next-intl](https://next-intl-docs.vercel.app/) - Soporte nativo para ES, EN, KO con rutas localizadas y formateo dinámico.
--   **IA & Búsqueda**: [@xenova/transformers](https://huggingface.co/docs/transformers.js) - Generación de embeddings locales (384D) con **pgvector** e índices HNSW.
--   **Base de Datos**: [Supabase](https://supabase.com/) (PostgreSQL) - Gestión de datos con RLS y búsqueda vectorial.
--   **Pagos**: [Stripe](https://stripe.com/) - Procesamiento con validación estricta de versiones de API en webhooks. Soporta **Google Pay**, **Apple Pay** y tarjetas mediante Payment Intents + `@stripe/react-stripe-js`.
--   **Estilos & UI**: Styled Components + [Framer Motion](https://www.framer.com/motion/).
--   **Calidad & A11y**: [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/) y [Axe Core](https://www.deque.com/axe/) para auditorías de accesibilidad.
+---
 
-## 🧠 Inteligencia Artificial (Búsqueda Semántica)
+## Descripción General
 
-A diferencia de las búsquedas tradicionales por texto exacto, StanStore utiliza **Embeddings**:
-- **Tecnología**: Módulos locales `transformers.js` (Xenova/all-MiniLM-L6-v2) - **Costo $0**.
-- **Infraestructura**: Almacenamiento en columnas `vector(384)` con índices **HNSW** para búsquedas de alta velocidad.
-- **Mantenimiento**: Scripts incrementales en `scripts/generate-embeddings.ts` que procesan únicamente productos nuevos o editados mediante batch upserts.
+**Group Order Manager** es una plataforma de e-commerce de grado producción, diseñada específicamente para organizar y gestionar **pedidos grupales internacionales** de mercancía exclusiva — construida para soportar los picos extremos de tráfico y la complejidad logística de los lanzamientos de mercancía K-pop / BTS, donde miles de fans convergen simultáneamente para realizar pedidos.
 
-## 🛒 Checkout & Gamificación (Nuevas Características)
+La plataforma resuelve un problema real: cuando un organizador grupal recopila pedidos de decenas (o cientos) de participantes en diferentes países, necesita gestionar **envío internacional prorrateado**, pagos divididos, reserva de inventario bajo alta concurrencia y checkout multi-moneda — todo manteniendo la experiencia rápida, accesible y localizada.
 
-### Pagos Express (Google Pay / Apple Pay)
-Integración nativa de wallets digitales sin redireccionamiento:
-- **`StripeElementsProvider`**: Crea un `PaymentIntent` al cargar el checkout y provee el `clientSecret` a hijos vía React Context, envolviendo con `<Elements>` de Stripe.
-- **`ExpressPaymentButton`**: Integrado en `CheckoutForm`, justo encima del botón principal. Usa `stripe.paymentRequest()` + `canMakePayment()` para mostrar el botón solo si el dispositivo tiene un wallet configurado (Google Pay en Android/Chrome, Apple Pay en Safari/iOS). Invisible en PC sin wallets registradas.
-- **Confirmación segura**: Maneja 3D Secure con doble llamada a `confirmCardPayment()` (`handleActions: false` → acción adicional si `requires_action`).
-- **Webhook `payment_intent.succeeded`**: Actualiza `orders.status = 'paid'` en Supabase usando el `order_id` almacenado en los `metadata` del PaymentIntent. Devuelve 500 si falla para activar el reintento automático de Stripe.
+### ¿Qué hace único a este proyecto?
 
-### Refactorización del Checkout
-- **Validación Robusta**: Implementación de `react-hook-form` con esquemas **Zod** para validación en tiempo real y feedback inmediato.
-- **Cumplimiento Legal**: Checkbox obligatorio para aceptación de Términos y Política de Reembolso, con alerta visual de puntos clave (`TermsSummaryAlert`) sobre envíos internacionales.
-- **Optimización de Renderizado**: Carga dinámica (`lazy loading`) del formulario de checkout para reducir el Time-to-Interactive (TTI).
+- **Diseño concurrencia-primero** — ISR con stale-while-revalidate, caché a nivel CDN y validación de inventario en servidor garantizan comportamiento consistente bajo ráfagas simultáneas de pedidos.
+- **Orquestación de pagos complejos** — Stripe Payment Intents con Google Pay / Apple Pay, manejo de 3D Secure, cálculo de envío prorrateado por participante y MercadoPago para mercados LATAM.
+- **Seguridad en profundidad** — 5 rondas de auditoría de hardening, Row Level Security en las 14 tablas, cifrado AES-256-CBC con rotación de claves y prevención automatizada de fugas de secretos en CI.
+- **Búsqueda semántica con IA** — Embeddings locales con transformers (costo $0) e índices HNSW con pgvector para descubrimiento de productos basado en significado.
 
-### Gamificación y Social Sharing
-Potenciando la retención y el alcance orgánico en la página de éxito (`/success`):
-1. **Cupón de Recompensa**: Componente `NextPurchaseCoupon` que incentiva la recompra inmediata con un código de descuento (`STANFAN5`).
-2. **Difusión Social**: Componente `ShareToUnlock` con integración nativa para:
-    - **X (Twitter)**: Intentos de tweet precargados.
-    - **WhatsApp**: Mensajes directos pre-rellenados.
-    - **Clipboard**: Copiado rápido del enlace de la tienda.
+---
 
-## ⚡ Rendimiento y Experiencia de Usuario (Optimización LCP/CLS)
+## Stack Tecnológico
 
-- **ISR (Incremental Static Regeneration)**: Todas las páginas de producto (`/[locale]/product/[id]`) se pre-generan en build con `generateStaticParams` (~63 páginas × 3 locales) y se revalidan cada hora (`revalidate = 3600`). Nuevos productos se renderizan on-demand gracias a `dynamicParams = true`. Las páginas expiradas son regeneradas en background sin bloquear al usuario (`stale-while-revalidate`).
-- **Home sin fetch del cliente**: El servidor pre-carga todos los productos con `getProducts()` (cacheada 1h via `unstable_cache`) y los pasa como `initialProducts` a `HomeContent`. Los filtros se aplican en memoria en el cliente — **cero peticiones a Supabase desde el navegador** en la carga inicial, eliminando el spinner de LCP.
-- **Cache-Control en rutas API públicas**: `GET /api/artists` y `GET /api/products/similar` incluyen `s-maxage=3600, stale-while-revalidate=86400` para ser cacheadas por el CDN de Vercel entre peticiones.
-- **Invalidación por evento**: Los webhooks de Stripe y las Server Actions de admin llaman `revalidateTag('products')` para invalidar el caché inmediatamente al actualizar stock o crear un producto nuevo.
-- **Charts sin dependencias**: `SalesChart` y `CategoryChart` del admin implementados con SVG puro (eliminando `recharts` ~400 KB del chunk de admin). Soportan tema claro/oscuro y tooltip nativo en cada punto.
-- **jsPDF lazy**: `generateContractPDF` usa `import('jspdf')` dinámico — la librería (~500 KB) se descarga solo cuando el usuario hace clic en "Descargar contrato", no al cargar `/success`.
-- **Priorización de Carga**: Uso de `priority={true}` en imágenes LCP y `sizes` dinámicos.
-- **Componentes Diferidos**: Carga bajo demanda de reproductores externos (Spotify, YouTube).
+<table>
+  <thead>
+    <tr>
+      <th align="center">Capa</th>
+      <th align="center">Tecnología</th>
+      <th align="center">Propósito</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center"><img src="https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js 16" /></td>
+      <td><strong>Next.js 16</strong> (App Router)</td>
+      <td>Server Components, Server Actions, ISR, streaming SSR</td>
+    </tr>
+    <tr>
+      <td align="center"><img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /></td>
+      <td><strong>TypeScript 5</strong></td>
+      <td>Tipado extremo a extremo desde el esquema de BD hasta los props de UI</td>
+    </tr>
+    <tr>
+      <td align="center"><img src="https://img.shields.io/badge/Supabase-PostgreSQL-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" /></td>
+      <td><strong>Supabase</strong> (PostgreSQL)</td>
+      <td>Auth, RLS, pgvector, suscripciones en tiempo real</td>
+    </tr>
+    <tr>
+      <td align="center"><img src="https://img.shields.io/badge/Stripe-Pagos-635BFF?style=for-the-badge&logo=stripe&logoColor=white" alt="Stripe" /></td>
+      <td><strong>Stripe</strong></td>
+      <td>Payment Intents, webhooks, Google Pay / Apple Pay</td>
+    </tr>
+    <tr>
+      <td align="center"><img src="https://img.shields.io/badge/Styled_Components-6-DB7093?style=for-the-badge&logo=styled-components&logoColor=white" alt="Styled Components" /></td>
+      <td><strong>Styled Components 6</strong></td>
+      <td>Tematización SSR-compatible con soporte de modo claro/oscuro</td>
+    </tr>
+    <tr>
+      <td align="center"><img src="https://img.shields.io/badge/Framer_Motion-12-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" /></td>
+      <td><strong>Framer Motion</strong></td>
+      <td>Transiciones de página, micro-animaciones, manejo de gestos</td>
+    </tr>
+    <tr>
+      <td align="center"><img src="https://img.shields.io/badge/next--intl-4-f97316?style=for-the-badge" alt="next-intl" /></td>
+      <td><strong>next-intl</strong></td>
+      <td>i18n con rutas localizadas, formateadores y mensajes Zod traducidos</td>
+    </tr>
+    <tr>
+      <td align="center"><img src="https://img.shields.io/badge/Vitest-4-6E9F18?style=for-the-badge&logo=vitest&logoColor=white" alt="Vitest" /></td>
+      <td><strong>Vitest</strong> + <strong>Playwright</strong></td>
+      <td>Tests unitarios, de integración y E2E (86% de cobertura)</td>
+    </tr>
+    <tr>
+      <td align="center"><img src="https://img.shields.io/badge/Sentry-10-362D59?style=for-the-badge&logo=sentry&logoColor=white" alt="Sentry" /></td>
+      <td><strong>Sentry</strong></td>
+      <td>Monitoreo de errores, trazado de rendimiento, source maps</td>
+    </tr>
+    <tr>
+      <td align="center"><img src="https://img.shields.io/badge/Zod-4-3E67B1?style=for-the-badge&logo=zod&logoColor=white" alt="Zod" /></td>
+      <td><strong>Zod</strong></td>
+      <td>Validación isomórfica compartida entre cliente y servidor</td>
+    </tr>
+  </tbody>
+</table>
 
-## 🌍 Internacionalización (i18n)
+**También utiliza:** React 19 · Zustand · React Query · Husky + lint-staged · Serwist (PWA) · jsPDF · Resend (email transaccional) · Docker
 
-Implementada con un enfoque de tipado seguro y optimizada para SEO:
-- **Idiomas Soportados**: 🇪🇸 Español, 🇺🇸 Inglés, 🇰🇷 Coreano.
-- **Rutas Localizadas**: Estructura `/[locale]/ruta` con detección automática de preferencia de idioma.
-- **Formateo Dinámico**: Uso de `useFormatter` para mostrar monedas (`PriceTag`), fechas y listas gramaticalmente correctas según el locale.
-- **Validaciones i18n**: Esquemas de **Zod** dinámicos que inyectan mensajes de error traducidos en tiempo real.
-- **Contenido Dinámico (JSONB)**: El servicio `getArtists` localiza campos JSONB (`bio`) con fallback automático a español.
-- **Páginas Estáticas en Markdown**: Páginas legales (`/terms`) renderizadas desde archivos `.md` por locale (`terms.es.md`, `terms.en.md`) con `gray-matter` + `remark`. Si el idioma no existe, se carga el español con un aviso visual.
-- **Cookie `NEXT_LOCALE`**: Gestionada automáticamente por el middleware `next-intl` para persistir la preferencia de idioma.
+---
 
-## ♿ Accesibilidad (A11y - WCAG 2.1 AA)
+## Características Clave
 
-Diseñada para ser inclusiva y navegable por todos:
-- **Navegación por Teclado**: Componente **Enlace de Salto** para saltar al contenido y anillos de foco de alto contraste (`:focus-visible`) globales. Todos los inputs, selects y botones exponen indicador de foco visible; se eliminaron overrides `outline: none` sin reemplazo (`HeaderSearch`, `CurrencySelector`, `SortSelector`).
-- **Formularios Accesibles**: Todos los campos de `CheckoutForm` y del panel de administración tienen `<label htmlFor>` asociado al `id` del input correspondiente. Los mensajes de error usan `role="alert"` via `styled.span.attrs({ role: 'alert' })`. Iconos decorativos llevan `aria-hidden="true"`.
-- **Controles Interactivos**: Opciones de envío implementadas con patrón ARIA radio (`role="radiogroup"` + `role="radio"` + `aria-checked` + navegación por teclado Enter/Space). Botones con estado usan `aria-pressed`. Botones de acción tienen `aria-label` descriptivo con el nombre específico del recurso.
-- **Contraste de Color**: Paleta auditada — todos los pares pasan WCAG AA. Los más ajustados: `#D13639` sobre blanco ~4.9:1 (light), `#EF5350` sobre `#121212` ~5.4:1 (dark). Variables `textMuted` ajustadas para ambos modos.
-- **Imágenes**: Componente `ProductImage` inteligente que exige `alt` o genera fallbacks automáticos basados en metadatos del producto (`"{nombre} - {categoría} merchandise"`).
-- **QA Automatizado**: Integración de `eslint-plugin-jsx-a11y` y diagnósticos en consola con **Axe Core** en entorno de desarrollo.
+### 🔒 Seguridad a Nivel de Base de Datos (Row Level Security)
 
-## 🛡️ Ingeniería de Seguridad (Fortalecimiento del Sistema)
+RLS está habilitado en **las 14 tablas públicas**. Las inserciones de órdenes están restringidas a `service_role` (solo Server Actions), los pedidos grupales aplican políticas basadas en el creador, y `audit_logs` usa `SECURITY DEFINER` para inserciones públicas con lectura exclusiva para administradores. Las Server Actions realizan verificaciones `verifyAdmin()` independientes — nunca dependen únicamente de guards del lado del cliente. Cinco rondas de auditoría de seguridad han fortalecido cada ruta API, Server Action e inicialización de cliente Supabase con patrones fail-fast y mensajes de error sanitizados.
 
-1. **Audit Logs Inmutables**: Registro detallado de acciones críticas incluyendo latencia y metadatos.
-2. **Cifrado de Alta Seguridad**: Implementación de AES-256-CBC con **rotación de claves** y versionado de secretos.
-3. **Validación de Integraciones**: El endpoint de Stripe valida que la versión del evento coincida con la configuración de la app (`STRIPE_API_VERSION`), alertando sobre discrepancias.
-4. **Protección de Secretos**: Tests automatizados (`env.security.test.ts`) que bloquean el build si se detectan fugas de claves administrativas (`SERVICE_ROLE_KEY`) hacia el cliente.
-5. **Validación Backend en Acciones de Admin**: Las Server Actions (`createProduct`, `updateProduct`, `deleteProduct`) incluyen verificación de sesión y rol admin en servidor (`verifyAdmin()`) mediante cookie Supabase SSR — independiente del `AdminGuard` del cliente. `ProductSchema` (Zod) reforzado: `category` restringido a enum `['albums','merch','photocards','clothing']`, `price` con límite superior `999999.99` y `.finite()`, campos de texto con `.trim()` y longitudes máximas. El cliente admin usa `createAdminClient()` que lanza excepción si `SERVICE_ROLE_KEY` está ausente (sin fallback a anon key).
+### 🌍 Internacionalización Completa (next-intl)
 
-### Modelo de Seguridad Supabase (RLS)
+Cuatro idiomas — 🇪🇸 Español, 🇺🇸 Inglés, 🇰🇷 Coreano, 🇧🇷 Portugués — con enrutamiento localizado (`/[locale]/...`), formateo dinámico de monedas y fechas vía `useFormatter`, esquemas de validación Zod que inyectan mensajes de error traducidos en tiempo real, y localización de contenido basada en JSONB con fallbacks automáticos. Las páginas legales se renderizan desde archivos Markdown por idioma con `gray-matter` + `remark`.
 
-- **RLS habilitado en las 14 tablas** públicas. La clave `anon` solo puede leer datos públicos (productos, artistas, reseñas) o insertar en tablas con política explícita.
-- **`orders` INSERT restringido a `service_role`**: Las órdenes solo se crean desde Server Actions; se eliminó la política `TO public` para evitar inserciones anónimas directas.
-- **`group_orders` con política de creador**: El organizador (`organizer_id = auth.uid()`) puede crear y editar sus propios GOs directamente. El borrado permanece exclusivo de `service_role` para proteger GOs con participantes pagados.
-- **`user_rewards` y `group_order_participants`**: Solo el propietario puede leer su propia fila; escritura via `service_role` para garantizar integridad de pagos y puntos.
-- **`audit_logs`**: Inserción pública (vía `SECURITY DEFINER`), lectura solo para admins.
-- **Admin (`lib/supabase/admin.ts`)**: Usa `SERVICE_ROLE_KEY`. Omite RLS — exclusivo de Server Actions en entorno servidor.
+### ⚡ Optimizaciones de Rendimiento (ISR + Edge Caching)
 
-## 🧪 Estrategia de Calidad & Automatización
+Todas las páginas de producto (~63 × 4 idiomas) se generan estáticamente en build con `generateStaticParams` y se revalidan cada hora mediante ISR. La página principal ejecuta **cero fetches del lado del cliente** — los productos se cachean en servidor con `unstable_cache` y se filtran en memoria. Las rutas API públicas incluyen headers `s-maxage` + `stale-while-revalidate` para caché CDN en Vercel Edge, y los webhooks de Stripe disparan invalidación instantánea con `revalidateTag`. Los gráficos del admin usan SVG puro (eliminando ~400 KB de librerías de gráficos), y dependencias pesadas como jsPDF se importan dinámicamente bajo demanda del usuario.
 
-- **Unit Testing**: Suite de Vitest optimizada con **Happy-DOM** para mayor compatibilidad de módulos ESM.
-- **Integración**: Pruebas de flujo completo con Playwright.
-- **Seguridad**: Escaneo de variables de entorno en tiempo de build (`npm run build`).
-- **Husky**: Pre-commit hooks con `lint-staged` para linting (`eslint --fix`) y tests locales.
-- **Generación de Tipos**: Script `npm run update-types` para sincronizar tipos TypeScript desde el esquema de Supabase (`supabase gen types`).
+### 🧠 Búsqueda Semántica con IA (Costo: $0)
 
-## 🏗️ Arquitectura Basada en Módulos
+El descubrimiento de productos funciona con embeddings locales de transformers (`transformers.js` / `all-MiniLM-L6-v2`) almacenados en columnas PostgreSQL `vector(384)` con **índices HNSW** vía pgvector. La generación incremental de embeddings procesa únicamente productos nuevos o modificados. Esto ofrece búsqueda basada en significado sin costo de API externa ni latencia adicional — el modelo corre completamente dentro del runtime de Node.js.
 
-El proyecto ha sido migrado a una arquitectura modular basada en **módulos de dominio**, donde cada dominio de negocio es un módulo autocontenido:
+---
+
+## Architecture & System Design
+
+### Control de Acceso Basado en Roles (RBAC via RLS)
+
+El sistema implementa un modelo RBAC declarativo directamente en PostgreSQL mediante las **políticas de Row Level Security (RLS)** de Supabase, eliminando la dependencia de lógica de autorización en el código de la aplicación. Esto garantiza que incluso si un atacante logra bypassar la capa de aplicación (Server Actions), la base de datos misma rechaza las operaciones no autorizadas.
+
+Se definen **tres roles funcionales** con privilegios estrictamente separados:
+
+```text
+┌─────────────────────────────────────────────────────────────────────┐
+│                    MODELO RBAC (Supabase RLS)                       │
+├──────────────────┬──────────────────────────────────────────────────┤
+│ Rol              │ Privilegios                                      │
+├──────────────────┼──────────────────────────────────────────────────┤
+│ Visitante (anon) │ SELECT en products, artists, group_orders        │
+│                  │ Sin INSERT/UPDATE/DELETE en ninguna tabla         │
+├──────────────────┼──────────────────────────────────────────────────┤
+│ Participante     │ SELECT en su propia fila (group_order_            │
+│ (authenticated)  │   participants WHERE auth.uid() = user_id)       │
+│                  │ INSERT su propia fila al unirse a un GO           │
+│                  │ Sin UPDATE/DELETE (protege pagos procesados)      │
+├──────────────────┼──────────────────────────────────────────────────┤
+│ Manager/Admin    │ CRUD completo en products (vía is_admin check)   │
+│ (authenticated + │ Lectura de audit_logs y blocked_ips              │
+│  profiles.       │ Ejecución de Server Actions protegidas           │
+│  is_admin=true)  │   con requireAdmin() + verifyAdmin()            │
+├──────────────────┼──────────────────────────────────────────────────┤
+│ service_role     │ Bypass total de RLS — exclusivo del backend      │
+│ (backend only)   │ INSERT en orders, audit_logs (Server Actions)    │
+│                  │ ALL en group_orders, group_order_participants     │
+└──────────────────┴──────────────────────────────────────────────────┘
+```
+
+**Decisiones de diseño clave:**
+
+- **`orders` INSERT solo `service_role`**: Las órdenes se crean exclusivamente desde Server Actions con `createAdminClient()`. Se eliminó la política `TO public` que permitía inserciones anónimas directas — un participante no puede fabricar una orden sin pasar por la verificación de Stripe/MercadoPago.
+- **`group_order_participants` sin UPDATE/DELETE para el usuario**: Un participante puede unirse (INSERT su fila), pero no puede modificar ni borrar su participación una vez que hay pagos procesados. Solo el backend (`service_role`) puede actualizar el estado de pagos, protegiendo la integridad financiera.
+- **Verificación de admin en dos capas**: Las Server Actions (`createProduct`, `deleteProduct`, `generateShippingInvoices`) verifican el rol admin en servidor con `requireAdmin()` (sesión + dominio de email + `profiles.is_admin`) — independiente del `AdminGuard` del cliente. Patrón **fail-closed**: cualquier error de BD niega el acceso.
+
+### Data Flow & Concurrency
+
+#### Prevención de Race Conditions en Inventario
+
+Durante un pico de ventas (ej. lanzamiento de photocard set limitado), cientos de usuarios pueden intentar comprar el último ítem simultáneamente. Sin protección, esto resulta en **overselling** — vender más unidades de las disponibles en stock.
+
+La solución implementa **bloqueo pesimista a nivel de fila** en PostgreSQL:
+
+```sql
+-- supabase/inventory.sql
+CREATE OR REPLACE FUNCTION decrement_stock(
+    product_id UUID,
+    quantity_to_decrement INTEGER
+) RETURNS JSONB
+LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  current_stock INTEGER;
+  new_stock     INTEGER;
+BEGIN
+  -- 1. SELECT FOR UPDATE adquiere un row-level lock exclusivo.
+  --    Cualquier transacción concurrente que intente leer esta fila
+  --    QUEDA BLOQUEADA hasta que esta transacción haga COMMIT o ROLLBACK.
+  SELECT stock INTO current_stock
+  FROM products WHERE id = product_id
+  FOR UPDATE;
+
+  -- 2. Verificación atómica: si el stock no alcanza, RAISE aborta
+  --    la transacción completa — no se modifica ningún dato.
+  IF current_stock < quantity_to_decrement THEN
+    RAISE EXCEPTION 'Insufficient stock: requested %, available %',
+                     quantity_to_decrement, current_stock;
+  END IF;
+
+  -- 3. Decremento seguro: ejecutado dentro del mismo lock,
+  --    garantiza que nadie más modificó el stock entre el SELECT y el UPDATE.
+  new_stock := current_stock - quantity_to_decrement;
+  UPDATE products SET stock = new_stock WHERE id = product_id;
+
+  RETURN jsonb_build_object('success', true, 'new_stock', new_stock);
+END; $$;
+```
+
+**¿Por qué `SELECT FOR UPDATE` en lugar de un UPDATE con WHERE condicional?**
+
+Un `UPDATE products SET stock = stock - 1 WHERE stock > 0` *es* atómico, pero no proporciona feedback útil: si no se actualizó ninguna fila, el caller no sabe si fue por stock insuficiente o porque el `product_id` no existe. Con `SELECT FOR UPDATE` + `RAISE EXCEPTION`, el webhook de Stripe recibe un error explícito que se registra en audit logs con `logAuditAction('INVENTORY_SYNC_FAILED', {...})` para trazabilidad operacional.
+
+**Flujo completo durante un pico de ventas:**
+
+```text
+Stripe Event: checkout.session.completed
+  │
+  ├─→ Webhook valida firma + versión de API
+  ├─→ Parsea items de metadata (UUID regex + quantity bounds)
+  │
+  └─→ Para cada item:
+        │
+        ├─→ supabaseAdmin.rpc('decrement_stock', { product_id, quantity })
+        │     │
+        │     ├─→ PostgreSQL adquiere row lock (FOR UPDATE)
+        │     ├─→ Verifica stock disponible
+        │     ├─→ Decrementa atómicamente
+        │     └─→ Libera lock → siguiente transacción en cola procede
+        │
+        └─→ Si error → logAuditAction('INVENTORY_SYNC_FAILED') + continúa con el siguiente item
+```
+
+#### Restricciones Adicionales a Nivel de Base de Datos
+
+```sql
+-- group_order_participants: constraints que la aplicación no puede violar
+items_count    INTEGER NOT NULL DEFAULT 0 CHECK (items_count >= 0),
+total_weight   NUMERIC(10, 2) NOT NULL DEFAULT 0 CHECK (total_weight >= 0),
+UNIQUE (group_order_id, user_id)  -- Un usuario no puede unirse dos veces al mismo GO
+```
+
+El constraint `UNIQUE (group_order_id, user_id)` funciona como **última línea de defensa** contra participaciones duplicadas: incluso si la aplicación fallara en validar la unicidad, PostgreSQL rechaza la inserción a nivel de storage engine.
+
+### Estrategia de Idempotencia
+
+Los pagos en e-commerce fallan por red, timeouts, o reintentos automáticos de los procesadores de pago. Sin idempotencia, un webhook que se ejecuta dos veces puede producir **cobros duplicados** o **doble decremento de inventario**.
+
+Se implementan **tres niveles de idempotencia**:
+
+#### 1. Idempotencia en Webhooks de MercadoPago
+
+```typescript
+// src/app/api/webhooks/mercadopago/route.ts
+
+// Paso 3: Verificación de idempotencia ANTES de cualquier escritura
+const { data: existingOrder } = await supabase
+    .from('orders')
+    .select('status')
+    .eq('mp_payment_id', String(paymentId))
+    .maybeSingle();
+
+if (existingOrder?.status === 'PAID') {
+    // Webhook duplicado — retornar 200 sin modificar nada
+    return new NextResponse('Already processed', { status: 200 });
+}
+
+// Paso 5: Upsert con onConflict — operación atómica e idempotente
+const { error } = await supabase
+    .from('orders')
+    .upsert(
+        { mp_payment_id: String(paymentId), status: 'PAID', ... },
+        { onConflict: 'mp_payment_id', ignoreDuplicates: false }
+    );
+```
+
+**Doble protección:** primero un SELECT explícito (cortocircuita sin tocar la BD), luego un UPSERT con `onConflict` (el segundo webhook que pase el SELECT no duplica la fila).
+
+#### 2. Idempotencia en Generación de Facturas de Envío
+
+```typescript
+// src/app/actions/generateShippingInvoices.ts
+
+// Filtrar participantes que ya tienen payment link (idempotencia)
+const pending = rows.filter(r => !r.ems_payment_link_url);
+```
+
+Si el organizador ejecuta `generateShippingInvoices()` dos veces (error de red, doble clic), la función **salta automáticamente** a los participantes que ya tienen un `ems_payment_link_url` persistido — no se crean Stripe Products/Prices duplicados.
+
+#### 3. Idempotencia en Webhooks de Stripe
+
+El webhook `payment_intent.succeeded` usa el `order_id` de los metadata del PaymentIntent como clave natural:
+
+```typescript
+// src/app/api/webhooks/stripe/route.ts
+
+// UPDATE (no INSERT): solo cambia el status de una orden existente
+await supabaseAdmin
+    .from('orders')
+    .update({ status: 'paid' })
+    .eq('id', orderId);
+
+// Si Stripe reintenta el webhook, el UPDATE es un no-op
+// (ya estaba en 'paid' — no hay efecto secundario)
+```
+
+**Flujo de reintentos de Stripe:** si el UPDATE falla (error de red a Supabase), el webhook retorna `500` — Stripe reintenta automáticamente hasta 3 días. Cuando el reintento llega y el UPDATE ya se aplicó, es un **no-op seguro**.
+
+---
+
+## Arquitectura del Proyecto
+
+### Arquitectura Modular por Dominio
 
 ```text
 src/features/
-├── auth/         # Autenticación (login, registro, sesión)
-├── product/      # Catálogo, servicios de artistas, búsqueda
+├── auth/         # Autenticación (login, registro, gestión de sesión)
+├── product/      # Catálogo, servicios de artistas, búsqueda semántica
 ├── cart/         # Carrito de compras (store Zustand)
-├── checkout/     # Flujo de pago y órdenes (Zod schemas, validations)
+├── checkout/     # Flujo de pago, creación de órdenes (esquemas Zod)
 └── components/
-    └── gamification/ # ShareToUnlock, NextPurchaseCoupon
+    └── gamification/  # ShareToUnlock, NextPurchaseCoupon
 ```
 
-- **API Pública (`index.ts`)**: Cada módulo exporta únicamente lo necesario a través de su `index.ts`, ocultando la implementación interna.
-- **Aplicación de Límites**: Regla ESLint `no-restricted-imports` con patrón `@/features/*/*` que prohíbe importaciones profundas entre módulos.
-- **Alias de Ruta**: `@/features/*`, `@/ui/*`, `@/lib/*` configurados en `tsconfig.json` para imports limpios.
+Cada módulo expone una **API pública** a través de su `index.ts` — las importaciones profundas entre módulos están prohibidas mediante reglas ESLint (`no-restricted-imports`).
 
-## 🔗 Cadena de Middlewares (Patrón Cadena)
-
-El middleware de Next.js ha sido refactorizado en una **cadena componible** de responsabilidades:
+### Cadena Componible de Middlewares
 
 ```text
-Request → withSecurityHeaders → withRateLimit → withAuth → withI18n → Response
+Request → Headers de Seguridad → Límite de Tasa → Auth → i18n → Response
 ```
 
-| Middleware | Responsabilidad |
-|---|---|
-| `withSecurityHeaders` | CSP, HSTS, X-Frame-Options |
-| `withRateLimit` | Límite de peticiones por IP |
-| `withAuth` | Validación de sesión Supabase y protección de rutas |
-| `withI18n` | Detección de locale, cookie `NEXT_LOCALE`, reescritura de rutas |
+| Middleware             | Responsabilidad                                       |
+|------------------------|-------------------------------------------------------|
+| `withSecurityHeaders`  | CSP, HSTS, X-Frame-Options                            |
+| `withRateLimit`        | Limitación de peticiones por IP                        |
+| `withAuth`             | Validación de sesión Supabase y protección de rutas    |
+| `withI18n`             | Detección de locale, persistencia en cookie, reescritura de URL |
 
-- **Matcher**: `/((?!api|_next|_vercel|.*\\..*).*)` — Excluye API, assets estáticos y archivos internos de Next.js.
-- **Utilidad `chain.ts`**: Implementa el patrón de manejador en pila con tipo `CustomMiddleware` para encadenar middlewares de forma declarativa.
-
-## 🔒 Sistema de Tipos Estricto
-
-Tipado extremo a extremo desde la base de datos hasta la interfaz:
-
-- **Tipos de Dominio** (`src/types/domain.ts`): `Product`, `OrderItem`, `User`, `Order` con status y métodos de pago tipados.
-- **Enums con `as const`** (`src/types/enums.ts`): `OrderStatus` y `PaymentMethod` para eliminación óptima de código muerto.
-- **`ActionResponse<T>`** (`src/types/api.ts`): Tipo discriminado (unión) para respuestas consistentes de Server Actions.
-- **Tipos de UI** (`src/types/ui.ts`): `ProductListProps`, `ClassNameProps`, `ChildrenProps` centralizados.
-- **Validación Isomórfica**: Esquemas Zod (`src/schemas/auth.ts`) compartidos entre cliente (`react-hook-form` + `zodResolver`) y servidor (Server Actions con `safeParse`).
-- **Mapa de Errores Global**: `src/lib/zod-error-map.ts` con traducción automática de errores de validación.
-
-## 🤖 DevOps & Automatización GitHub
-
-- **Dependabot** (`.github/dependabot.yml`): Actualización semanal de `npm` (lunes 09:00) y mensual de `github-actions`. Límite de 10 PRs abiertos.
-- **Auto-Merge** (`.github/workflows/dependabot-automerge.yml`): Merge automático de PRs de Dependabot para actualizaciones patch/minor que pasen CI.
-- **CodeQL** (`.github/workflows/codeql.yml`): Análisis estático de seguridad en push, PR y cron semanal.
-- **Secret Scanning & Push Protection**: Activado en el repositorio para bloquear pushes con secretos expuestos.
-
-
-## 📂 Estructura del Proyecto
+### Tipado Seguro Extremo a Extremo
 
 ```text
-src/
-├── app/              # Rutas, Layouts e Internacionalización (next-intl)
-├── components/       # UI Atómica y Organismos complejos
-├── content/          # Contenido estático en Markdown (terms, privacy)
-├── context/          # Estado global (Zustand) y Lógica de Negocio
-├── features/         # Módulos de dominio (auth, product, cart, checkout)
-│   └── [feature]/
-│       ├── components/
-│       ├── hooks/
-│       ├── services/
-│       └── index.ts  # API Pública
-├── lib/              # Supabase clients, utilidades y helpers
-├── middlewares/      # Cadena de middlewares (Seguridad, Auth, i18n, Límite de tasa)
-├── schemas/          # Esquemas Zod (validación isomórfica)
-├── types/            # Tipos de dominio, API, UI y enums
-├── middleware.ts     # Punto de entrada de la cadena de middlewares
-└── scripts/          # Herramientas de IA y mantenimiento
+Esquema Supabase → Tipos Generados → Tipos de Dominio → Esquemas Zod → React Hook Form → UI
 ```
 
-## 🛠️ Instalación y Desarrollo
-
-1. **Dependencias**: `npm install`
-2. **Entorno**: Configurar `.env.local` con claves de Supabase y Stripe.
-3. **Desarrollo**: `npm run dev`
-4. **Pruebas**: `npm test` o `npm run test:coverage` para ver el reporte detallado.
-
-## 🔧 Correcciones de Bugs Críticos
-
-### Crash de Checkout (Stripe `Elements` Context)
-- **Problema**: La página `/checkout` crasheaba con `"Could not find Elements context"` porque `ExpressPaymentButton` llamaba a `useStripe()` antes de que el `clientSecret` estuviera disponible, renderizándose fuera del wrapper `<Elements>`.
-- **Solución**: `StripeElementsProvider` ahora **siempre** envuelve a los hijos en `<Elements>`. Cuando no hay `clientSecret`, usa `mode: 'payment'` como fallback. Se añadió `key={clientSecret ?? 'loading'}` para forzar un remount limpio al recibir el `clientSecret`, evitando corrupción del contexto Stripe.
-- **`ExpressPaymentButton`**: Añadido guard `isLoading` desde el contexto para evitar inicializar `paymentRequest` prematuramente.
-
-### Páginas de Redirección Post-Pago (`/success` y `/cancel`)
-- **Problema**: Stripe redirigía a `/{locale}/success` (404) y a `/{locale}/` al cancelar (sin feedback). MercadoPago enviaba fallos y pagos pendientes a `/checkout`.
-- **Solución**: Creada página `/cancel` con mensaje contextual (`?reason=failed` diferencia pago rechazado de cancelación voluntaria) y dos CTAs. Página `/success` corregida: `Link` de `next/link` → `@/navigation` (locale-aware). `cancel_url` de Stripe apunta a `/{locale}/cancel`; `failure` de MercadoPago a `/{locale}/cancel?reason=failed`; `pending` a `/{locale}/success`. Ruta `/cancel` registrada en `navigation.ts`.
-
-### Dropdown de Búsqueda Persistente
-- **Problema**: Al buscar y navegar a la página de resultados, el dropdown de sugerencias permanecía visible superpuesto sobre los resultados.
-- **Solución**: Se limpian los arrays `suggestions[]` y `products[]` tanto al navegar vía `debouncedQuery` como al seleccionar una sugerencia en `handleSuggestionSelect`.
-
-### Claves de Traducción Faltantes (`MISSING_MESSAGE`)
-- **Problema**: El namespace `Validations` (con "s") no contenía las claves `acceptTerms` ni `phoneMin`, usadas por el schema Zod del checkout. Existían solo en el namespace `Validation` (sin "s").
-- **Solución**: Añadidas las claves faltantes al namespace `Validations` en los 4 locales (`es`, `en`, `fr-CA`, `pt-BR`).
-
-## 🌍 Corrección de Uniformidad de Rutas (i18n)
-
-Con `localePrefix: 'always'`, todas las rutas deben incluir prefijo de locale. Se identificaron y corrigieron componentes que usaban `useRouter` de `next/navigation` en lugar de `@/navigation`, lo que provocaba redirecciones sin prefijo (p. ej. `/` en vez de `/es/`):
-
-- **`useAdmin.tsx` (`AdminGuard`)**: `router.push('/')` al detectar no-admin ahora usa `useRouter` de `@/navigation`.
-- **`profile/page.tsx`**: `router.push('/')` en logout y redirección por sesión inválida ahora preserva el locale del usuario.
-
-Componentes correctos que no requirieron cambio: `HeaderNav`, `HeaderSearch` (ya importaban de `@/navigation`); `useProductFilters` (usa `usePathname` de `next/navigation` que devuelve el path con locale ya embebido, correcto para actualizar query params en la misma página).
-
-## 📊 Gestión de Estados Vacíos (Admin Dashboard)
-
-Mejora de la percepción de la aplicación cuando no hay datos de ventas:
-
-- **KPI Cards**: Muestran `—` con texto explicativo ("Sin pedidos registrados aún") cuando `totalRevenue === 0` o `totalOrders === 0`, en lugar de mostrar `$0.00` o conteos confusos.
-- **`SalesChart`**: Condición mejorada `data.length === 0 || data.every(d => d.total === 0)` con icono `TrendingUp` semitransparente, mensaje principal y hint contextual.
-- **`CategoryChart`**: Condición mejorada `data.length === 0 || totalCount === 0` que cubre el caso donde la RPC devuelve categorías con `count: 0` (antes mostraba solo la leyenda sin gráfico ni mensaje).
-
-## 🔐 Hardening de Seguridad (Ronda 2)
-
-Correcciones aplicadas tras auditoría de código:
-
-### Políticas RLS en `fix_all_rls.sql`
-- **Problema**: El script de emergencia contenía `UPDATE public.profiles SET is_admin = true` (promovía a todos los usuarios a administrador) y políticas INSERT `TO public` en `orders` y `audit_logs` (cualquier cliente podía insertar órdenes o logs directamente).
-- **Solución**: Eliminada la línea de promoción masiva; políticas INSERT de `orders` y `audit_logs` cambiadas de `TO public` a `TO service_role`. El script ahora incluye advertencia explícita de no ejecutar en producción sin revisión.
-
-### Tipado estricto en AdminDashboard
-- **Problema**: `salesData` y `categoryData` tenían tipo `any[]`, anulando las garantías de TypeScript. El `reduce` de categorías accedía a `.total` (campo inexistente en `CategoryData`) produciendo siempre `totalOrders = 0`.
-- **Solución**: Añadidas interfaces `SalesData { date: string; total: number }` y `CategoryData { category: string; count: number }`. Corregido el `reduce` para usar `.count`. Eliminados los comentarios `eslint-disable`.
-
-### Sanitización de mensajes de error en Server Actions
-- **Problema**: `createProduct`, `updateProduct` y `deleteProduct` concatenaban `error.message` de Supabase directamente en la respuesta al cliente, filtrando posibles detalles internos (nombres de tablas, constraints).
-- **Solución**: Los mensajes al cliente son ahora genéricos (`'Error al guardar el producto. Inténtalo de nuevo.'`). El `error.message` real se preserva únicamente en `console.error` y `logAuditAction` para trazabilidad servidor.
-
-### Fail-fast en clientes Supabase
-- **Problema**: `supabaseClient.ts` usaba `|| 'placeholder-key'` y `|| 'https://placeholder.supabase.co'` como fallback, permitiendo que la app arrancara silenciosamente con credenciales inválidas. `client.ts` y `server.ts` usaban el operador `!` (solo compilador, sin protección en runtime).
-- **Solución**: Los cuatro clientes (`supabaseClient.ts`, `client.ts`, `server.ts`, `admin.ts`) extraen las variables de entorno en constantes y lanzan `throw new Error('FATAL: ...')` inmediatamente si alguna está ausente. `admin.ts` ya tenía este patrón; los demás fueron alineados.
-
-## 🔐 Hardening de Seguridad (Ronda 3)
-
-Correcciones aplicadas tras segunda auditoría de rutas API:
-
-### `POST /api/create-payment-intent` — Autenticación y límites de monto
-- **Problema**: Cualquier visitante podía crear PaymentIntents de Stripe sin autenticación, sin tope de monto y con cualquier moneda, permitiendo abusar del saldo de la cuenta.
-- **Solución**: Verificación de sesión con `supabase.auth.getUser()` → 401. Validación estricta: `Number.isInteger(amount)`, `MIN_AMOUNT = 100`, `MAX_AMOUNT = 1_000_000`. Lista blanca de monedas `VALID_CURRENCIES = new Set(['mxn', 'usd'])`. UUID regex en `orderId`. `user_id` añadido a `metadata` del PaymentIntent.
-
-### `POST /api/create-preference` — Descuento manipulable desde el cliente
-- **Problema**: El campo `discountAmount` llegaba directamente desde el body del cliente sin verificación; un atacante podía aplicar cualquier descuento arbitrario. Sin autenticación y sin validación de ítems.
-- **Solución**: Autenticación obligatoria → 401. Reemplazado `discountAmount` (client-supplied) por `promoCodeId` + `usePoints`: el descuento se calcula completamente en el servidor mediante `stripe.promotionCodes.retrieve()` y consulta a `users.loyalty_points`. Agregados `VALID_LOCALES`, `MAX_ITEMS = 50`, `MAX_QUANTITY = 99` y UUID regex por ítem. Se reemplazó el cliente browser de Supabase por `createClient()` de `@/lib/supabase/server`.
-
-### `POST /api/csp-reports` — Inyección de logs
-- **Problema**: El endpoint registraba el cuerpo crudo del reporte sin sanitizar, permitiendo inyección de caracteres de control/saltos de línea en los logs del servidor. Sin límite de tamaño de payload.
-- **Solución**: Límite `MAX_BODY_BYTES = 8 192`. Lista blanca `CSP_FIELDS` con los 11 campos estándar de CSP. Función `sanitize()` que elimina caracteres de control `\x00-\x1f\x7f` y trunca a 500 caracteres por campo. El log solo incluye campos conocidos y saneados.
-
-### `GET /api/doc` — Spec OpenAPI sin autenticación
-- **Problema**: El handler devolvía la especificación OpenAPI completa (endpoints, esquemas, parámetros) a cualquier visitante sin ningún control de acceso.
-- **Solución**: Agregado `requireAdmin()` antes de servir el spec; devuelve 401/403 según el motivo del rechazo.
-
-### Helper compartido `requireAdmin()`
-- **Creado** `src/lib/supabase/requireAdmin.ts`: verifica sesión, dominio de email (`NEXT_PUBLIC_ADMIN_DOMAIN`) y `profiles.is_admin` en ese orden. Patrón fail-closed — cualquier error de BD niega el acceso. Reutilizado en `GET /api/doc` y `GET /api/docs`, eliminando lógica duplicada.
-
-### `GET /api/products/similar` — Service role key y validación de parámetros
-- **Problema**: El handler instanciaba `createClient` de `@supabase/supabase-js` directamente con `SUPABASE_SERVICE_ROLE_KEY`, bypassando todas las políticas RLS. El parámetro `limit` usaba `parseInt` sin verificar `NaN` (podía devolver todas las filas). `productId` sin validación UUID.
-- **Solución**: Reemplazado por `createClient` compartido de `@/lib/supabase/server` (usa `anon key` + RLS). UUID regex en `productId` → 400. Límite seguro: `Number.isInteger(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 10) : 4`.
-
-### `GET /api/rewards/download` — Cliente Supabase inline con `!` non-null
-- **Problema**: El handler instanciaba `createServerClient` de `@supabase/ssr` directamente usando `NEXT_PUBLIC_SUPABASE_URL!` y `NEXT_PUBLIC_SUPABASE_ANON_KEY!` (operadores `!` sin protección en runtime). Sin validación UUID en el parámetro `id`.
-- **Solución**: Reemplazado por `createClient` de `@/lib/supabase/server` (centraliza cookies y fail-fast de env vars). UUID regex en `rewardId` → 400 si inválido o ausente. El uso de `createAdminClient()` para generar signed URLs permanece correcto (requiere service role, y la auth se verifica primero con anon client).
-
-## 🔐 Hardening de Seguridad (Ronda 4)
-
-Correcciones aplicadas tras auditoría de Server Actions:
-
-### `src/app/actions/admin.ts` — UUID y tryAudit wrapper
-- **Problema**: `updateProduct` y `deleteProduct` usaban `formData.id` / `productId` directamente en `.eq()` sin validar formato UUID. Si `logAuditAction` lanzaba excepción, una operación DB exitosa devolvía `{ success: false }`.
-- **Solución**: Agregado `UUID_REGEX` con validación previa al bloque `try` en ambas funciones. Creado wrapper `tryAudit(action, metadata)` que captura excepciones de `logAuditAction` con `console.error` sin propagarlas, garantizando que el resultado de la acción refleje el estado real de la BD.
-
-### `src/app/actions/audit.ts` — Eliminación de fallback silencioso a anon key
-- **Problema**: El cliente Supabase se inicializaba a nivel de módulo con `|| process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'`. En ausencia de `SUPABASE_SERVICE_ROLE_KEY`, todos los inserts a `audit_logs` fallaban bajo RLS sin ningún aviso en arranque.
-- **Solución**: Eliminado el cliente a nivel de módulo y la importación de `@supabase/supabase-js`. Reemplazado por `createAdminClient()` inicializado perezosamente dentro de `logAuditAction()` — fail-fast si la service role key está ausente, error capturado por el try/catch existente.
-
-### `src/app/actions/generateShippingInvoices.ts` — Guard admin, paralelismo y sanitización
-- **Problema**: La función carecía de verificación de rol de administrador, por lo que cualquier usuario autenticado podía invocarla. El procesamiento de participantes era secuencial (`for...of`), saturando el servidor con GOs grandes. La instancia de `Resend` se creaba dentro del loop de emails.
-- **Solución**: Agregado `requireAdmin()` al inicio — lanza excepción en unauthenticated/forbidden. Agregado `UUID_REGEX` en `groupOrderId`. Reemplazado el loop por `Promise.allSettled` sobre todos los participantes (las 3 llamadas Stripe de cada uno siguen siendo secuenciales internamente: product → price → paymentLink). La instancia `new Resend()` se crea una sola vez fuera del map, y los emails se envían en paralelo con `Promise.allSettled`. Los errores por participante se reducen a mensaje genérico para el caller; el error real va solo a `console.error` y audit log.
-
-### `src/app/actions/getReviewsAction.ts` — Cambio a cliente servidor y error explícito
-- **Problema**: La acción usaba `supabase` de `@/lib/supabaseClient` (cliente browser con anon key), y devolvía `[]` silenciosamente en caso de error de BD, ocultando problemas al caller.
-- **Solución**: Reemplazado por `createClient()` de `@/lib/supabase/server`. Agregado `UUID_REGEX` en `productId` → throw. Parámetros `page` y `limit` saneados con `Math.max`/`Math.min` (límite `MAX_LIMIT = 50`). Eliminado el `return []` en error; ahora lanza `new Error('Error al obtener las reseñas.')` para que el caller pueda reaccionar.
-
-### `src/app/actions/goUpdates.ts` — Auth, validación de inputs y contención de notifyParticipants
-- **Problema**: `publishGoUpdate` no verificaba que el actor fuera admin ni validaba longitud de inputs. `notifyParticipants` estaba exportada como Server Action independiente, permitiendo que cualquier usuario autenticado enviase correos masivos a participantes con un `updateId` conocido.
-- **Solución**: Agregado `requireAdmin()` en `publishGoUpdate` (retorna `{ error }` en lugar de lanzar, para preservar el flujo UI). UUID regex en `groupOrderId`. Constantes `MAX_TITLE_LENGTH = 255` y `MAX_CONTENT_LENGTH = 10 000` validadas antes del insert. Eliminado `export` de `notifyParticipants` — ahora es función interna invocable solo desde `publishGoUpdate`. Agregada verificación UUID dentro de `notifyParticipants` como defensa en profundidad.
-
-## 🔐 Hardening de Seguridad (Ronda 5)
-
-Correcciones aplicadas tras auditoría de Server Actions (segunda tanda):
-
-### `src/app/actions/health.ts` — Guard admin y cliente inline
-- **Problema**: `checkSystemHealth` era una Server Action exportada sin autenticación; cualquier cliente podía invocarla para confirmar disponibilidad del sistema y obtener latencia, memoria y uptime. Usaba `createClient` de `@supabase/supabase-js` con `|| placeholder-key` fallback.
-- **Solución**: Agregado `requireAdmin()` al inicio — lanza excepción en unauthenticated/forbidden. Reemplazado cliente inline por `createAdminClient()`. Eliminado import de `@supabase/supabase-js`.
-
-### `src/app/actions/loyalty.ts` — Race condition y falta de auth
-- **Problema**: El guard `.gte('loyalty_points', POINTS_COST)` en el UPDATE era correcto a nivel PostgreSQL, pero Supabase devuelve `error: null` aunque 0 filas sean afectadas — el código no verificaba el resultado, por lo que requests concurrentes recibían `{ success: true }` sin haber deducido puntos. Además, `userId` llegaba del caller sin verificar que el actor fuera ese mismo usuario.
-- **Solución**: Agregado `.select('loyalty_points')` al UPDATE y verificación `updated.length === 0` → error en vez de success. Agregado `createClient().auth.getUser()` con `user.id !== userId` → `{ error: 'No autorizado.' }`. Agregado `UUID_REGEX` en `userId`.
-
-### `src/app/actions/orders.ts` — Sin auth, Stripe no bloqueaba y inputs del cliente
-- **Problema**: Cualquier script podía llamar `saveOrder(anyUserId, 0, [...])` y crear una orden con `status: 'paid'`. La verificación de Stripe solo condicionaba la extracción de metadata (`agreedAt`, `userAgent`) pero no bloqueaba el insert si `payment_status !== 'paid'`. `total` e `items` venían del cliente sin validar. Cliente módulo-nivel con `|| placeholder`. `revalidateTag` llamado con 2 argumentos (solo acepta uno). Errores internos concatenados al caller.
-- **Solución**: `auth.getUser()` + `user.id !== userId` → error. Si `sessionId` presente y `payment_status !== 'paid'` o error Stripe → return error (bloquea insert). Bounds: `MAX_ITEMS = 50`, `MAX_TOTAL = 1_000_000`, `total > 0`. `UUID_REGEX` en `userId` e `item.product_id`. Reemplazado cliente módulo-nivel por `createAdminClient()` lazy. Corregido `revalidateTag`. Sanitizados mensajes de error al caller.
-
-### `src/app/actions/privacy.ts` — IDOR y cliente browser
-- **Problema**: `getUserData(userId)` aceptaba el `userId` como parámetro sin verificar que el caller fuera ese usuario — IDOR completo: cualquier usuario autenticado podía exportar órdenes y reseñas de otra persona con solo conocer su UUID. Usaba `supabase` de `@/lib/supabaseClient` (cliente browser con anon key) en un Server Action.
-- **Solución**: Eliminado el parámetro `userId` — ahora siempre se deriva de `auth.getUser()` en el servidor. Reemplazado cliente browser por `createClient()` de `@/lib/supabase/server`. Actualizado `profile/page.tsx`: `getUserData(user.id)` → `getUserData()`.
-
-### `src/app/actions/profile.ts` — Token en parámetro, fallback silencioso y bug null-check
-- **Problema**: `updateProfile(token, formData)` y `getProfile(token)` recibían el `session.access_token` del cliente como argumento, enviando JWTs en cada llamada. Variables módulo-nivel con `|| 'placeholder-key'`. Bug: `phone !== undefined` siempre era `true` porque `formData.get()` retorna `null` (no `undefined`) cuando el campo no existe — sobreescribía phone/address en cada submit aunque no se enviaran. Sin límites de longitud en campos sensibles.
-- **Solución**: Eliminados parámetros `token` de ambas funciones; auth verificada vía cookies SSR con `createClient()` de `@/lib/supabase/server`. Eliminados `createAuthenticatedClient`, variables módulo-nivel y import de `@supabase/supabase-js`. Corregido `!== undefined` → `!== null`. Agregados `MAX_PHONE_LENGTH = 20` y `MAX_ADDRESS_LENGTH = 500`. Actualizado `profile/page.tsx`: eliminados guards de `session.access_token` y llamadas con token.
+- **Tipos de dominio** (`Product`, `Order`, `User`) con enums de estado tipados vía `as const`
+- **`ActionResponse<T>`** unión discriminada para respuestas consistentes de Server Actions
+- **Esquemas Zod isomórficos** compartidos entre `zodResolver` (cliente) y `safeParse` (servidor)
+- **Mapa de errores global** con traducción automática i18n de mensajes de validación
 
 ---
-## 📄 Licencia
+
+## Getting Started (Local Development)
+
+### Prerrequisitos
+
+| Herramienta | Versión mínima | Instalación |
+|---|---|---|
+| **Node.js** | ≥ 18.17 | [nodejs.org](https://nodejs.org/) |
+| **pnpm** *(recomendado)* | ≥ 9 | `npm install -g pnpm` |
+| **Supabase CLI** | ≥ 1.100 | `npm install -g supabase` |
+| **Docker** *(opcional)* | ≥ 24 | [docker.com](https://www.docker.com/) |
+
+Adicionalmente necesitas:
+- Un proyecto en [Supabase](https://supabase.com/) con la extensión **pgvector** habilitada
+- Una cuenta de [Stripe](https://stripe.com/) en modo **Test**
+- *(Opcional)* Una cuenta de [MercadoPago Developers](https://www.mercadopago.com.mx/developers/) para pagos LATAM
+
+---
+
+### Paso 1 — Clonar e instalar dependencias
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/KimJesus22/StanStore.git
+cd StanStore
+
+# Instalar dependencias (pnpm recomendado para mayor velocidad y dedup)
+pnpm i
+
+# Alternativa con npm
+npm install
+```
+
+---
+
+### Paso 2 — Configurar variables de entorno
+
+Crea el archivo `.env.local` en la raíz del proyecto:
+
+```bash
+cp .env.example .env.local
+```
+
+Complétalo con las siguientes variables:
+
+| Variable | Requerida | Descripción | Dónde obtenerla |
+|---|:---:|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | URL de tu proyecto Supabase | Supabase Dashboard → Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Clave pública (anon) de Supabase | Supabase Dashboard → Settings → API → `anon` `public` |
+| `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Clave de servicio (bypasa RLS) | Supabase Dashboard → Settings → API → `service_role` `secret` |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | ✅ | Clave pública de Stripe (test) | Stripe Dashboard → Developers → API Keys → Publishable key |
+| `STRIPE_SECRET_KEY` | ✅ | Clave secreta de Stripe (test) | Stripe Dashboard → Developers → API Keys → Secret key |
+| `STRIPE_WEBHOOK_SECRET` | ✅ | Secreto de firma de webhooks | Stripe CLI: `stripe listen --forward-to localhost:3000/api/webhooks/stripe` |
+| `STRIPE_API_VERSION` | ✅ | Versión de API de Stripe | Usar `'2025-01-27.acacia'` o consultar tu Stripe Dashboard |
+| `NEXT_PUBLIC_BASE_URL` | ✅ | URL base de la app | `http://localhost:3000` para desarrollo local |
+| `ENCRYPTION_KEY` | ✅ | Clave AES-256 para cifrado de datos sensibles | Generar con: `openssl rand -hex 32` |
+| `NEXT_PUBLIC_ADMIN_DOMAIN` | ⚠️ | Dominio de email para verificación de admin | Ej: `@stanstore.com` — los admins deben tener email con este dominio |
+| `MP_ACCESS_TOKEN` | ⬜ | Token de acceso MercadoPago (test) | MercadoPago Developers → Tus integraciones → Credenciales de prueba |
+| `NEXT_PUBLIC_MP_PUBLIC_KEY` | ⬜ | Clave pública MercadoPago (test) | MercadoPago Developers → Tus integraciones → Credenciales de prueba |
+| `MP_WEBHOOK_SECRET` | ⬜ | Secreto de webhook MercadoPago | MercadoPago Dashboard → Webhooks → Tu endpoint |
+| `SPOTIFY_CLIENT_ID` | ⬜ | Client ID de Spotify API | [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) |
+| `SPOTIFY_CLIENT_SECRET` | ⬜ | Client Secret de Spotify API | Spotify Developer Dashboard → Tu app → Settings |
+| `YOUTUBE_API_KEY` | ⬜ | API Key de YouTube Data v3 | [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services |
+| `RESEND_API_KEY` | ⬜ | API Key de Resend (email transaccional) | [Resend Dashboard](https://resend.com/) → API Keys |
+
+> **✅** = Requerida para arrancar | **⚠️** = Recomendada | **⬜** = Opcional (funcionalidad específica)
+
+> [!CAUTION]
+> **Nunca subas el archivo `.env.local` al repositorio.** El `.gitignore` ya incluye el patrón `.env*` para prevenir fugas accidentales. Además, el proyecto incluye un test de seguridad automatizado (`npm run test:security`) que bloquea el build si detecta claves administrativas (`SERVICE_ROLE_KEY`) expuestas al cliente.
+
+---
+
+### Paso 3 — Ejecutar migraciones de base de datos
+
+Conecta el CLI de Supabase a tu proyecto y aplica todas las migraciones SQL:
+
+```bash
+# Vincular el CLI a tu proyecto remoto
+supabase link --project-ref <tu-project-ref>
+
+# Aplicar todas las migraciones (esquemas, RLS, funciones, triggers)
+supabase db push
+```
+
+Los archivos de migración se encuentran en `supabase/` e incluyen:
+
+| Archivo | Contenido |
+|---|---|
+| `schema.sql` | Esquema base de tablas |
+| `group_orders.sql` | Tablas de pedidos grupales, RLS y vista de resumen |
+| `inventory.sql` | Función `decrement_stock()` con `SELECT FOR UPDATE` |
+| `fix_all_rls.sql` | Políticas RLS hardeneadas (14 tablas) |
+| `products_vector.sql` | Columna `vector(384)` e índice HNSW para búsqueda semántica |
+| `loyalty_rewards.sql` | Sistema de puntos y recompensas |
+| `audit_v2.sql` | Audit logs inmutables con metadatos de latencia |
+
+> [!TIP]
+> Si prefieres trabajar con Supabase **local** (sin proyecto remoto), ejecuta `supabase start` para levantar una instancia PostgreSQL en Docker y luego `supabase db push` contra ella.
+
+---
+
+### Paso 4 — Iniciar el servidor de desarrollo
+
+```bash
+# Iniciar con Turbopack (compilación incremental ultra-rápida)
+pnpm dev
+# o con npm
+npm run dev
+```
+
+La aplicación estará disponible en **http://localhost:3000**.
+
+Para escuchar webhooks de Stripe en desarrollo local:
+
+```bash
+# En otra terminal — reenvía eventos de Stripe a tu servidor local
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+```
+
+---
+
+### Comandos útiles
+
+```bash
+# Tests unitarios (Vitest + Happy-DOM)
+pnpm test
+
+# Tests con reporte de cobertura
+pnpm test:coverage
+
+# Test de seguridad (bloquea build si hay fugas de secretos)
+pnpm test:security
+
+# Verificar claves de traducción i18n
+pnpm i18n:check
+
+# Lanzar Storybook (explorador de componentes)
+pnpm storybook
+
+# Analizar el tamaño del bundle
+pnpm analyze
+
+# Generar tipos TypeScript desde el esquema de Supabase
+pnpm update-types
+```
+
+---
+
+### Docker (alternativa)
+
+```bash
+# Construir e iniciar la app contenerizada
+docker compose up --build -d
+
+# Detener contenedores
+docker compose down
+```
+
+---
+
+## DevOps y CI/CD
+
+| Herramienta         | Configuración                                                        |
+|---------------------|----------------------------------------------------------------------|
+| **Dependabot**      | Actualizaciones npm semanales (lunes 09:00), GitHub Actions mensual  |
+| **Auto-Merge**      | Merge automático para PRs patch/minor de Dependabot que pasen CI     |
+| **CodeQL**          | Análisis estático de seguridad en push, PR y cron semanal            |
+| **Husky**           | Hooks pre-commit con `lint-staged` (ESLint + Vitest)                 |
+| **Sentry**          | Monitoreo de errores con carga de source maps en CI                  |
+| **Secret Scanning** | Push protection activado para bloquear credenciales expuestas        |
+
+---
+
+## Licencia
+
 Este proyecto es de código abierto bajo la [Licencia MIT](LICENSE).
+
+---
+
+<p align="center">
+  Construido con ☕ y 🎵 por <a href="https://github.com/KimJesus22">@KimJesus22</a>
+</p>
