@@ -41,7 +41,7 @@
     "canvas-confetti": "^1.9.4",
     "cookies-next": "^6.1.1",
     "date-fns": "^4.1.0",
-    "dompurify": "^3.3.1",
+    "dompurify": "^3.4.2",
     "framer-motion": "^12.38.0",
     "gray-matter": "^4.0.3",
     "jspdf": "^4.2.1",
