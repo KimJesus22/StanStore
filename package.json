@@ -59,7 +59,7 @@
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "resend": "^6.12.2",
-    "serwist": "^9.5.7",
+    "serwist": "^9.5.11",
     "stripe": "^20.4.1",
     "styled-components": "^6.3.12",
     "zod": "^4.3.6",
